@@ -28,9 +28,9 @@ namespace EasyIotSharp.Core.Repositories.TenantAccount.Impl
             // 初始化条件
             var predicate = PredicateBuilder.New<Menu>(m => m.IsDelete == false);
 
-            if (isSugerAdmin>-1)
+            if (isSugerAdmin > -1)
             {
-                predicate = predicate.And(m => m.IsSuperAdmin == (isSugerAdmin == 1 ? true : false)) ;
+                predicate = predicate.And(m => m.IsSuperAdmin == (isSugerAdmin == 1 ? true : false));
             }
 
             // 关键字模糊查询
@@ -51,7 +51,7 @@ namespace EasyIotSharp.Core.Repositories.TenantAccount.Impl
             {
                 return (0, new List<Menu>());
             }
-            if (isPage==true)
+            if (isPage == true)
             {
                 // 手动拼接排序和分页逻辑
                 var query = Client.Queryable<Menu>().Where(predicate)
@@ -126,7 +126,7 @@ namespace EasyIotSharp.Core.Repositories.TenantAccount.Impl
                 Icon = menu.Icon,
                 Url = menu.Url,
                 Type = menu.Type,
-                Sort=menu.Sort,
+                Sort = menu.Sort,
                 IsSuperAdmin = menu.IsSuperAdmin,
                 IsEnable = menu.IsEnable,
                 Children = GetChildren(menu.Id, menuList)
@@ -150,6 +150,10 @@ namespace EasyIotSharp.Core.Repositories.TenantAccount.Impl
             else if (input.Type == 3)
             {
                 IsVerify = false;
+            }
+            else if (input.Id != null)
+            {
+                IsVerify = await Client.Queryable<Menu>().AnyAsync(x => x.ParentId == input.ParentId && x.IsDelete == false && x.Type == input.Type && x.Url == input.Url);
             }
             else
             {
@@ -179,7 +183,7 @@ namespace EasyIotSharp.Core.Repositories.TenantAccount.Impl
                 OperatorId = child.OperatorId,
                 OperatorName = child.OperatorName,
                 ParentId = child.ParentId,
-                Sort=child.Sort,
+                Sort = child.Sort,
                 Name = child.Name,
                 Icon = child.Icon,
                 Url = child.Url,

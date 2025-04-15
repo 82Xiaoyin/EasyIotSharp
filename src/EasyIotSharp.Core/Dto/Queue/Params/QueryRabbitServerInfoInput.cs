@@ -9,5 +9,10 @@ namespace EasyIotSharp.Core.Dto.Queue.Params
         /// 关键字（主机地址/用户名）
         /// </summary>
         public string Keyword { get; set; }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public int IsEnable { get; set; }
     }
 }

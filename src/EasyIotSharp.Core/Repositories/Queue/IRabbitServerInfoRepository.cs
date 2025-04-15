@@ -19,6 +19,6 @@ namespace EasyIotSharp.Core.Repositories.Queue
         /// <param name="pageSize">每页多少条</param>
         /// <param name="isPage">是否分页</param>
         /// <returns></returns>
-        Task<(int totalCount, List<RabbitServerInfo> items)> Query(int tenantNumId, string keyword, int pageIndex, int pageSize, bool isPage = true);
+        Task<(int totalCount, List<RabbitServerInfo> items)> Query(int tenantNumId, string keyword, int isEnable,int pageIndex, int pageSize, bool isPage = true);
     }
 }

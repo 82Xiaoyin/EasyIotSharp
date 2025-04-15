@@ -54,7 +54,7 @@ namespace EasyIotSharp.Core.Services.Queue.Impl
             var entity = new RabbitServerInfo
             {
                 Id = Guid.NewGuid().ToString().Replace("-", ""),
-                TenantNumId= ContextUser.TenantNumId,
+                TenantNumId = ContextUser.TenantNumId,
                 Host = input.Host.Trim(),
                 Port = input.Port,
                 Username = input.Username.Trim(),
@@ -129,7 +129,7 @@ namespace EasyIotSharp.Core.Services.Queue.Impl
         /// </summary>
         public async Task<PagedResultDto<RabbitServerInfoDto>> QueryRabbitServerInfo(QueryRabbitServerInfoInput input)
         {
-            var query = await _rabbitServerInfoRepository.Query(ContextUser.TenantNumId, input.Keyword,input.PageIndex, input.PageSize, input.IsPage);
+            var query = await _rabbitServerInfoRepository.Query(ContextUser.TenantNumId, input.Keyword, input.IsEnable, input.PageIndex, input.PageSize, input.IsPage);
             var list = query.items.MapTo<List<RabbitServerInfoDto>>();
             return new PagedResultDto<RabbitServerInfoDto>(query.totalCount, list);
         }

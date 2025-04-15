@@ -25,7 +25,7 @@ namespace EasyIotSharp.Core.Repositories.Queue.Impl
         /// <param name="pageSize">每页记录数</param>
         /// <param name="isPage">是否分页</param>
         /// <returns>返回总记录数和分页数据</returns>
-        public async Task<(int totalCount, List<RabbitServerInfo> items)> Query(int tenantNumId, string keyword, int pageIndex, int pageSize, bool isPage = true)
+        public async Task<(int totalCount, List<RabbitServerInfo> items)> Query(int tenantNumId, string keyword, int isEnable, int pageIndex, int pageSize, bool isPage = true)
         {
             // 初始化条件
             var predicate = PredicateBuilder.New<RabbitServerInfo>(r => r.IsDelete == false);
@@ -41,6 +41,11 @@ namespace EasyIotSharp.Core.Repositories.Queue.Impl
             {
                 keyword = keyword.Trim();
                 predicate = predicate.And(r => r.Host.Contains(keyword) || r.Username.Contains(keyword));
+            }
+
+            if (isEnable > -1)
+            {
+                predicate = predicate.And(r => r.IsEnable == (isEnable == 0 ? true : false));
             }
 
             // 获取总记录数
