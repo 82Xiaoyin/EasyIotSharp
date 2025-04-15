@@ -107,11 +107,11 @@ namespace EasyIotSharp.GateWay.Core.Socket
     public class GatewayConnectionManager
     {
         public easyiotsharpContext _easyiotsharpContext;
-        
+
         // 修改为懒加载单例模式
         private static volatile GatewayConnectionManager _instance;
         private static readonly object _lock = new object();
-    
+
         /// <summary>
         /// 单例实例
         /// </summary>
@@ -136,19 +136,39 @@ namespace EasyIotSharp.GateWay.Core.Socket
 
         private readonly Timer _statusCheckTimer;
         private const int STATUS_CHECK_INTERVAL = 30000; // 30秒检查一次
-        private const int GATEWAY_TIMEOUT = 60000; // 60秒没有心跳就认为离线
-        
+        private const int GATEWAY_TIMEOUT = 360000; // 60秒没有心跳就认为离线
+
         /// <summary>
         /// 连接ID到网关连接信息的映射
         /// </summary>
         private static readonly ConcurrentDictionary<IntPtr, GatewayConnectionInfo> _connectionMap =
             new ConcurrentDictionary<IntPtr, GatewayConnectionInfo>();
-    
+
         /// <summary>
         /// 网关ID到连接ID的映射
         /// </summary>
         private static readonly ConcurrentDictionary<string, IntPtr> _gatewayMap =
             new ConcurrentDictionary<string, IntPtr>();
+
+        /// <summary>
+        /// 添加新连接
+        /// </summary>
+        public void AddConnection(IntPtr connId, string ip, ushort port)
+        {
+            var connectionInfo = new GatewayConnectionInfo
+            {
+                ConnId = connId,
+                IP = ip,
+                Port = port,
+                ConnectTime = DateTime.Now,
+                LastActiveTime = DateTime.Now,
+                ReceivedPackets = 0,
+                ReceivedBytes = 0,
+                IsRegistered = false
+            };
+
+            _connectionMap.TryAdd(connId, connectionInfo);
+        }
 
         public GatewayConnectionManager(easyiotsharpContext easyiotsharpContext)
         {
@@ -343,7 +363,7 @@ namespace EasyIotSharp.GateWay.Core.Socket
                 }
             }
         }
-         
+
         /// <summary>
         /// 通过网关ID获取连接信息
         /// </summary>
