@@ -882,6 +882,11 @@
             交换机名称
             </summary>
         </member>
+        <member name="P:EasyIotSharp.Core.Domain.Queue.RabbitServerInfo.IsEnable">
+            <summary>
+            是否启用
+            </summary>
+        </member>
         <member name="T:EasyIotSharp.Core.Domain.TenantAccount.Menu">
             <summary>
             租户菜单表
@@ -2982,6 +2987,11 @@
             交换机名称
             </summary>
         </member>
+        <member name="P:EasyIotSharp.Core.Dto.Queue.Params.InsertRabbitServerInfoInput.IsEnable">
+            <summary>
+            是否启用
+            </summary>
+        </member>
         <member name="T:EasyIotSharp.Core.Dto.Queue.Params.QueryRabbitServerInfoInput">
             <summary>
             查询RabbitMQ服务器配置信息的入参类
@@ -3032,6 +3042,11 @@
             交换机名称
             </summary>
         </member>
+        <member name="P:EasyIotSharp.Core.Dto.Queue.Params.UpdateRabbitServerInfoInput.IsEnable">
+            <summary>
+            是否启用
+            </summary>
+        </member>
         <member name="T:EasyIotSharp.Core.Dto.Queue.RabbitServerInfoDto">
             <summary>
             代表一条RabbitMQ服务器配置信息的"DTO"
@@ -3070,6 +3085,11 @@
         <member name="P:EasyIotSharp.Core.Dto.Queue.RabbitServerInfoDto.Exchange">
             <summary>
             交换机名称
+            </summary>
+        </member>
+        <member name="P:EasyIotSharp.Core.Dto.Queue.RabbitServerInfoDto.IsEnable">
+            <summary>
+            是否启用
             </summary>
         </member>
         <member name="T:EasyIotSharp.Core.Dto.TenantAccount.MenuDto">
@@ -5554,6 +5574,13 @@
             <param name="menuList"></param>
             <returns></returns>
         </member>
+        <member name="M:EasyIotSharp.Core.Repositories.TenantAccount.IMenuRepository.VerifyMenu(EasyIotSharp.Core.Dto.TenantAccount.Params.InsertMenuInput)">
+            <summary>
+            验证
+            </summary>
+            <param name="input"></param>
+            <returns></returns>
+        </member>
         <member name="M:EasyIotSharp.Core.Repositories.TenantAccount.Impl.MenuRepository.#ctor(EasyIotSharp.Core.Repositories.Mysql.ISqlSugarDatabaseProvider)">
             <summary>
             构造函数
@@ -5571,6 +5598,13 @@
             <summary>
             构建菜单树形结构
             </summary>
+        </member>
+        <member name="M:EasyIotSharp.Core.Repositories.TenantAccount.Impl.MenuRepository.VerifyMenu(EasyIotSharp.Core.Dto.TenantAccount.Params.InsertMenuInput)">
+            <summary>
+            验证
+            </summary>
+            <param name="input"></param>
+            <returns></returns>
         </member>
         <member name="M:EasyIotSharp.Core.Repositories.TenantAccount.Impl.MenuRepository.GetChildren(System.String,System.Collections.Generic.List{EasyIotSharp.Core.Dto.TenantAccount.MenuDto})">
             <summary>
@@ -6311,7 +6345,7 @@
             <param name="input"></param>
             <returns></returns>
         </member>
-        <member name="M:EasyIotSharp.Core.Services.TenantAccount.IMenuService.UpdateMenu(EasyIotSharp.Core.Dto.TenantAccount.Params.UpdateMenuInput)">
+        <member name="M:EasyIotSharp.Core.Services.TenantAccount.IMenuService.UpdateMenu(EasyIotSharp.Core.Dto.TenantAccount.Params.InsertMenuInput)">
             <summary>
             通过id修改一条菜单信息
             </summary>

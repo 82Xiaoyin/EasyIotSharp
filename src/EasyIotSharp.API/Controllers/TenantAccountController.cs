@@ -31,7 +31,7 @@ namespace EasyIotSharp.API.Controllers
             _soldierService = UPrime.UPrimeEngine.Instance.Resolve<ISoldierService>();
             _menuService = UPrime.UPrimeEngine.Instance.Resolve<IMenuService>();
             _roleService = UPrime.UPrimeEngine.Instance.Resolve<IRoleService>();
-            _soldierRoleService= UPrime.UPrimeEngine.Instance.Resolve<ISoldierRoleService>();
+            _soldierRoleService = UPrime.UPrimeEngine.Instance.Resolve<ISoldierRoleService>();
             _rabbitServerInfoService = UPrime.UPrimeEngine.Instance.Resolve<IRabbitServerInfoService>();
         }
 
@@ -168,7 +168,7 @@ namespace EasyIotSharp.API.Controllers
         /// <returns></returns>
         [HttpPost("/TenantAccount/Menu/Query")]
         [Authorize]
-        public async Task<UPrimeResponse<PagedResultDto<MenuTreeDto>>> QueryMenu([FromBody]QueryMenuInput input)
+        public async Task<UPrimeResponse<PagedResultDto<MenuTreeDto>>> QueryMenu([FromBody] QueryMenuInput input)
         {
             UPrimeResponse<PagedResultDto<MenuTreeDto>> res = new UPrimeResponse<PagedResultDto<MenuTreeDto>>();
             res.Result = await _menuService.QueryMenu(input);
@@ -209,7 +209,7 @@ namespace EasyIotSharp.API.Controllers
         /// <returns></returns>
         [HttpPost("/TenantAccount/Menu/Insert")]
         [Authorize]
-        public async Task<UPrimeResponse> InsertMenu([FromBody]InsertMenuInput input)
+        public async Task<UPrimeResponse> InsertMenu([FromBody] InsertMenuInput input)
         {
             await _menuService.InsertMenu(input);
             return new UPrimeResponse();
@@ -222,7 +222,7 @@ namespace EasyIotSharp.API.Controllers
         /// <returns></returns>
         [HttpPost("/TenantAccount/Menu/Update")]
         [Authorize]
-        public async Task<UPrimeResponse> UpdateMenu([FromBody]UpdateMenuInput input)
+        public async Task<UPrimeResponse> UpdateMenu([FromBody] InsertMenuInput input)
         {
             await _menuService.UpdateMenu(input);
             return new UPrimeResponse();

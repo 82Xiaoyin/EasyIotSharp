@@ -5,6 +5,7 @@ using System.Linq.Expressions;
 using System.Threading.Tasks;
 using EasyIotSharp.Core.Domain.TenantAccount;
 using EasyIotSharp.Core.Dto.TenantAccount;
+using EasyIotSharp.Core.Dto.TenantAccount.Params;
 using EasyIotSharp.Core.Repositories.Mysql;
 using EasyIotSharp.Repositories.Mysql;
 using LinqKit;
@@ -132,6 +133,29 @@ namespace EasyIotSharp.Core.Repositories.TenantAccount.Impl
             }).OrderBy(x => x.Sort).ToList();
 
             return tree;
+        }
+
+        /// <summary>
+        /// 验证
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
+        public async Task<bool> VerifyMenu(InsertMenuInput input)
+        {
+            bool IsVerify = true;
+            if (input.ParentId == null)
+            {
+                IsVerify = await Client.Queryable<Menu>().AnyAsync(x => x.IsDelete == false && x.Type == input.Type && (x.Name == input.Name || x.Url == input.Url));
+            }
+            else if (input.Type == 3)
+            {
+                IsVerify = false;
+            }
+            else
+            {
+                IsVerify = await Client.Queryable<Menu>().AnyAsync(x => x.ParentId == input.ParentId && x.IsDelete == false && x.Type == input.Type && (x.Name == input.Name || x.Url == input.Url));
+            }
+            return IsVerify;
         }
 
         /// <summary>

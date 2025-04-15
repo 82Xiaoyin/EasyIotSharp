@@ -47,7 +47,7 @@ namespace EasyIotSharp.Core.Services.TenantAccount.Impl
                 throw new BizException(BizError.BIND_EXCEPTION_ERROR, "未找到指定资源");
             }
             // 查询菜单数据
-            var query = await _menuRepository.Query(soldier.IsSuperAdmin == true ? -1 : 0, input.Keyword, input.IsEnable, input.PageIndex, input.PageSize,false);
+            var query = await _menuRepository.Query(soldier.IsSuperAdmin == true ? -1 : 0, input.Keyword, input.IsEnable, input.PageIndex, input.PageSize, false);
             int totalCount = query.totalCount;
             var list = query.items.MapTo<List<MenuDto>>();
 
@@ -56,15 +56,15 @@ namespace EasyIotSharp.Core.Services.TenantAccount.Impl
             return new PagedResultDto<MenuTreeDto>() { TotalCount = totalCount, Items = tree };
         }
 
-        public async Task<(List<QueryMenuBySoldierIdOutput> output,List<Menu> menus)> QueryMenuBySoldierId(bool isTreeResult = true)
+        public async Task<(List<QueryMenuBySoldierIdOutput> output, List<Menu> menus)> QueryMenuBySoldierId(bool isTreeResult = true)
         {
             var soldier = await _soldierRepository.FirstOrDefaultAsync(x => x.IsDelete == false && x.Id == ContextUser.UserId);
             if (soldier.IsNull())
             {
-                throw new BizException(BizError.BIND_EXCEPTION_ERROR,"未找到指定资源");
+                throw new BizException(BizError.BIND_EXCEPTION_ERROR, "未找到指定资源");
             }
             var menus = new List<Menu>();
-            if (soldier.IsSuperAdmin==true)
+            if (soldier.IsSuperAdmin == true)
             {
                 menus = await _menuRepository.GetAllAsync();
             }
@@ -73,11 +73,11 @@ namespace EasyIotSharp.Core.Services.TenantAccount.Impl
                 var soldierRoles = await _soldierRoleRepository.QueryBySoldierId(ContextUser.UserId);
                 if (soldierRoles.Count <= 0)
                 {
-                    return (new List<QueryMenuBySoldierIdOutput>(),new List<Menu>());
+                    return (new List<QueryMenuBySoldierIdOutput>(), new List<Menu>());
                 }
                 var soldierRoleIds = soldierRoles.Select(x => x.RoleId).ToList();
                 var roles = await _roleRepository.QueryByIds(soldierRoleIds);
-                if (roles.Count<=0)
+                if (roles.Count <= 0)
                 {
                     return (new List<QueryMenuBySoldierIdOutput>(), new List<Menu>());
                 }
@@ -90,17 +90,17 @@ namespace EasyIotSharp.Core.Services.TenantAccount.Impl
                 var menuIds = roleMenus.Select(x => x.MenuId).ToList();
                 menus = await _menuRepository.QueryByIds(menuIds);
             }
-            
-            if (menus.Count<=0)
+
+            if (menus.Count <= 0)
             {
                 return (new List<QueryMenuBySoldierIdOutput>(), new List<Menu>());
             }
-            if (isTreeResult==false)
+            if (isTreeResult == false)
             {
                 return (new List<QueryMenuBySoldierIdOutput>(), menus);
             }
             List<QueryMenuBySoldierIdOutput> output = new List<QueryMenuBySoldierIdOutput>();
-            var firstMenus = menus.Where(x => string.IsNullOrWhiteSpace(x.ParentId)).OrderBy(x=>x.CreationTime).ToList();
+            var firstMenus = menus.Where(x => string.IsNullOrWhiteSpace(x.ParentId)).OrderBy(x => x.CreationTime).ToList();
             foreach (var item in firstMenus)
             {
                 QueryMenuBySoldierIdOutput model = new QueryMenuBySoldierIdOutput();
@@ -153,13 +153,13 @@ namespace EasyIotSharp.Core.Services.TenantAccount.Impl
 
         public async Task InsertMenu(InsertMenuInput input)
         {
-            var isExist = await _menuRepository.FirstOrDefaultAsync(x => x.IsDelete == false && x.Type == input.Type && (x.Name == input.Name || x.Url == input.Url));
-            if (isExist.IsNotNull())
+            var isExist = await _menuRepository.VerifyMenu(input);
+            if (isExist)
             {
                 throw new BizException(BizError.BIND_EXCEPTION_ERROR, "菜单名称或路由重复");
             }
             var model = new Menu();
-            model.Id= Guid.NewGuid().ToString().Replace("-", "");
+            model.Id = Guid.NewGuid().ToString().Replace("-", "");
             model.ParentId = input.ParentId;
             model.Name = input.Name;
             model.Icon = input.Icon;
@@ -175,15 +175,15 @@ namespace EasyIotSharp.Core.Services.TenantAccount.Impl
             await _menuRepository.InsertAsync(model);
         }
 
-        public async Task UpdateMenu(UpdateMenuInput input)
+        public async Task UpdateMenu(InsertMenuInput input)
         {
             var info = await _menuRepository.GetByIdAsync(input.Id);
             if (info.IsNull())
             {
                 throw new BizException(BizError.BIND_EXCEPTION_ERROR, "未找到指定数据");
             }
-            var isExist = await _menuRepository.FirstOrDefaultAsync(x => x.Id != input.Id && x.IsDelete == false && x.Type == info.Type && (x.Name == input.Name || x.Url == input.Url));
-            if (isExist.IsNotNull())
+            var isExist = await _menuRepository.VerifyMenu(input);
+            if (isExist)
             {
                 throw new BizException(BizError.BIND_EXCEPTION_ERROR, "菜单名称或路由重复");
             }
@@ -206,7 +206,7 @@ namespace EasyIotSharp.Core.Services.TenantAccount.Impl
             {
                 throw new BizException(BizError.BIND_EXCEPTION_ERROR, "未找到指定数据");
             }
-            if (info.IsEnable!=input.IsEnable)
+            if (info.IsEnable != input.IsEnable)
             {
                 info.IsEnable = input.IsEnable;
                 info.OperatorId = ContextUser.UserId;

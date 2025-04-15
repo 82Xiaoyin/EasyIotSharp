@@ -61,6 +61,7 @@ namespace EasyIotSharp.Core.Services.Queue.Impl
                 Password = input.Password,
                 VirtualHost = input.VirtualHost?.Trim(),
                 Exchange = input.Exchange?.Trim(),
+                IsEnable = input.IsEnable,
                 CreationTime = DateTime.Now,
                 UpdatedAt = DateTime.Now,
                 OperatorId = ContextUser.UserId,
@@ -98,6 +99,7 @@ namespace EasyIotSharp.Core.Services.Queue.Impl
             entity.Password = input.Password;
             entity.VirtualHost = input.VirtualHost?.Trim();
             entity.Exchange = input.Exchange?.Trim();
+            entity.IsEnable = input.IsEnable;
             entity.UpdatedAt = DateTime.Now;
             entity.OperatorId = ContextUser.UserId;
             entity.OperatorName = ContextUser.UserName;
@@ -112,7 +114,7 @@ namespace EasyIotSharp.Core.Services.Queue.Impl
         {
             var entity = await _rabbitServerInfoRepository.FirstOrDefaultAsync(x => x.Id == input.Id && x.IsDelete == false);
             if (entity.IsNull())
-                throw new BizException(BizError.BIND_EXCEPTION_ERROR, "未找到指定的资源");
+                throw new BizException(BizError.NO_HANDLER_FOUND, "未找到指定的资源");
 
             entity.IsDelete = true;
             entity.DeleteTime = DateTime.Now;

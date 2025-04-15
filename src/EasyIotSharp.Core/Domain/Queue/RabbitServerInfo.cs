@@ -44,5 +44,10 @@ namespace EasyIotSharp.Core.Domain.Queue
         /// </summary>
         public string Exchange { get; set; }
 
+        /// <summary>
+        /// 是否启用
+        /// </summary>
+        public bool IsEnable { get; set; }
+
     }
 }

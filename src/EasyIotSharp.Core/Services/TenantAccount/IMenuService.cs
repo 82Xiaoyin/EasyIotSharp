@@ -50,7 +50,7 @@ namespace EasyIotSharp.Core.Services.TenantAccount
         /// </summary>
         /// <param name="input"></param>
         /// <returns></returns>
-        Task UpdateMenu(UpdateMenuInput input);
+        Task UpdateMenu(InsertMenuInput input);
 
         /// <summary>
         /// 通过id修改一条菜单是否启用状态
