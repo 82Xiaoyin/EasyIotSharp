@@ -99,7 +99,7 @@ namespace EasyIotSharp.Core.Services.Project.Impl
                 addRabbitProject.Id = Guid.NewGuid().ToString().Replace("-", "");
                 addRabbitProject.RabbitServerInfoId = input.RabbitServerInfoId;
                 addRabbitProject.ProjectId = info.Id;
-                await _projectBaseRepository.AddRabbitProject(rabbitProject);
+                await _projectBaseRepository.AddRabbitProject(addRabbitProject);
             }
         }
 
