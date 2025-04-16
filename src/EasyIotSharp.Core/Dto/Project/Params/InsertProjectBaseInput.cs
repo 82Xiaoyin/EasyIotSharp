@@ -10,6 +10,10 @@ namespace EasyIotSharp.Core.Dto.Project.Params
     public class InsertProjectBaseInput
     {
         /// <summary>
+        /// 项目id
+        /// </summary>
+        public string Id { get; set; }
+        /// <summary>
         /// 服务器配置表Id
         /// </summary>
         public string RabbitServerInfoId { get; set; } 

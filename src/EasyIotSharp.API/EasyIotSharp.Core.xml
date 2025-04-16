@@ -852,6 +852,11 @@
             是否报警
             </summary>
         </member>
+        <member name="T:EasyIotSharp.Core.Domain.Queue.RabbitProject">
+            <summary>
+            配置项目关系表
+            </summary>
+        </member>
         <member name="T:EasyIotSharp.Core.Domain.Queue.RabbitServerInfo">
             <summary>
             RabbitMQ服务器配置信息表
@@ -2496,6 +2501,16 @@
             添加一个项目信息的入参类
             </summary>
         </member>
+        <member name="P:EasyIotSharp.Core.Dto.Project.Params.InsertProjectBaseInput.Id">
+            <summary>
+            项目id
+            </summary>
+        </member>
+        <member name="P:EasyIotSharp.Core.Dto.Project.Params.InsertProjectBaseInput.RabbitServerInfoId">
+            <summary>
+            服务器配置表Id
+            </summary>
+        </member>
         <member name="P:EasyIotSharp.Core.Dto.Project.Params.InsertProjectBaseInput.Name">
             <summary>
             项目名称
@@ -2660,6 +2675,11 @@
             传感器Id
             </summary>
         </member>
+        <member name="P:EasyIotSharp.Core.Dto.Project.Params.QuerySensorPointInput.State">
+            <summary>
+            状态
+            </summary>
+        </member>
         <member name="T:EasyIotSharp.Core.Dto.Project.Params.UpdateClassificationInput">
             <summary>
             通过id修改一条项目分类的入参类
@@ -2738,6 +2758,11 @@
         <member name="P:EasyIotSharp.Core.Dto.Project.Params.UpdateProjectBaseInput.Id">
             <summary>
             项目id
+            </summary>
+        </member>
+        <member name="P:EasyIotSharp.Core.Dto.Project.Params.UpdateProjectBaseInput.RabbitServerInfoId">
+            <summary>
+            服务器配置表Id
             </summary>
         </member>
         <member name="P:EasyIotSharp.Core.Dto.Project.Params.UpdateProjectBaseInput.Name">
@@ -2828,6 +2853,16 @@
         <member name="P:EasyIotSharp.Core.Dto.Project.ProjectBaseDto.Name">
             <summary>
             项目名称
+            </summary>
+        </member>
+        <member name="P:EasyIotSharp.Core.Dto.Project.ProjectBaseDto.RabbitServerInfoId">
+            <summary>
+            RabbitServerInfoId
+            </summary>
+        </member>
+        <member name="P:EasyIotSharp.Core.Dto.Project.ProjectBaseDto.Host">
+            <summary>
+            主机地址
             </summary>
         </member>
         <member name="P:EasyIotSharp.Core.Dto.Project.ProjectBaseDto.Longitude">
@@ -2954,7 +2989,7 @@
         </member>
         <member name="P:EasyIotSharp.Core.Dto.Project.SensorPointDto.State">
             <summary>
-            网关名称
+            状态
             </summary>
         </member>
         <member name="P:EasyIotSharp.Core.Dto.Project.SensorPointDto.SensorId">
@@ -5550,6 +5585,13 @@
             <param name="pageSize">每页多少条数据</param>
             <returns></returns>
         </member>
+        <member name="M:EasyIotSharp.Core.Repositories.Project.IProjectBaseRepository.QueryByProjectBaseFirst(System.String)">
+            <summary>
+            根据ID拿到一条
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
         <member name="M:EasyIotSharp.Core.Repositories.Project.IProjectBaseRepository.QueryByIds(System.Collections.Generic.List{System.String})">
             <summary>
             根据ID集合查询项目列表
@@ -5557,7 +5599,27 @@
             <param name="ids">ID集合</param>
             <returns></returns>
         </member>
-        <member name="M:EasyIotSharp.Core.Repositories.Project.ISensorPointRepository.Query(System.Int32,System.String,System.String,System.String,System.String,System.String,System.Int32,System.Int32,System.Boolean)">
+        <member name="M:EasyIotSharp.Core.Repositories.Project.IProjectBaseRepository.QueryRabbitProject(System.String)">
+            <summary>
+            根据ID拿到一条
+            </summary>
+            <param name="projectId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EasyIotSharp.Core.Repositories.Project.IProjectBaseRepository.AddRabbitProject(EasyIotSharp.Core.Domain.Queue.RabbitProject)">
+            <summary>
+            新增
+            </summary>
+            <param name="rabbitProject"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EasyIotSharp.Core.Repositories.Project.IProjectBaseRepository.UpdateRabbitProject(EasyIotSharp.Core.Domain.Queue.RabbitProject)">
+            <summary>
+            修改
+            </summary>
+            <param name="rabbitProject"></param>
+        </member>
+        <member name="M:EasyIotSharp.Core.Repositories.Project.ISensorPointRepository.Query(System.Int32,System.String,System.String,System.String,System.String,System.String,System.Int32,System.Int32,System.Int32,System.Boolean)">
             <summary>
             通过条件分页查询项目分类列表
             </summary>
