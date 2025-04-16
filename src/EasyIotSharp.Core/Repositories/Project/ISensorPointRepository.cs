@@ -28,10 +28,11 @@ namespace EasyIotSharp.Core.Repositories.Project
                                                               string classificationId,
                                                               string gatewayId,
                                                               string sensorId,
+                                                              int state,
                                                               int pageIndex,
                                                               int pageSize,
                                                               bool isPage);
-        
+
         /// <summary>
         /// 获取列表数据
         /// </summary>

@@ -10,6 +10,7 @@ using EasyIotSharp.Core.Dto.Tenant;
 using UPrime.AutoMapper;
 using EasyIotSharp.Core.Dto.TenantAccount.Params;
 using EasyIotSharp.Core.Domain.Proejct;
+using EasyIotSharp.Core.Domain.Queue;
 
 namespace EasyIotSharp.Core.Services.Project.Impl
 {
@@ -24,7 +25,7 @@ namespace EasyIotSharp.Core.Services.Project.Impl
 
         public async Task<ProjectBaseDto> GetProjectBase(string id)
         {
-            var info = await _projectBaseRepository.FirstOrDefaultAsync(x => x.Id == id && x.IsDelete == false);
+            var info = await _projectBaseRepository.QueryByProjectBaseFirst(id);
             return info.MapTo<ProjectBaseDto>();
         }
 
@@ -59,6 +60,11 @@ namespace EasyIotSharp.Core.Services.Project.Impl
             model.OperatorId = ContextUser.UserId;
             model.OperatorName = ContextUser.UserName;
             await _projectBaseRepository.InsertAsync(model);
+
+            var rabbitProject = new RabbitProject();
+            rabbitProject.RabbitServerInfoId = input.RabbitServerInfoId;
+            rabbitProject.ProjectId = model.Id;
+            await _projectBaseRepository.AddRabbitProject(rabbitProject);
         }
 
         public async Task UpdateProjectBase(UpdateProjectBaseInput input)
@@ -78,6 +84,14 @@ namespace EasyIotSharp.Core.Services.Project.Impl
             info.OperatorId = ContextUser.UserId;
             info.OperatorName = ContextUser.UserName;
             await _projectBaseRepository.UpdateAsync(info);
+
+            var rabbitProject = await _projectBaseRepository.QueryRabbitProject(info.Id);
+            if (rabbitProject != null) 
+            {
+                rabbitProject.RabbitServerInfoId = input.RabbitServerInfoId;
+                rabbitProject.ProjectId = info.Id;
+                await _projectBaseRepository.UpdateRabbitProject(rabbitProject);
+            }
         }
 
         public async Task UpdateStateProjectBase(UpdateStateProjectBaseInput input)
@@ -104,6 +118,17 @@ namespace EasyIotSharp.Core.Services.Project.Impl
                 info.OperatorName = ContextUser.UserName;
                 await _projectBaseRepository.UpdateAsync(info);
             }
+
+            var rabbitProject = await _projectBaseRepository.QueryRabbitProject(info.Id);
+            if (rabbitProject != null)
+            {
+                rabbitProject.IsDelete = input.IsDelete;
+                rabbitProject.UpdatedAt = DateTime.Now;
+                rabbitProject.OperatorId = ContextUser.UserId;
+                rabbitProject.OperatorName = ContextUser.UserName;
+                await _projectBaseRepository.UpdateRabbitProject(rabbitProject);
+            }
+            ;
         }
     }
 }

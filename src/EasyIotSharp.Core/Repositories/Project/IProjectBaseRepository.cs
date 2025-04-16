@@ -1,4 +1,6 @@
 ﻿using EasyIotSharp.Core.Domain.Proejct;
+using EasyIotSharp.Core.Domain.Queue;
+using EasyIotSharp.Core.Dto.Project;
 using EasyIotSharp.Core.Repositories.Mysql;
 using System;
 using System.Collections.Generic;
@@ -20,7 +22,7 @@ namespace EasyIotSharp.Core.Repositories.Project
         /// <param name="pageIndex">起始页</param>
         /// <param name="pageSize">每页多少条数据</param>
         /// <returns></returns>
-        Task<(int totalCount, List<ProjectBase> items)> Query(int tenantNumId,
+        Task<(int totalCount, List<ProjectBaseDto> items)> Query(int tenantNumId,
                                                               string keyword,
                                                               int state,
                                                               DateTime? createStartTime,
@@ -29,10 +31,37 @@ namespace EasyIotSharp.Core.Repositories.Project
                                                               int pageSize);
 
         /// <summary>
+        /// 根据ID拿到一条
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        Task<ProjectBaseDto> QueryByProjectBaseFirst(string id);
+
+        /// <summary>
         /// 根据ID集合查询项目列表
         /// </summary>
         /// <param name="ids">ID集合</param>
         /// <returns></returns>
         Task<List<ProjectBase>> QueryByIds(List<string> ids);
+
+        /// <summary>
+        /// 根据ID拿到一条
+        /// </summary>
+        /// <param name="projectId"></param>
+        /// <returns></returns>
+        Task<RabbitProject> QueryRabbitProject(string projectId);
+
+        /// <summary>
+        /// 新增
+        /// </summary>
+        /// <param name="rabbitProject"></param>
+        /// <returns></returns>
+        Task AddRabbitProject(RabbitProject rabbitProject);
+
+        /// <summary>
+        /// 修改
+        /// </summary>
+        /// <param name="rabbitProject"></param>
+        Task UpdateRabbitProject(RabbitProject rabbitProject);
     }
 }

@@ -22,6 +22,7 @@ namespace EasyIotSharp.Core.Repositories.Project.Impl
                                                                            string classificationId,
                                                                            string gatewayId,
                                                                            string sensorId,
+                                                                           int state,
                                                                            int pageIndex,
                                                                            int pageSize,
                                                                            bool isPage)
@@ -32,6 +33,10 @@ namespace EasyIotSharp.Core.Repositories.Project.Impl
             if (tenantNumId > 0)
             {
                 predicate = predicate.And(t => t.TenantNumId.Equals(tenantNumId));
+            }
+            if (state > -1)
+            {
+                predicate = predicate.And(t => t.State.Equals(state));
             }
 
             if (!string.IsNullOrWhiteSpace(keyword))

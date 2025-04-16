@@ -33,5 +33,11 @@ namespace EasyIotSharp.Core.Dto.Project.Params
         /// 传感器Id
         /// </summary>
         public string SensorId { get; set; }
+
+        /// <summary>
+        /// 状态
+        /// </summary>
+        public int State { get; set; }
+
     }
 }

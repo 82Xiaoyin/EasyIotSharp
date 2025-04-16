@@ -66,7 +66,7 @@ namespace EasyIotSharp.Core.Services.Project.Impl
 
         public async Task<PagedResultDto<SensorPointDto>> QuerySensorPoint(QuerySensorPointInput input)
         {
-            var query = await _sensorPointRepository.Query(ContextUser.TenantNumId, input.Keyword, input.ProjectId, input.ClassificationId, input.GatewayId, input.SensorId, input.PageIndex, input.PageSize, input.IsPage);
+            var query = await _sensorPointRepository.Query(ContextUser.TenantNumId, input.Keyword, input.ProjectId, input.ClassificationId, input.GatewayId, input.SensorId, input.State, input.PageIndex, input.PageSize, input.IsPage);
             int totalCount = query.totalCount;
             var list = query.items.MapTo<List<SensorPointDto>>();
             var projects = await _projectBaseRepository.QueryByIds(list.Select(x => x.ProjectId).ToList());

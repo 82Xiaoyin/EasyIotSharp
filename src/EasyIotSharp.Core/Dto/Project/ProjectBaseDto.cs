@@ -22,6 +22,11 @@ namespace EasyIotSharp.Core.Dto.Project
         public string Name { get; set; }
 
         /// <summary>
+        /// 主机地址
+        /// </summary>
+        public string Host { get; set; }
+
+        /// <summary>
         /// 经度
         /// </summary>
         public string Longitude { get; set; }

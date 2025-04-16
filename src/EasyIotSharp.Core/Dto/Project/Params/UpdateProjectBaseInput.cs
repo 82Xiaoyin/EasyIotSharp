@@ -12,6 +12,11 @@ namespace EasyIotSharp.Core.Dto.Project.Params
         public string Id { get; set; }
 
         /// <summary>
+        /// 服务器配置表Id
+        /// </summary>
+        public string RabbitServerInfoId { get; set; }
+
+        /// <summary>
         /// 项目名称
         /// </summary>
         public string Name { get; set; }
