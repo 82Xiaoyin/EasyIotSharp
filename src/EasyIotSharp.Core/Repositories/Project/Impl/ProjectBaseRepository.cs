@@ -20,7 +20,7 @@ namespace EasyIotSharp.Core.Repositories.Project.Impl
 
         public async Task<(int totalCount, List<ProjectBaseDto> items)> Query(int tenantNumId,
                                                       string keyword,
-                                                      int state,
+                                                      bool? state,
                                                       DateTime? createStartTime,
                                                       DateTime? createEndTime,
                                                       int pageIndex,
@@ -42,9 +42,9 @@ namespace EasyIotSharp.Core.Repositories.Project.Impl
                 sql = sql.Where((p, rp, rs) => p.Name.Contains(keyword) || p.Remark.Contains(keyword));
             }
 
-            if (state > -1)
+            if (state.HasValue)
             {
-                sql = sql.Where((p, rp, rs) => p.State.Equals(state));
+                sql = sql.Where((p, rp, rs) => p.State.Equals(state == true ? 1 : 0));
             }
 
             if (createStartTime.HasValue && createEndTime.HasValue)
