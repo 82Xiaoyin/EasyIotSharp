@@ -62,6 +62,7 @@ namespace EasyIotSharp.Core.Services.Project.Impl
             await _projectBaseRepository.InsertAsync(model);
 
             var rabbitProject = new RabbitProject();
+            rabbitProject.Id = Guid.NewGuid().ToString().Replace("-", "");
             rabbitProject.RabbitServerInfoId = input.RabbitServerInfoId;
             rabbitProject.ProjectId = model.Id;
             await _projectBaseRepository.AddRabbitProject(rabbitProject);
@@ -86,11 +87,19 @@ namespace EasyIotSharp.Core.Services.Project.Impl
             await _projectBaseRepository.UpdateAsync(info);
 
             var rabbitProject = await _projectBaseRepository.QueryRabbitProject(info.Id);
-            if (rabbitProject != null) 
+            if (rabbitProject != null)
             {
                 rabbitProject.RabbitServerInfoId = input.RabbitServerInfoId;
                 rabbitProject.ProjectId = info.Id;
                 await _projectBaseRepository.UpdateRabbitProject(rabbitProject);
+            }
+            else
+            {
+                var addRabbitProject = new RabbitProject();
+                addRabbitProject.Id = Guid.NewGuid().ToString().Replace("-", "");
+                addRabbitProject.RabbitServerInfoId = input.RabbitServerInfoId;
+                addRabbitProject.ProjectId = info.Id;
+                await _projectBaseRepository.AddRabbitProject(rabbitProject);
             }
         }
 
