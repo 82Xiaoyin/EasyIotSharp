@@ -338,6 +338,12 @@
             <param name="input"></param>
             <returns></returns>
         </member>
+        <member name="M:EasyIotSharp.API.Controllers.ProjectController.QuerySensorPointChart(EasyIotSharp.Core.Dto.Project.Params.ChartInput)">
+            <summary>
+             首页在线告警echart图
+            </summary>
+            <returns></returns>
+        </member>
         <member name="T:EasyIotSharp.API.Controllers.TenantAccountController">
             <summary>
             租户账号控制器
@@ -433,7 +439,7 @@
             <param name="input"></param>
             <returns></returns>
         </member>
-        <member name="M:EasyIotSharp.API.Controllers.TenantAccountController.UpdateMenu(EasyIotSharp.Core.Dto.TenantAccount.Params.UpdateMenuInput)">
+        <member name="M:EasyIotSharp.API.Controllers.TenantAccountController.UpdateMenu(EasyIotSharp.Core.Dto.TenantAccount.Params.InsertMenuInput)">
             <summary>
             通过id修改一条菜单信息
             </summary>

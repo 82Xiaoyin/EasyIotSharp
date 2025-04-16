@@ -415,11 +415,11 @@ namespace EasyIotSharp.API.Controllers
         }
 
         /// <summary>
-        /// echart图
+        ///  首页在线告警echart图
         /// </summary>
         /// <returns></returns>
         [HttpPost("/Project/SensorPoint/Chart")]
-        //[Authorize]
+        [Authorize]
         public async Task<UPrimeResponse<SensorPointChart>> QuerySensorPointChart([FromBody] ChartInput input)
         {
             UPrimeResponse<SensorPointChart> res = new UPrimeResponse<SensorPointChart>();
