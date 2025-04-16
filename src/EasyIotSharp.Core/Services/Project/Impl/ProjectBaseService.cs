@@ -14,7 +14,7 @@ using EasyIotSharp.Core.Domain.Queue;
 
 namespace EasyIotSharp.Core.Services.Project.Impl
 {
-    public class ProjectBaseService:ServiceBase, IProjectBaseService
+    public class ProjectBaseService : ServiceBase, IProjectBaseService
     {
         private readonly IProjectBaseRepository _projectBaseRepository;
 
@@ -53,7 +53,7 @@ namespace EasyIotSharp.Core.Services.Project.Impl
             model.latitude = input.latitude;
             model.State = 0;
             model.Address = input.Address;
-            model.Remark=input.Remark;
+            model.Remark = input.Remark;
             model.IsDelete = false;
             model.CreationTime = DateTime.Now;
             model.UpdatedAt = DateTime.Now;
@@ -70,7 +70,7 @@ namespace EasyIotSharp.Core.Services.Project.Impl
 
         public async Task UpdateProjectBase(UpdateProjectBaseInput input)
         {
-            var info= await _projectBaseRepository.FirstOrDefaultAsync(x => x.TenantNumId == ContextUser.TenantNumId && x.Id == input.Id && x.IsDelete == false);
+            var info = await _projectBaseRepository.FirstOrDefaultAsync(x => x.TenantNumId == ContextUser.TenantNumId && x.Id == input.Id && x.IsDelete == false);
             var isExistName = await _projectBaseRepository.FirstOrDefaultAsync(x => x.TenantNumId == ContextUser.TenantNumId && x.Name == input.Name && x.IsDelete == false);
             if (isExistName.IsNotNull() && isExistName.Id != input.Id)
             {
@@ -84,6 +84,7 @@ namespace EasyIotSharp.Core.Services.Project.Impl
             info.UpdatedAt = DateTime.Now;
             info.OperatorId = ContextUser.UserId;
             info.OperatorName = ContextUser.UserName;
+            info.State = input.State == true ? 0 : 1;
             await _projectBaseRepository.UpdateAsync(info);
 
             var rabbitProject = await _projectBaseRepository.QueryRabbitProject(info.Id);
@@ -106,7 +107,7 @@ namespace EasyIotSharp.Core.Services.Project.Impl
         public async Task UpdateStateProjectBase(UpdateStateProjectBaseInput input)
         {
             var info = await _projectBaseRepository.FirstOrDefaultAsync(x => x.TenantNumId == ContextUser.TenantNumId && x.Id == input.Id && x.IsDelete == false);
-            if (info.State!=input.State)
+            if (info.State != input.State)
             {
                 info.State = input.State;
                 info.UpdatedAt = DateTime.Now;

@@ -24,7 +24,7 @@ namespace EasyIotSharp.Core.Repositories.Project
         /// <returns></returns>
         Task<(int totalCount, List<ProjectBaseDto> items)> Query(int tenantNumId,
                                                               string keyword,
-                                                              bool? state,
+                                                              int state,
                                                               DateTime? createStartTime,
                                                               DateTime? createEndTime,
                                                               int pageIndex,

@@ -40,5 +40,10 @@ namespace EasyIotSharp.Core.Dto.Project.Params
         /// 项目描述
         /// </summary>
         public string Remark { get; set; }
+
+        /// <summary>
+        /// 状态
+        /// </summary>
+        public bool State { get; set; }
     }
 }
