@@ -22,6 +22,11 @@ namespace EasyIotSharp.Core.Dto.Project
         public string Name { get; set; }
 
         /// <summary>
+        /// RabbitServerInfoId
+        /// </summary>
+        public string RabbitServerInfoId { get; set; }
+
+        /// <summary>
         /// 主机地址
         /// </summary>
         public string Host { get; set; }

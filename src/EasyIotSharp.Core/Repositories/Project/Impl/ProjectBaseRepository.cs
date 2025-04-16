@@ -84,7 +84,8 @@ namespace EasyIotSharp.Core.Repositories.Project.Impl
                 OperatorName = p.OperatorName,
                 Remark = p.Remark,
                 State = p.State,
-                Host = rs.Host
+                Host = rs.Host,
+                RabbitServerInfoId = rs.Id
             }).ToPageListAsync(pageIndex, pageSize);
 
             return (totalCount, items);
@@ -110,7 +111,8 @@ namespace EasyIotSharp.Core.Repositories.Project.Impl
                 OperatorName = p.OperatorName,
                 Remark = p.Remark,
                 State = p.State,
-                Host = rs.Host
+                Host = rs.Host,
+                RabbitServerInfoId = rs.Id
             }).FirstAsync();
 
             return items;
