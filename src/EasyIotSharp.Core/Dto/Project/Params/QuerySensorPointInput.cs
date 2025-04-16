@@ -7,7 +7,7 @@ namespace EasyIotSharp.Core.Dto.Project.Params
     /// <summary>
     /// 通过条件查询查询测点信息的入参类
     /// </summary>
-    public class QuerySensorPointInput:PagingInput
+    public class QuerySensorPointInput : PagingInput
     {
         /// <summary>
         /// 测点名称

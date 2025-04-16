@@ -58,6 +58,11 @@ namespace EasyIotSharp.Core.Dto.Project
         public string GatewayName { get; set; }
 
         /// <summary>
+        /// 网关名称
+        /// </summary>
+        public int State { get; set; }
+
+        /// <summary>
         /// 传感器Id
         /// </summary>
         public string SensorId { get; set; }

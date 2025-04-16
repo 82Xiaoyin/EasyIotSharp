@@ -7,7 +7,7 @@ namespace EasyIotSharp.Core.Domain.Proejct
     /// <summary>
     /// 测点表
     /// </summary>
-    public class SensorPoint:BaseEntity<string>
+    public class SensorPoint : BaseEntity<string>
     {
         /// <summary>
         /// 租户id
@@ -38,5 +38,15 @@ namespace EasyIotSharp.Core.Domain.Proejct
         /// 传感器Id
         /// </summary>
         public string SensorId { get; set; }
+
+        /// <summary>
+        /// 状态
+        /// </summary>
+        public int State { get; set; } = 0;
+
+        /// <summary>
+        /// 是否报警
+        /// </summary>
+        public bool IsAlarms { get; set; } = false;
     }
 }

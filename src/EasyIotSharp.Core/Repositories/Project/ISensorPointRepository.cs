@@ -31,5 +31,11 @@ namespace EasyIotSharp.Core.Repositories.Project
                                                               int pageIndex,
                                                               int pageSize,
                                                               bool isPage);
+        
+        /// <summary>
+        /// 获取列表数据
+        /// </summary>
+        /// <returns></returns>
+        Task<List<SensorPoint>> QueryList(string projectId);
     }
 }

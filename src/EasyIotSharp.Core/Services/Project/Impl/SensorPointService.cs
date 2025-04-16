@@ -13,7 +13,7 @@ using UPrime.Services.Dto;
 
 namespace EasyIotSharp.Core.Services.Project.Impl
 {
-    public class SensorPointService:ServiceBase,ISensorPointService
+    public class SensorPointService : ServiceBase, ISensorPointService
     {
         private readonly IProjectBaseRepository _projectBaseRepository;
         private readonly IClassificationRepository _classificationRepository;
@@ -66,7 +66,7 @@ namespace EasyIotSharp.Core.Services.Project.Impl
 
         public async Task<PagedResultDto<SensorPointDto>> QuerySensorPoint(QuerySensorPointInput input)
         {
-            var query = await _sensorPointRepository.Query(ContextUser.TenantNumId, input.Keyword,input.ProjectId,input.ClassificationId,input.GatewayId, input.SensorId, input.PageIndex, input.PageSize, input.IsPage);
+            var query = await _sensorPointRepository.Query(ContextUser.TenantNumId, input.Keyword, input.ProjectId, input.ClassificationId, input.GatewayId, input.SensorId, input.PageIndex, input.PageSize, input.IsPage);
             int totalCount = query.totalCount;
             var list = query.items.MapTo<List<SensorPointDto>>();
             var projects = await _projectBaseRepository.QueryByIds(list.Select(x => x.ProjectId).ToList());
@@ -129,7 +129,7 @@ namespace EasyIotSharp.Core.Services.Project.Impl
             {
                 throw new BizException(BizError.BIND_EXCEPTION_ERROR, "测点不存在");
             }
-            var isExistName = await _sensorPointRepository.FirstOrDefaultAsync(x => x.TenantNumId == ContextUser.TenantNumId && x.Name == input.Name && x.ProjectId == info.ProjectId &&x.GatewayId ==input.GatewayId && x.IsDelete == false);
+            var isExistName = await _sensorPointRepository.FirstOrDefaultAsync(x => x.TenantNumId == ContextUser.TenantNumId && x.Name == input.Name && x.ProjectId == info.ProjectId && x.GatewayId == input.GatewayId && x.IsDelete == false);
             if (isExistName.IsNotNull() && isExistName.Id != input.Id)
             {
                 throw new BizException(BizError.BIND_EXCEPTION_ERROR, "测点名称重复");
@@ -156,6 +156,25 @@ namespace EasyIotSharp.Core.Services.Project.Impl
                 info.OperatorName = ContextUser.UserName;
                 await _sensorPointRepository.UpdateAsync(info);
             }
+        }
+
+        /// <summary>
+        /// echart 图
+        /// </summary>
+        /// <returns></returns>
+        public async Task<SensorPointChart> QuerySensorPointChart(ChartInput input)
+        {
+            var reuslt = new SensorPointChart();
+            var list = await _sensorPointRepository.QueryList(input.ProjectId);
+            reuslt.Offline = list.Where(w => w.State == 0).Count();
+            reuslt.Online = list.Where(w => w.State == 1).Count();
+            reuslt.OnlineRatio = reuslt.Online == 0 ? 0 : reuslt.Online / reuslt.Offline;
+
+            reuslt.Total = list.Count();
+            reuslt.AlarmsCount = list.Where(w => w.IsAlarms == true).Count();
+            reuslt.AlarmsRatio = reuslt.AlarmsCount == 0 ? 0 : reuslt.AlarmsCount / reuslt.Total;
+
+            return reuslt;
         }
     }
 }

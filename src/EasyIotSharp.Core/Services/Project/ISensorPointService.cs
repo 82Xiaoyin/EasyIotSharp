@@ -44,5 +44,11 @@ namespace EasyIotSharp.Core.Services.Project
         /// <param name="input"></param>
         /// <returns></returns>
         Task DeleteSensorPoint(DeleteSensorPointInput input);
+
+        /// <summary>
+        /// echat图
+        /// </summary>
+        /// <returns></returns>
+        Task<SensorPointChart> QuerySensorPointChart(ChartInput input);
     }
 }

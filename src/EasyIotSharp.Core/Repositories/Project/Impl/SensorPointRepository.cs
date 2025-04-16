@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
+using static FluentValidation.Validators.PredicateValidator;
 
 namespace EasyIotSharp.Core.Repositories.Project.Impl
 {
@@ -80,6 +81,22 @@ namespace EasyIotSharp.Core.Repositories.Project.Impl
                 var items = await query.ToListAsync();
                 return (totalCount, items);
             }
+        }
+
+        /// <summary>
+        /// 获取全部数据
+        /// </summary>
+        /// <returns></returns>
+        public async Task<List<SensorPoint>> QueryList(string projectId)
+        {
+            // 初始化条件
+            var predicate = PredicateBuilder.New<SensorPoint>(t => t.IsDelete == false);
+            if (!string.IsNullOrWhiteSpace(projectId))
+            {
+                predicate = predicate.And(t => t.ProjectId.Equals(projectId));
+            }
+
+            return await Client.Queryable<SensorPoint>().Where(predicate).ToListAsync();
         }
     }
 }
