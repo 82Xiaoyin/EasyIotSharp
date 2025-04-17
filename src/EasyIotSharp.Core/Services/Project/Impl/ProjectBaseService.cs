@@ -84,7 +84,7 @@ namespace EasyIotSharp.Core.Services.Project.Impl
             info.UpdatedAt = DateTime.Now;
             info.OperatorId = ContextUser.UserId;
             info.OperatorName = ContextUser.UserName;
-            info.State = input.State == true ? 0 : 1;
+            info.State = input.State == true ? 1 : 0;
             await _projectBaseRepository.UpdateAsync(info);
 
             var rabbitProject = await _projectBaseRepository.QueryRabbitProject(info.Id);

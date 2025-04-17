@@ -46,7 +46,7 @@ namespace EasyIotSharp.Core.Dto.Project
         /// 0=初始化状态
         /// 1=正在运行状态
         /// </summary>
-        public int State { get; set; }
+        public bool State { get; set; }
 
         /// <summary>
         /// 项目地址

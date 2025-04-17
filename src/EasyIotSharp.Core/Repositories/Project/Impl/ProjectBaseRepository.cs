@@ -83,7 +83,7 @@ namespace EasyIotSharp.Core.Repositories.Project.Impl
                 OperatorId = p.OperatorId,
                 OperatorName = p.OperatorName,
                 Remark = p.Remark,
-                State = p.State,
+                State = p.State==1?true:false,
                 Host = rs.Host,
                 RabbitServerInfoId = rs.Id
             }).ToPageListAsync(pageIndex, pageSize);
@@ -110,7 +110,7 @@ namespace EasyIotSharp.Core.Repositories.Project.Impl
                 OperatorId = p.OperatorId,
                 OperatorName = p.OperatorName,
                 Remark = p.Remark,
-                State = p.State,
+                State = p.State == 1 ? true : false,
                 Host = rs.Host,
                 RabbitServerInfoId = rs.Id
             }).FirstAsync();
