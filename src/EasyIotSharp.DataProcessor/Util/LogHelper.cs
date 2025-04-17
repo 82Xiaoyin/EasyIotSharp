@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Text;
 [assembly: log4net.Config.XmlConfigurator(ConfigFile = "log.xml", Watch = false)]
 namespace EasyIotSharp.DataProcessor.Util
-{ 
+{
     public class LogHelper
     {
         private static ILog log = log4net.LogManager.GetLogger("LogFileAppender");

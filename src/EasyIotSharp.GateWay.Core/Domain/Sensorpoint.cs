@@ -22,5 +22,7 @@ namespace EasyIotSharp.GateWay.Core.Domain
         public string OperatorName { get; set; }
         public string GatewayId { get; set; }
         public string SensorId { get; set; }
+        public int State { get; set; }
+        public bool IsAlarms { get; set; }
     }
 }

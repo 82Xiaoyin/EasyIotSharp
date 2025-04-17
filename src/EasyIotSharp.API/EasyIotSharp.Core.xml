@@ -217,6 +217,11 @@
             DMS api 地址相关
             </summary>
         </member>
+        <member name="P:EasyIotSharp.Core.Configuration.AppOptions.MinIOOptions">
+            <summary>
+            minio配置
+            </summary>
+        </member>
         <member name="P:EasyIotSharp.Core.Configuration.AppOptions.ESPaggingOptions">
             <summary>
             es 分页读写相关
@@ -6139,6 +6144,246 @@
             </summary>
             <param name="input"></param>
             <returns></returns>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.IO.IMinIOFileService.BucketExistsAsync(System.String)">
+            <summary>
+            判断 bucket 是否存在
+            </summary>
+            <param name="bucketName">桶名</param>
+            <returns>是否存在</returns>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.IO.IMinIOFileService.CreateBucketAsync(System.String)">
+            <summary>
+            创建 bucket
+            </summary>
+            <param name="bucketName">桶名</param>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.IO.IMinIOFileService.GetAllBucketsAsync">
+            <summary>
+            获取全部 bucket
+            </summary>
+            <returns>Bucket 列表</returns>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.IO.IMinIOFileService.UploadAsync(System.String,System.String,System.String)">
+            <summary>
+            文件上传
+            </summary>
+            <param name="bucketName">桶名</param>
+            <param name="fileName">文件名</param>
+            <param name="filePath">文件路径</param>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.IO.IMinIOFileService.UploadAsync(System.String,System.String)">
+            <summary>
+            文件上传
+            </summary>
+            <param name="fileName">文件名</param>
+            <param name="filePath">文件路径</param>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.IO.IMinIOFileService.UploadAsync(System.String,System.String,System.IO.Stream)">
+            <summary>
+            文件上传
+            </summary>
+            <param name="bucketName">桶名</param>
+            <param name="fileName">文件名</param>
+            <param name="stream">文件流</param>
+            <returns>文件 URL 地址</returns>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.IO.IMinIOFileService.UploadAsync(System.String,System.IO.Stream)">
+            <summary>
+            文件上传
+            </summary>
+            <param name="fileName">文件名</param>
+            <param name="stream">文件流</param>
+            <returns>文件 URL 地址</returns>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.IO.IMinIOFileService.UploadAsync(System.String,Microsoft.AspNetCore.Http.IFormFile)">
+            <summary>
+            文件上传
+            </summary>
+            <param name="bucketName">桶名</param>
+            <param name="file">文件</param>
+            <returns>文件 URL 地址</returns>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.IO.IMinIOFileService.UploadAsync(Microsoft.AspNetCore.Http.IFormFile)">
+            <summary>
+            文件上传
+            </summary>
+            <param name="file">文件</param>
+            <returns>文件 URL 地址</returns>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.IO.IMinIOFileService.DeleteFileAsync(System.String,System.String)">
+            <summary>
+            删除文件
+            </summary>
+            <param name="bucketName">桶名</param>
+            <param name="fileName">文件名</param>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.IO.IMinIOFileService.DeleteFileAsync(System.String)">
+            <summary>
+            删除文件
+            </summary>
+            <param name="fileName">文件名</param>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.IO.IMinIOFileService.DownloadAsync(System.String,System.String)">
+            <summary>
+            下载文件
+            </summary>
+            <param name="bucketName">桶名</param>
+            <param name="fileName">文件名</param>
+            <returns>文件流</returns>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.IO.IMinIOFileService.DownloadAsync(System.String)">
+            <summary>
+            下载文件
+            </summary>
+            <param name="fileName">文件名</param>
+            <returns>文件流</returns>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.IO.IMinIOFileService.GetFileUrlAsync(System.String,System.String)">
+            <summary>
+            获取 minio 文件的下载地址
+            </summary>
+            <param name="bucketName">桶名</param>
+            <param name="fileName">文件名</param>
+            <returns>文件 URL</returns>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.IO.IMinIOFileService.GetFileUrlAsync(System.String)">
+            <summary>
+            获取 minio 文件的下载地址
+            </summary>
+            <param name="fileName">文件名</param>
+            <returns>文件 URL</returns>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.IO.IMinIOFileService.GetFileStatAsync(System.String)">
+            <summary>
+            获取文件属性
+            </summary>
+            <param name="fileName">文件名称</param>
+            <returns>文件属性字典</returns>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.IO.Impl.MinIOFileService.BucketExistsAsync(System.String)">
+            <summary>
+            判断 bucket 是否存在
+            </summary>
+            <param name="bucketName">桶名</param>
+            <returns>是否存在</returns>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.IO.Impl.MinIOFileService.CreateBucketAsync(System.String)">
+            <summary>
+            创建 bucket
+            </summary>
+            <param name="bucketName">桶名</param>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.IO.Impl.MinIOFileService.GetAllBucketsAsync">
+            <summary>
+            获取全部 bucket
+            </summary>
+            <returns>Bucket 列表</returns>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.IO.Impl.MinIOFileService.UploadAsync(System.String,System.String,System.String)">
+            <summary>
+            文件上传
+            </summary>
+            <param name="bucketName">桶名</param>
+            <param name="fileName">文件名</param>
+            <param name="filePath">文件路径</param>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.IO.Impl.MinIOFileService.UploadAsync(System.String,System.String)">
+            <summary>
+            文件上传
+            </summary>
+            <param name="fileName">文件名</param>
+            <param name="filePath">文件路径</param>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.IO.Impl.MinIOFileService.UploadAsync(System.String,System.String,System.IO.Stream)">
+            <summary>
+            文件上传
+            </summary>
+            <param name="bucketName">桶名</param>
+            <param name="fileName">文件名</param>
+            <param name="stream">文件流</param>
+            <returns>文件 URL 地址</returns>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.IO.Impl.MinIOFileService.UploadAsync(System.String,System.IO.Stream)">
+            <summary>
+            文件上传
+            </summary>
+            <param name="fileName">文件名</param>
+            <param name="stream">文件流</param>
+            <returns>文件 URL 地址</returns>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.IO.Impl.MinIOFileService.UploadAsync(System.String,Microsoft.AspNetCore.Http.IFormFile)">
+            <summary>
+            文件上传
+            </summary>
+            <param name="bucketName">桶名</param>
+            <param name="file">文件</param>
+            <returns>文件 URL 地址</returns>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.IO.Impl.MinIOFileService.UploadAsync(Microsoft.AspNetCore.Http.IFormFile)">
+            <summary>
+            文件上传
+            </summary>
+            <param name="file">文件</param>
+            <returns>文件 URL 地址</returns>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.IO.Impl.MinIOFileService.DeleteFileAsync(System.String,System.String)">
+            <summary>
+            删除文件
+            </summary>
+            <param name="bucketName">桶名</param>
+            <param name="fileName">文件名</param>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.IO.Impl.MinIOFileService.DeleteFileAsync(System.String)">
+            <summary>
+            删除文件
+            </summary>
+            <param name="fileName">文件名</param>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.IO.Impl.MinIOFileService.DownloadAsync(System.String,System.String)">
+            <summary>
+            下载文件
+            </summary>
+            <param name="bucketName">桶名</param>
+            <param name="fileName">文件名</param>
+            <returns>文件流</returns>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.IO.Impl.MinIOFileService.DownloadAsync(System.String)">
+            <summary>
+            下载文件
+            </summary>
+            <param name="fileName">文件名</param>
+            <returns>文件流</returns>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.IO.Impl.MinIOFileService.GetFileUrlAsync(System.String,System.String)">
+            <summary>
+            获取 minio 文件的下载地址
+            </summary>
+            <param name="bucketName">桶名</param>
+            <param name="fileName">文件名</param>
+            <returns>文件 URL</returns>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.IO.Impl.MinIOFileService.GetFileUrlAsync(System.String)">
+            <summary>
+            获取 minio 文件的下载地址
+            </summary>
+            <param name="fileName">文件名</param>
+            <returns>文件 URL</returns>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.IO.Impl.MinIOFileService.GetFileStatAsync(System.String)">
+            <summary>
+            获取文件属性
+            </summary>
+            <param name="fileName">文件名称</param>
+            <returns>文件属性字典</returns>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.IO.Impl.MinIOFileService.GetFileStatAsync(System.String,System.String)">
+            <summary>
+            获取文件属性
+            </summary>
+            <param name="bucketName">桶名</param>
+            <param name="fileName">文件名称</param>
+            <returns>文件属性字典</returns>
         </member>
         <member name="P:EasyIotSharp.Core.Services.IO.Impl.TempFolderService.Path">
             <summary>

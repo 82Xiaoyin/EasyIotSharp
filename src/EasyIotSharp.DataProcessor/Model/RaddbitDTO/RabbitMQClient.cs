@@ -1,10 +1,10 @@
-using EasyIotSharp.GateWay.Core.Util;
+using EasyIotSharp.DataProcessor.Util;
 using RabbitMQ.Client;
 using System;
 using System.Text;
 using System.Threading;
 
-namespace EasyIotSharp.GateWay.Core.Model.RaddbitDTO
+namespace EasyIotSharp.DataProcessor.Model.RaddbitDTO
 {
     /// <summary>
     /// RabbitMQ客户端
@@ -20,7 +20,7 @@ namespace EasyIotSharp.GateWay.Core.Model.RaddbitDTO
         public string mqid { get; set; }
         
         private IConnection _connection;
-        private IModel _channel;
+        public IModel _channel;
         private bool _isInitialized = false;
         private readonly object _lockObj = new object();
         private int _retryCount = 3;
