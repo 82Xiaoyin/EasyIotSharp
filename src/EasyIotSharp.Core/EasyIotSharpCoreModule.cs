@@ -47,7 +47,7 @@ namespace EasyIotSharp.Core
 
             IocManager.Register<IInfluxdbDatabaseProvider, InfluxdbDatabaseProvider>();
 
-            IocManager.Register<IMinIOFileService, MinIOFileService>
+            IocManager.Register<IMinIOFileService, MinIOFileService>();
 
 
             var camelCaseConventionPack = new ConventionPack { new CamelCaseElementNameConvention() };
