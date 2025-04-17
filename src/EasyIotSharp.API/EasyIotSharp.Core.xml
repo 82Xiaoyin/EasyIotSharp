@@ -2790,6 +2790,11 @@
             项目描述
             </summary>
         </member>
+        <member name="P:EasyIotSharp.Core.Dto.Project.Params.UpdateProjectBaseInput.State">
+            <summary>
+            状态
+            </summary>
+        </member>
         <member name="T:EasyIotSharp.Core.Dto.Project.Params.UpdateSensorPointInput">
             <summary>
             根据id修改一条测点信息的入参类
