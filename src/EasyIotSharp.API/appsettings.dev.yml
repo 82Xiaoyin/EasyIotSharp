@@ -24,11 +24,11 @@ MinIO:
   BucketName: 'hhtl-dsmb'
 
 Caching:
-  IsOpen: false
-  RedisEnabled:  false
-  RedisConnStr: '106.75.84.97:7369,password=i&@D04oK,SyncTimeout=5000,allowAdmin=true'
+  IsOpen: true
+  RedisEnabled:  true
+  RedisConnStr: '82.156.125.76:7369,password=Redis1234!,SyncTimeout=5000,allowAdmin=true'
   RedisTwemProxyEnabled: false
-  RedisDatabaseId:  2
+  RedisDatabaseId:  0
 
 ESPagging:
   MaxReadCount: 10000

@@ -26,6 +26,8 @@ using EasyIotSharp.Core.Repositories.Hardware.Impl;
 using EasyIotSharp.Core.Repositories.Influxdb;
 using EasyIotSharp.Core.Repositories.Queue;
 using EasyIotSharp.Core.Repositories.Queue.Impl;
+using EasyIotSharp.Core.Services.IO;
+using EasyIotSharp.Core.Services.IO.Impl;
 
 namespace EasyIotSharp.Core
 {
@@ -44,6 +46,8 @@ namespace EasyIotSharp.Core
             IocManager.Register<ISqlSugarDatabaseProvider, SqlSugarDatabaseProvider>();
 
             IocManager.Register<IInfluxdbDatabaseProvider, InfluxdbDatabaseProvider>();
+
+            IocManager.Register<IMinIOFileService, MinIOFileService>
 
 
             var camelCaseConventionPack = new ConventionPack { new CamelCaseElementNameConvention() };

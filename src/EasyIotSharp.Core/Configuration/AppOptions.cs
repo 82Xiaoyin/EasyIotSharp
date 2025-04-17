@@ -41,6 +41,10 @@ namespace EasyIotSharp.Core.Configuration
         /// </summary>
         public APIServiceOptions APIServiceOptions { get; internal set; }
 
+        /// <summary>
+        /// minio配置
+        /// </summary>
+        public MinIOOptions MinIOOptions { get; set; }
 
         /// <summary>
         /// es 分页读写相关
@@ -70,6 +74,8 @@ namespace EasyIotSharp.Core.Configuration
             options.StorageOptions = StorageOptions.ReadFromConfiguration(config);
             options.APIServiceOptions = APIServiceOptions.ReadFromConfiguration(config);
             options.CachingOptions = CachingOptions.ReadFromConfiguration(config);
+            options.MinIOOptions = MinIOOptions.ReadFromConfiguration(config);
+            options.QueueOptions = QueueOptions.ReadFromConfiguration(config);
             options.ESPaggingOptions = ESPaggingOptions.ReadFromConfiguration(config);
             options.QueueOptions = QueueOptions.ReadFromConfiguration(config);
             options.CorpWeixinOptions = CorpWeixinOptions.ReadFromConfiguration(config);
