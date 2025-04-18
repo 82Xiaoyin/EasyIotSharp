@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace EasyIotSharp.GateWay.Core.Model.RaddbitDTO
+namespace EasyIotSharp.DataProcessor.Model.RaddbitDTO
 {
     public class RabbitMqInfo
     {

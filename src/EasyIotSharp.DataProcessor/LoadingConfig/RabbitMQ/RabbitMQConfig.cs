@@ -1,14 +1,13 @@
-﻿using EasyIotSharp.GateWay.Core.Util.ModbusUtil;
-using EasyIotSharp.GateWay.Core.Util;
+﻿using EasyIotSharp.DataProcessor.Util;
 using System;
 using System.Collections.Generic;
 using System.Text;
-using EasyIotSharp.GateWay.Core.Domain;
+using EasyIotSharp.DataProcessor.Domain;
 using System.Linq;
-using EasyIotSharp.GateWay.Core.Model.RaddbitDTO;
+using EasyIotSharp.DataProcessor.Model.RaddbitDTO;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace EasyIotSharp.GateWay.Core.LoadingConfig.RabbitMQ
+namespace EasyIotSharp.DataProcessor.LoadingConfig.RabbitMQ
 {
     /// <summary>
     /// RabbitMQ配置管理类
@@ -44,7 +43,6 @@ namespace EasyIotSharp.GateWay.Core.LoadingConfig.RabbitMQ
         /// <summary>
         /// 初始化RabbitMQ配置
         /// </summary>
-        // 修改查询和初始化逻辑
         public static void InitMQ(IServiceProvider serviceProvider = null)
         {
             // 防止重复初始化
@@ -97,7 +95,6 @@ namespace EasyIotSharp.GateWay.Core.LoadingConfig.RabbitMQ
                                           ProjectId = mqpject.ProjectId,
                                           RoutingKey = mqpject.ProjectId.ToString()
                                       }).ToList();
-
 
                         LogHelper.Info($"找到 {mqlist.Count} 个RabbitMQ配置");
 

@@ -5,7 +5,7 @@ using System.Collections.Generic;
 // If you have enabled NRTs for your project, then un-comment the following line:
 // #nullable disable
 
-namespace EasyIotSharp.GateWay.Core.Domain
+namespace EasyIotSharp.DataProcessor.Domain
 {
     public partial class RabbitServerinfo
     {

@@ -39,7 +39,7 @@ namespace EasyIotSharp.GateWay.Core.Services
                 }
                 
                 // 序列化消息
-                string messageJson = JsonSerializer.Serialize(message);
+                string messageJson = message.ToString();
                 byte[] messageBytes = Encoding.UTF8.GetBytes(messageJson);
                 
                 // 发送消息

@@ -9,12 +9,14 @@ namespace EasyIotSharp.GateWay.Core.Domain
 {
     public partial class RabbitProject
     {
-        public int Id { get; set; }
-        public int MqId { get; set; }
+        public string Id { get; set; }
+        public string RabbitServerInfoId { get; set; }
         public string ProjectId { get; set; }
-        public string Extendstr { get; set; }
-        public int? Extendint { get; set; }
-        public DateTime? CreateTime { get; set; }
-        public DateTime? UpdateTime { get; set; }
+        public DateTime CreationTime { get; set; }
+        public bool IsDelete { get; set; }
+        public DateTime? DeleteTime { get; set; }
+        public DateTime UpdatedAt { get; set; }
+        public string OperatorId { get; set; }
+        public string OperatorName { get; set; }
     }
 }
