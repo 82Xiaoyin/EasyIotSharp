@@ -11,6 +11,8 @@ using System;
 using System.IO;
 using System.Threading;
 using UPrime;
+using UPrime.Castle.Log4Net;
+using UPrime.Configuration;
 using EasyIotSharp.Core;
 
 namespace EasyIotSharp.GateWay.Core
@@ -34,9 +36,6 @@ namespace EasyIotSharp.GateWay.Core
                {
                    options.IocManager.IocContainer.AddFacility<LoggingFacility>(f => f.UseUpLog4Net().WithConfig("log4net.config"));
                    options.IocManager.AddAppOptions(appOptions);
-                   options.IocManager.AddEagleOptions(eagleOptions);
-                   // 注入F6OLog配置 
-                   options.IocManager.AddF6OLogOptions(config.GetF6OLogOptions());
                }
                ).Initialize();
 

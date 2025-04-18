@@ -20,4 +20,8 @@
     <PackageReference Include="RabbitMQ.Client" Version="6.0.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\EasyIotSharp.Core\EasyIotSharp.Core.csproj" />
+  </ItemGroup>
+
 </Project>
