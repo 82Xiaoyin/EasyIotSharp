@@ -11,6 +11,9 @@ using System.Text;
 using System.Threading.Tasks;
 using UPrime;
 using Minio.DataModel.Result;
+using Nest;
+using System.Net.Http;
+using System.Security.AccessControl;
 
 namespace EasyIotSharp.Core.Services.IO.Impl
 {
@@ -52,23 +55,29 @@ namespace EasyIotSharp.Core.Services.IO.Impl
             {
                 await _minioClient.MakeBucketAsync(new MakeBucketArgs().WithBucket(bucketName));
             }
-            //// 设置公开访问策略   是否公开访问链接永久有效
-            //var policy = $@"{{
-            //    ""Version"": ""2012-10-17"",
-            //    ""Statement"": [
-            //        {{
-            //            ""Effect"": ""Allow"",
-            //            ""Principal"": {{""AWS"": [""*""]}},
-            //            ""Action"": [""s3:GetObject""],
-            //            ""Resource"": [""arn:aws:s3:::{bucketName}/*""]
-            //        }}
-            //    ]
-            //}}";
+            var policy = @"{
+        ""Version"": ""2012-10-17"",
+        ""Statement"": [
+            {
+                ""Effect"": ""Allow"",
+                ""Principal"": {""AWS"": [""*""]},
+                ""Action"": [
+                    ""s3:GetBucketLocation"",
+                    ""s3:ListBucket"",
+                    ""s3:GetObject""
+                ],
+                ""Resource"": [
+                    ""arn:aws:s3:::" + bucketName + @""",
+                    ""arn:aws:s3:::" + bucketName + @"/*""
+                ]
+            }
+        ]
+    }";
 
-            //await _minioClient.SetPolicyAsync(
-            //    new SetPolicyArgs()
-            //        .WithBucket(bucketName)
-            //        .WithPolicy(policy));
+            await _minioClient.SetPolicyAsync(
+                new SetPolicyArgs()
+                    .WithBucket(bucketName)
+                    .WithPolicy(policy));
         }
 
         /// <summary>
@@ -156,6 +165,8 @@ namespace EasyIotSharp.Core.Services.IO.Impl
         /// <returns>文件 URL 地址</returns>
         public async Task<string> UploadAsync(IFormFile file)
         {
+            await CreateBucketAsync(_bucketName);
+
             return await UploadAsync(_bucketName, file);
         }
 
@@ -217,12 +228,22 @@ namespace EasyIotSharp.Core.Services.IO.Impl
         /// <returns>文件 URL</returns>
         public async Task<string> GetFileUrlAsync(string bucketName, string fileName)
         {
-            var args = new PresignedGetObjectArgs()
-                .WithBucket(bucketName)
-                .WithObject(fileName)
-                .WithExpiry(60 * 60 * 24); // 24小时有效期
+            var policy = await _minioClient.GetPolicyAsync(
+                     new GetPolicyArgs().WithBucket(_bucketName));
+            if (policy.IsNotNull())
+            {
+                bool useHttps = false;
+                return $"{(useHttps ? "https" : "http")}://{_appOptions.MinIOOptions.Servers}/{bucketName}/{fileName}";
+            }
+            else
+            {
+                var args = new PresignedGetObjectArgs()
+                 .WithBucket(bucketName)
+                 .WithObject(fileName)
+                 .WithExpiry(60 * 60 * 24); // 24小时有效期
 
-            return await _minioClient.PresignedGetObjectAsync(args);
+                return await _minioClient.PresignedGetObjectAsync(args);
+            }
         }
 
         /// <summary>
