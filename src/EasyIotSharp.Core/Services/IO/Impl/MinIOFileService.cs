@@ -14,20 +14,20 @@ using Minio.DataModel.Result;
 
 namespace EasyIotSharp.Core.Services.IO.Impl
 {
-    public class MinIOFileService:IMinIOFileService
+    public class MinIOFileService : IMinIOFileService
     {
         private readonly IMinioClient _minioClient;
         private readonly string _bucketName;
 
-        private readonly MinIOOptions _minIOOptions;
+        private readonly AppOptions _appOptions;
 
         public MinIOFileService()
         {
-            _minIOOptions = UPrimeEngine.Instance.Resolve<MinIOOptions>();
-
+            _appOptions = UPrimeEngine.Instance.Resolve<AppOptions>();
+            _bucketName = _appOptions.MinIOOptions.BucketName;
             _minioClient = new MinioClient()
-                .WithEndpoint(_minIOOptions.Servers)
-                .WithCredentials(_minIOOptions.AccessKey, _minIOOptions.SecretKey)
+                .WithEndpoint(_appOptions.MinIOOptions.Servers)
+                .WithCredentials(_appOptions.MinIOOptions.AccessKey, _appOptions.MinIOOptions.SecretKey)
                 .Build();
         }
 

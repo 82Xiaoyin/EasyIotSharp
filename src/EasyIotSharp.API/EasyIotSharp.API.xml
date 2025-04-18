@@ -581,6 +581,13 @@
             <param name="input"></param>
             <returns></returns>
         </member>
+        <member name="M:EasyIotSharp.API.Controllers.Util4yController.UploadMediaFile(EasyIotSharp.Core.Dto.IO.Params.UploadMediaFileInput)">
+            <summary>
+            媒体文件上传
+            </summary>
+            <param name="input"></param>
+            <returns></returns>
+        </member>
         <member name="M:EasyIotSharp.API.Extensions.GetClientIp(Microsoft.AspNetCore.Http.HttpContext)">
             <summary>
             获取客户端IP

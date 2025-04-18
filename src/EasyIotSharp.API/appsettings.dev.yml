@@ -18,7 +18,7 @@ Storage:
   InfluxdbPassword: 'jsuper[admin]'
 
 MinIO:
-  Servers: 'http://82.156.125.76:9000/'
+  Servers: '82.156.125.76:9000'
   AccessKey: 'admin'
   SecretKey: 'jsuper[minio]'
   BucketName: 'hhtl-dsmb'
