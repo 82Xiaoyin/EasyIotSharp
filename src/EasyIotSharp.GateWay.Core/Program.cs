@@ -1,10 +1,17 @@
-﻿using EasyIotSharp.GateWay.Core.Services;
+﻿using EasyIotSharp.Core.Configuration;
+using EasyIotSharp.GateWay.Core.Services;
 using EasyIotSharp.GateWay.Core.Socket;
 using EasyIotSharp.GateWay.Core.UI;
 using EasyIotSharp.GateWay.Core.Util;
 using EasyIotSharp.GateWay.Core.Util.Encrypotion;
+using Microsoft.Extensions.Configuration;
+using UPrime.Configuration;
+using Serilog;
 using System;
+using System.IO;
 using System.Threading;
+using UPrime;
+using EasyIotSharp.Core;
 
 namespace EasyIotSharp.GateWay.Core
 {
@@ -14,6 +21,48 @@ namespace EasyIotSharp.GateWay.Core
 
         public static void Main(string[] args)
         {
+            string environment = GetEnv(args);
+            var config = new ConfigurationBuilder()
+                    .SetBasePath(Directory.GetCurrentDirectory())
+                    .AddYamlFile("appsettings.yml", optional: true, reloadOnChange: true)
+                    .AddYamlFile($"appsettings.{environment}.yml", optional: true, reloadOnChange: true)
+                    .AddCommandLine(args)
+                    .Build();
+            var appOptions = AppOptions.ReadFromConfiguration(config);
+            UPrimeStarter.Create<GateWayCoreModule>(
+               (options) =>
+               {
+                   options.IocManager.IocContainer.AddFacility<LoggingFacility>(f => f.UseUpLog4Net().WithConfig("log4net.config"));
+                   options.IocManager.AddAppOptions(appOptions);
+                   options.IocManager.AddEagleOptions(eagleOptions);
+                   // 注入F6OLog配置 
+                   options.IocManager.AddF6OLogOptions(config.GetF6OLogOptions());
+               }
+               ).Initialize();
+
+            var configDictionary = config.ToDictionary("Serilog");
+            var loggerConfig = new LoggerConfiguration().ReadFrom.Configuration(config);
+            Log.Logger = loggerConfig.CreateLogger();
+            Log.Information("Settings {@Settings}", configDictionary);
+
+            if (appOptions.SetMinThreads > 16)
+            {
+                //https://stackexchange.github.io/StackExchange.Redis/Timeouts
+                //https://docs.microsoft.com/en-us/dotnet/api/system.threading.threadpool.setminthreads?view=netcore-2.0#System_Threading_ThreadPool_SetMinThreads_System_Int32_System_Int32_
+                ThreadPool.GetMinThreads(out int minWorker, out int minIOC);
+                Log.Information($"默认最小线程：worker:{minWorker} ioc: {minIOC}");
+
+                if (ThreadPool.SetMinThreads(appOptions.SetMinThreads, minIOC))
+                {
+                    Log.Information($"最小线程设置成功: worker = {appOptions.SetMinThreads}");
+                }
+                else
+                {
+                    Log.Information($"最小线程数没有改变: worker = {minWorker}");
+                }
+            }
+
+
             try
             {
                 AppDomain.CurrentDomain.ProcessExit += AppDomain_ProcessExit;
@@ -72,6 +121,21 @@ namespace EasyIotSharp.GateWay.Core
             {
                 LogHelper.Error($"资源清理异常: {ex.ToString()}");
             }
+        }
+        private static string GetEnv(string[] args)
+        {
+            string env = "dev";
+            if (args.Length > 0)
+            {
+                foreach (string argValue in args)
+                {
+                    if (argValue.Contains("--env"))
+                    {
+                        env = argValue.ReplaceByEmpty("--env=").Trim();
+                    }
+                }
+            }
+            return env;
         }
     }
 }

@@ -1,0 +1,29 @@
+---
+Name:  'easyiotsharp'
+
+Host: '106.75.118.194:5999'
+
+Storage: 
+  Elasticsearch:
+    - 'http://106.75.84.97:9200'
+  MysqlServers:  '82.156.125.76:3306'
+  MysqlConnectionMode: ''
+  MysqlDbName:  'easyiotsharp'
+  MysqlUsername:  'root'
+  MysqlPassword:  'jichang2025!@#'
+  InfluxdbServers: '82.156.125.76:8086'
+  InfluxdbConnectionMode: ''
+  InfluxdbName: 'db_sports_center'
+  InfluxdbUsername: 'jsuper'
+  InfluxdbPassword: 'jsuper[admin]'
+
+Caching:
+  IsOpen: true
+  RedisEnabled:  true
+  RedisConnStr: '10.10.138.209:6379'
+  RedisTwemProxyEnabled: false
+  RedisDatabaseId:  1
+
+ESPagging:
+  MaxReadCount: 10000
+  MaxWriteCount: 1000
