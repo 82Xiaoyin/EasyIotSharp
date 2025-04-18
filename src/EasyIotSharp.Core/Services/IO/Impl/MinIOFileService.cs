@@ -52,6 +52,23 @@ namespace EasyIotSharp.Core.Services.IO.Impl
             {
                 await _minioClient.MakeBucketAsync(new MakeBucketArgs().WithBucket(bucketName));
             }
+            //// 设置公开访问策略   是否公开访问链接永久有效
+            //var policy = $@"{{
+            //    ""Version"": ""2012-10-17"",
+            //    ""Statement"": [
+            //        {{
+            //            ""Effect"": ""Allow"",
+            //            ""Principal"": {{""AWS"": [""*""]}},
+            //            ""Action"": [""s3:GetObject""],
+            //            ""Resource"": [""arn:aws:s3:::{bucketName}/*""]
+            //        }}
+            //    ]
+            //}}";
+
+            //await _minioClient.SetPolicyAsync(
+            //    new SetPolicyArgs()
+            //        .WithBucket(bucketName)
+            //        .WithPolicy(policy));
         }
 
         /// <summary>
