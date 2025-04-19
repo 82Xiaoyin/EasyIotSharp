@@ -157,11 +157,23 @@ namespace EasyIotSharp.DataProcessor.Processing.Implementation
         {
             try
             {
-                // 尝试解析消息
                 try
                 {
-                    var data = LowFrequencyData.FromEncryptedString<SensorDataBase>(message);
-                    // 这里可以添加更多处理逻辑，但不存储到数据库
+                    // 简单判断是否为高频数据
+                    bool isHighFrequency = IsHighFrequencyData(message);
+                    
+                    if (isHighFrequency)
+                    {
+                        // 处理高频数据
+                        var data = HighFrequencyData.FromEncryptedString<SensorDataBase>(message);
+                        LogHelper.Debug($"成功解析高频数据，项目ID: {projectId}");
+                    }
+                    else
+                    {
+                        // 处理低频数据
+                        var data = LowFrequencyData.FromEncryptedString<SensorDataBase>(message);
+                        LogHelper.Debug($"成功解析低频数据，项目ID: {projectId}");
+                    }
                 }
                 catch (Exception parseEx)
                 {
@@ -179,13 +191,25 @@ namespace EasyIotSharp.DataProcessor.Processing.Implementation
         }
         
         /// <summary>
+        /// 判断是否为高频数据
+        /// </summary>
+        private bool IsHighFrequencyData(string message)
+        {
+            // 简单判断方法：检查消息中是否包含高频数据的特征
+            // 这里需要根据实际数据格式调整判断条件
+            return message.Contains("\"dataType\":\"high\"") || 
+                   message.Contains("\"type\":\"high\"") || 
+                   message.Contains("\"samplingRate\":");
+        }
+        
+        /// <summary>
         /// 保存解析失败的消息
         /// </summary>
         private void SaveFailedMessage(string projectId, string message)
         {
             try
             {
-                // 使用项目ID作为文件名
+                // 使用Path.Combine确保路径分隔符在不同操作系统下正确
                 string baseDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "FailedMessages");
                 string filePath = Path.Combine(baseDir, $"{projectId}.json");
                 
@@ -201,6 +225,9 @@ namespace EasyIotSharp.DataProcessor.Processing.Implementation
                         writer.WriteLine($"{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}|{message}");
                     }
                 }
+                
+                // 记录保存位置
+                LogHelper.Debug($"已保存解析失败的消息到: {filePath}");
             }
             catch (Exception ex)
             {
