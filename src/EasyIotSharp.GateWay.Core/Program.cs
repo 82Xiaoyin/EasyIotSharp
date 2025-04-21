@@ -6,13 +6,11 @@ using EasyIotSharp.GateWay.Core.Util;
 using EasyIotSharp.GateWay.Core.Util.Encrypotion;
 using Microsoft.Extensions.Configuration;
 using UPrime.Configuration;
-using Castle.Facilities.Logging;
 using Serilog;
 using System;
 using System.IO;
 using System.Threading;
 using UPrime;
-using UPrime.Castle.Log4Net;
 using UPrime.Configuration;
 using EasyIotSharp.Core.Extensions;
 
@@ -35,7 +33,6 @@ namespace EasyIotSharp.GateWay.Core
             UPrimeStarter.Create<GateWayCoreModule>(
                (options) =>
                {
-                   options.IocManager.IocContainer.AddFacility<LoggingFacility>(f => f.UseUpLog4Net().WithConfig("log4net.config"));
                    options.IocManager.AddAppOptions(appOptions);
                }
                ).Initialize();

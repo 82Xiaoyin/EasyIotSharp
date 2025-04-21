@@ -9,6 +9,13 @@ namespace EasyIotSharp.Core.Repositories.Project
 {
     public interface IGatewayProtocolRepository : IMySqlRepositoryBase<GatewayProtocol, string>
     {
+
+        /// <summary>
+        /// 通过网关id获取数据
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        GatewayProtocol GetGatewayProtocol(string id);
         /// <summary>
         /// 通过条件分页查询网关协议列表
         /// </summary>

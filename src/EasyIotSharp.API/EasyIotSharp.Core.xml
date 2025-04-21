@@ -5284,6 +5284,20 @@
             true or false
             </summary>
         </member>
+        <member name="M:EasyIotSharp.Core.Repositories.Hardware.Impl.SensorQuotaRepository.GetSensorQuotaList(System.String)">
+            <summary>
+            根据id获取单条指标记录
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EasyIotSharp.Core.Repositories.Hardware.Impl.SensorRepository.GetBySensor(System.String)">
+            <summary>
+            根据传感器ID获取单条记录
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
         <member name="M:EasyIotSharp.Core.Repositories.Hardware.IProtocolConfigExtRepository.QueryByConfigIds(System.Collections.Generic.List{System.String})">
             <summary>
             通过配置id集合查询配置扩展列表
@@ -5328,6 +5342,13 @@
             <param name="ids">ID集合</param>
             <returns></returns>
         </member>
+        <member name="M:EasyIotSharp.Core.Repositories.Hardware.ISensorQuotaRepository.GetSensorQuotaList(System.String)">
+            <summary>
+            根据id获取单条指标记录
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
         <member name="M:EasyIotSharp.Core.Repositories.Hardware.ISensorQuotaRepository.Query(System.Int32,System.String,System.String,EasyIotSharp.Core.DataTypeMenu,System.Int32,System.Int32,System.Boolean)">
             <summary>
             通过条件分页查询传感器指标列表
@@ -5339,6 +5360,13 @@
             <param name="pageIndex">起始页</param>
             <param name="pageSize">每页多少条数据</param>
             <param name="isPage">是否分页</param>
+            <returns></returns>
+        </member>
+        <member name="M:EasyIotSharp.Core.Repositories.Hardware.ISensorRepository.GetBySensor(System.String)">
+            <summary>
+            根据ID查询传感器单条记录
+            </summary>
+            <param name="ids">ID集合</param>
             <returns></returns>
         </member>
         <member name="M:EasyIotSharp.Core.Repositories.Hardware.ISensorRepository.Query(System.Int32,System.String,System.Int32,System.Int32,System.Boolean)">
@@ -5486,6 +5514,13 @@
             <param name="entity"></param>
             <returns></returns>
         </member>
+        <member name="M:EasyIotSharp.Core.Repositories.Mysql.IMySqlRepositoryBase`2.Update(`0)">
+            <summary>
+            更新实体
+            </summary>
+            <param name="entity"></param>
+            <returns></returns>
+        </member>
         <member name="M:EasyIotSharp.Core.Repositories.Mysql.IMySqlRepositoryBase`2.GetByIdAsync(System.Object)">
             <summary>
             查询实体
@@ -5566,6 +5601,13 @@
             <param name="ids">ID集合</param>
             <returns></returns>
         </member>
+        <member name="M:EasyIotSharp.Core.Repositories.Project.IGatewayProtocolRepository.GetGatewayProtocol(System.String)">
+            <summary>
+            通过网关id获取数据
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
         <member name="M:EasyIotSharp.Core.Repositories.Project.IGatewayProtocolRepository.Query(System.Int32,System.String,System.Int32,System.Int32)">
             <summary>
             通过条件分页查询网关协议列表
@@ -5574,6 +5616,20 @@
             <param name="gatewayId">网关id</param>
             <param name="pageIndex">起始页</param>
             <param name="pageSize">每页多少条</param>
+            <returns></returns>
+        </member>
+        <member name="M:EasyIotSharp.Core.Repositories.Project.IGatewayRepository.GetGateway(System.String)">
+            <summary>
+            根据ID查询网关信息
+            </summary>
+            <param name="id">id</param>
+            <returns></returns>
+        </member>
+        <member name="M:EasyIotSharp.Core.Repositories.Project.IGatewayRepository.GetByIds(System.Collections.Generic.List{System.String})">
+            <summary>
+            根据ID集合查询网关列表
+            </summary>
+            <param name="ids">ID集合</param>
             <returns></returns>
         </member>
         <member name="M:EasyIotSharp.Core.Repositories.Project.IGatewayRepository.Query(System.Int32,System.String,System.Int32,System.String,System.String,System.Int32,System.Int32)">
@@ -5596,10 +5652,38 @@
             <param name="ids">ID集合</param>
             <returns></returns>
         </member>
+        <member name="M:EasyIotSharp.Core.Repositories.Project.Impl.GatewayProtocolRepository.GetGatewayProtocol(System.String)">
+            <summary>
+            通过网关id获取数据
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EasyIotSharp.Core.Repositories.Project.Impl.GatewayRepository.GetGateway(System.String)">
+            <summary>
+            根据网关id获取单条信息
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EasyIotSharp.Core.Repositories.Project.Impl.GatewayRepository.GetByIds(System.Collections.Generic.List{System.String})">
+            <summary>
+            根据网关ids获取集合
+            </summary>
+            <param name="ids"></param>
+            <returns></returns>
+        </member>
         <member name="M:EasyIotSharp.Core.Repositories.Project.Impl.SensorPointRepository.QueryList(System.String)">
             <summary>
             获取全部数据
             </summary>
+            <returns></returns>
+        </member>
+        <member name="M:EasyIotSharp.Core.Repositories.Project.Impl.SensorPointRepository.GetBySensorPointId(System.String)">
+            <summary>
+            根据测点ID获取测点数据
+            </summary>
+            <param name="sensorPointId"></param>
             <returns></returns>
         </member>
         <member name="M:EasyIotSharp.Core.Repositories.Project.IProjectBaseRepository.Query(System.Int32,System.String,System.Int32,System.Nullable{System.DateTime},System.Nullable{System.DateTime},System.Int32,System.Int32)">
@@ -5649,6 +5733,13 @@
             </summary>
             <param name="rabbitProject"></param>
         </member>
+        <member name="M:EasyIotSharp.Core.Repositories.Project.ISensorPointRepository.GetBySensorPointId(System.String)">
+            <summary>
+            根据测点ID获取单条记录
+            </summary>
+            <param name="projectId"></param>
+            <returns></returns>
+        </member>
         <member name="M:EasyIotSharp.Core.Repositories.Project.ISensorPointRepository.Query(System.Int32,System.String,System.String,System.String,System.String,System.String,System.Int32,System.Int32,System.Int32,System.Boolean)">
             <summary>
             通过条件分页查询项目分类列表
@@ -5686,6 +5777,12 @@
             <param name="isPage">是否分页</param>
             <returns>返回总记录数和分页数据</returns>
         </member>
+        <member name="M:EasyIotSharp.Core.Repositories.Queue.Impl.RabbitServerInfoRepository.GetRabbitProject">
+            <summary>
+            获取rabbit配置信息列表
+            </summary>
+            <returns></returns>
+        </member>
         <member name="T:EasyIotSharp.Core.Repositories.Queue.IRabbitServerInfoRepository">
             <summary>
             RabbitMQ服务器配置信息仓储接口
@@ -5700,6 +5797,12 @@
             <param name="pageIndex">起始页</param>
             <param name="pageSize">每页多少条</param>
             <param name="isPage">是否分页</param>
+            <returns></returns>
+        </member>
+        <member name="M:EasyIotSharp.Core.Repositories.Queue.IRabbitServerInfoRepository.GetRabbitProject">
+            <summary>
+            获取rabbit配置信息列表
+            </summary>
             <returns></returns>
         </member>
         <member name="M:EasyIotSharp.Core.Repositories.TenantAccount.IMenuRepository.Query(System.Int32,System.String,System.Int32,System.Int32,System.Int32,System.Boolean)">

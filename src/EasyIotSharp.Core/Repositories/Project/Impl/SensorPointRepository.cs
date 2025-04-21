@@ -103,5 +103,24 @@ namespace EasyIotSharp.Core.Repositories.Project.Impl
 
             return await Client.Queryable<SensorPoint>().Where(predicate).ToListAsync();
         }
+
+        /// <summary>
+        /// 根据测点ID获取测点数据
+        /// </summary>
+        /// <param name="sensorPointId"></param>
+        /// <returns></returns>
+        public SensorPoint GetBySensorPointId(string sensorPointId)
+        {
+            // 初始化条件
+            var predicate = PredicateBuilder.New<SensorPoint>(t => t.IsDelete == false);
+            if (!string.IsNullOrWhiteSpace(sensorPointId))
+            {
+                predicate = predicate.And(t => t.Id.Equals(sensorPointId));
+            }
+
+            return  Client.Queryable<SensorPoint>().Where(predicate).First();
+        }
+
+
     }
 }

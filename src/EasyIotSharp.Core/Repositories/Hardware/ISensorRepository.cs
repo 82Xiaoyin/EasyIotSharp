@@ -9,6 +9,13 @@ namespace EasyIotSharp.Core.Repositories.Hardware
 {
     public interface ISensorRepository : IMySqlRepositoryBase<Sensor, string>
     {
+
+        /// <summary>
+        /// 根据ID查询传感器单条记录
+        /// </summary>
+        /// <param name="ids">ID集合</param>
+        /// <returns></returns>
+        Sensor GetBySensor(string id);
         /// <summary>
         /// 通过条件分页查询传感器列表
         /// </summary>

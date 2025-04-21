@@ -4,18 +4,51 @@ using LinqKit;
 using SqlSugar;
 using System;
 using System.Collections.Generic;
+using System.Drawing.Printing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static FluentValidation.Validators.PredicateValidator;
 
 namespace EasyIotSharp.Core.Repositories.Project.Impl
 {
-    public class GatewayRepository: MySqlRepositoryBase<Gateway, string>, IGatewayRepository
+    public class GatewayRepository : MySqlRepositoryBase<Gateway, string>, IGatewayRepository
     {
         public GatewayRepository(ISqlSugarDatabaseProvider databaseProvider) : base(databaseProvider)
         {
         }
+        /// <summary>
+        /// 根据网关id获取单条信息
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public Gateway GetGateway(string id)
+        {
+            return Client.Queryable<Gateway>().Where(w => w.Id.Equals(id))
+                            .First();
+        }
 
+        /// <summary>
+        /// 根据网关ids获取集合
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <returns></returns>
+        public List<Gateway> GetByIds(List<string> ids)
+        {
+            if (ids == null || ids.Count == 0)
+            {
+                return new List<Gateway>();
+            }
+
+            // 使用表达式构建查询条件
+            var predicate = PredicateBuilder.New<Gateway>(false); // 初始化为空条件
+            predicate = predicate.And(t => ids.Contains(t.Id));
+            predicate = predicate.And(m => m.IsDelete == false); // 是否删除 = false
+
+            // 查询数据
+            var items = Client.Queryable<Gateway>().Where(predicate);
+            return items.ToList();
+        }
         public async Task<(int totalCount, List<Gateway> items)> Query(int tenantNumId,
                                                                       string Keyword,
                                                                       int state,
@@ -86,5 +119,6 @@ namespace EasyIotSharp.Core.Repositories.Project.Impl
             var items = await GetListAsync(predicate);
             return items.ToList();
         }
+
     }
 }

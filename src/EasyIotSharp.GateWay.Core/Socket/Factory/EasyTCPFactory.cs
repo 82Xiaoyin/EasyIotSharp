@@ -16,7 +16,7 @@ namespace EasyIotSharp.GateWay.Core.Socket.Factory
                 switch (manufacturer)
                 {
                     case "modbusRTU"://Modbus应答式
-                        tcpSuper = new ModbusDTU(new Domain.easyiotsharpContext());
+                        tcpSuper = new ModbusDTU();
                         break;
                     default:
                         break;

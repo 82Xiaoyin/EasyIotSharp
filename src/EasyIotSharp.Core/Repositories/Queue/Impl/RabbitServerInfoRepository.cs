@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using SqlSugar;
 using LinqKit;
+using EasyIotSharp.Core.Dto.Queue;
 
 namespace EasyIotSharp.Core.Repositories.Queue.Impl
 {
@@ -75,5 +76,32 @@ namespace EasyIotSharp.Core.Repositories.Queue.Impl
                 return (totalCount, query);
             }
         }
+
+        /// <summary>
+        /// 获取rabbit配置信息列表
+        /// </summary>
+        /// <returns></returns>
+        public  List<RabbitServerInfoDto> GetRabbitProject()
+        { 
+                // 手动拼接排序逻辑
+                var query =  Client.Queryable<RabbitProject>()
+                .LeftJoin<RabbitServerInfo>((rp,rs)=>rp.RabbitServerInfoId.Equals(rs.Id))
+                 .Select((rp, rs) =>  
+                   new RabbitServerInfoDto
+                   {
+                     Host = rs.Host,
+                     Port = rs.Port,
+                     Username = rs.Username,
+                     Password = rs.Password,
+                     VirtualHost = rs.VirtualHost,
+                     Exchange = rp.ProjectId,
+                     MqId = rs.Id,
+                     ProjectId = rp.ProjectId,
+                     RoutingKey = rp.ProjectId
+                 })
+                .ToList();
+                return query;
+        }
+
     }
 }

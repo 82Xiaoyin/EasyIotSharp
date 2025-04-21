@@ -42,7 +42,11 @@ namespace EasyIotSharp.Core.Repositories.Mysql
             var result = await Client.Updateable(entity).ExecuteCommandAsync();
             return result > 0;
         }
-
+        public virtual bool Update(TEntity entity)
+        {
+            var result =  Client.Updateable(entity).ExecuteCommand();
+            return result > 0;
+        }
         public virtual async Task<TEntity> GetByIdAsync(object id)
         {
             return await Client.Queryable<TEntity>().InSingleAsync(id);

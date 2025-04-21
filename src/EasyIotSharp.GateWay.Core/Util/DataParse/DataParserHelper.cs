@@ -1,9 +1,11 @@
+using EasyIotSharp.Core.Repositories.Project;
 using EasyIotSharp.GateWay.Core.Model.AnalysisDTO;
 using EasyIotSharp.GateWay.Core.Services;
 using EasyIotSharp.GateWay.Core.Socket;
 using System;
 using System.Linq;
 using System.Text.Json;
+using UPrime;
 
 namespace EasyIotSharp.GateWay.Core.Util
 {
@@ -12,12 +14,12 @@ namespace EasyIotSharp.GateWay.Core.Util
         public static void SendEncryptedData(
             LowFrequencyData sensorData,
             GatewayConnectionInfo connectionInfo,
-            easyiotsharpContext dbContext,
             RabbitMQService rabbitMQService)
         {
+            var _gatewayRepository = UPrimeEngine.Instance.Resolve<IGatewayRepository>();
             if (string.IsNullOrEmpty(connectionInfo?.GatewayId)) return;
 
-            var gateway = dbContext.Gateway.FirstOrDefault(g => g.Id == connectionInfo.GatewayId);
+            var gateway = _gatewayRepository.GetGateway(connectionInfo.GatewayId);
             if (gateway != null && !string.IsNullOrEmpty(gateway.ProjectId))
             {
                 try

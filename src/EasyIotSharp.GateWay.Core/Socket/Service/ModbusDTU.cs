@@ -13,25 +13,29 @@ using EasyIotSharp.GateWay.Core.Util.ModbusUtil;
 using EasyIotSharp.GateWay.Core.Services;
 using EasyIotSharp.GateWay.Core.Model.AnalysisDTO;
 using EasyIotSharp.GateWay.Core.Model.ConfigDTO;
+using EasyIotSharp.Core.Repositories.Queue;
+using UPrime;
+using EasyIotSharp.Core.Repositories.Project;
+using EasyIotSharp.Core.Repositories.Project.Impl;
+using EasyIotSharp.Core.Repositories.Hardware.Impl;
+using EasyIotSharp.Core.Repositories.Hardware;
 
 namespace EasyIotSharp.GateWay.Core.Socket.Service
 {
     public class ModbusDTU : EasyTCPSuper
     {
-        public easyiotsharpContext _easyiotsharpContext;
         // 在类的成员变量中添加
         private RabbitMQService _rabbitMQService;
-        
         // 修改构造函数
-        public ModbusDTU(easyiotsharpContext easyiotsharpContext)
+        public ModbusDTU()
         {
-            _easyiotsharpContext = easyiotsharpContext;
             _rabbitMQService = new RabbitMQService();
         }
         public override void DecodeData(TaskInfo taskData)
         {
             try
             {
+                var _gatewayProtocolRepository = UPrimeEngine.Instance.Resolve<IGatewayProtocolRepository>();
                 //1、server查询是否ConfigJson=null
                 string modbusConfig = taskData.Client.ConfigJson;
                 if (taskData.Packet == null || taskData.Packet.BData == null)
@@ -55,7 +59,7 @@ namespace EasyIotSharp.GateWay.Core.Socket.Service
                     //3.1ModbusDevieConfig未查询到,则进行解码、
                     string strData = System.Text.Encoding.ASCII.GetString(bReceived, 0, bReceived.Length);//转换为Ascll码
                     LogHelper.Info("  收到注册包:  " + strData);
-                    var gatewayprotocol = _easyiotsharpContext.Gatewayprotocol.Where(x=>x.GatewayId.Equals(strData)).FirstOrDefault();
+                    var gatewayprotocol = _gatewayProtocolRepository.GetGatewayProtocol(strData);
                     if (gatewayprotocol == null)
                     {
                         LogHelper.Info("未找到注册包: " + strData);
@@ -84,8 +88,11 @@ namespace EasyIotSharp.GateWay.Core.Socket.Service
         /// <summary>
         /// 解析接收到的数据包
         /// </summary>
-        private void ParseReceivedData(IntPtr connId, byte[] data, string configJson)
+        private  void ParseReceivedData(IntPtr connId, byte[] data, string configJson)
         {
+            var _sensorPointRepository = UPrimeEngine.Instance.Resolve<ISensorPointRepository>();
+            var _sensorRepository = UPrimeEngine.Instance.Resolve<ISensorRepository>();
+            var _sensorQuotaRepository = UPrimeEngine.Instance.Resolve<ISensorQuotaRepository>();
             try
             {
                 if (data == null || data.Length < 7) return;
@@ -115,31 +122,22 @@ namespace EasyIotSharp.GateWay.Core.Socket.Service
                             continue;
                         }
 
-                        var sensorPoint = _easyiotsharpContext.Sensorpoint
-                            .Where(x => x.Id == config.MeasurementPoint)
-                            .FirstOrDefault();
-
+                        var sensorPoint = _sensorPointRepository.GetBySensorPointId(config.MeasurementPoint);
                         if (sensorPoint == null)
                         {
                             LogHelper.Error($"未找到测点信息，测点ID: {config.MeasurementPoint}");
                             continue;
                         }
 
-                        var sensor = _easyiotsharpContext.Sensor
-                         .Where(x => x.Id == sensorPoint.SensorId)
-                         .FirstOrDefault();
-
+                        var sensor = _sensorRepository.GetBySensor(sensorPoint.Id);
                         if (sensor == null)
                         {
                             LogHelper.Error($"未找到测点类型信息，测点类型id: {sensorPoint.SensorId}");
                             continue;
                         }
-                        var sensorQuota = _easyiotsharpContext.Sensorquota
-                            .Where(x => x.SensorId == sensorPoint.SensorId)
-                            .OrderBy(x => x.Sort)
-                            .ToList();
+                        var sensorQuotaList = _sensorQuotaRepository.GetSensorQuotaList(sensorPoint.SensorId);
 
-                        if (sensorQuota == null || !sensorQuota.Any())
+                        if (sensorQuotaList == null || !sensorQuotaList.Any())
                         {
                             LogHelper.Warn($"未找到传感器指标信息，传感器ID: {sensorPoint.SensorId}");
                         }
@@ -171,9 +169,9 @@ namespace EasyIotSharp.GateWay.Core.Socket.Service
                                     ushort registerValue = (ushort)((data[3 + i * 2] << 8) | data[3 + i * 2 + 1]);
                                     
                                     // 获取对应的指标名称
-                                    string quotaName = i < sensorQuota.Count ? sensorQuota[i].Identifier : $"指标{i+1}";
+                                    string quotaName = i < sensorQuotaList.Count ? sensorQuotaList[i].Identifier : $"指标{i+1}";
                                     double quotaValue = registerValue * k;
-                                    string Unit= i < sensorQuota.Count ? sensorQuota[i].Unit : $"指标{i + 1}";
+                                    string Unit= i < sensorQuotaList.Count ? sensorQuotaList[i].Unit : $"指标{i + 1}";
                                     // 添加带有名称的值
                                     pointData.Values.Add(new NamedValue 
                                     { 
@@ -185,7 +183,7 @@ namespace EasyIotSharp.GateWay.Core.Socket.Service
                             }
 
                             sensorData.Points.Add(pointData);
-                            DataParserHelper.SendEncryptedData(sensorData, connectionInfo, _easyiotsharpContext, _rabbitMQService);
+                            DataParserHelper.SendEncryptedData(sensorData, connectionInfo, _rabbitMQService);
                         }
                         break; // 找到匹配的配置后退出循环
                     }

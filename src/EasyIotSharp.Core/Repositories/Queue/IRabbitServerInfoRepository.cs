@@ -1,4 +1,5 @@
 using EasyIotSharp.Core.Domain.Queue;
+using EasyIotSharp.Core.Dto.Queue;
 using EasyIotSharp.Core.Repositories.Mysql;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -20,5 +21,11 @@ namespace EasyIotSharp.Core.Repositories.Queue
         /// <param name="isPage">是否分页</param>
         /// <returns></returns>
         Task<(int totalCount, List<RabbitServerInfo> items)> Query(int tenantNumId, string keyword, int isEnable,int pageIndex, int pageSize, bool isPage = true);
+
+        /// <summary>
+        /// 获取rabbit配置信息列表
+        /// </summary>
+        /// <returns></returns>
+        List<RabbitServerInfoDto> GetRabbitProject();
     }
 }

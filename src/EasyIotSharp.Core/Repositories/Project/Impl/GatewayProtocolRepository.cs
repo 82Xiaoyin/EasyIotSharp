@@ -1,11 +1,14 @@
 ﻿using EasyIotSharp.Core.Domain.Proejct;
 using EasyIotSharp.Core.Repositories.Mysql;
 using LinqKit;
+using Nest;
 using SqlSugar;
 using System;
 using System.Collections.Generic;
+using System.Drawing.Printing;
 using System.Text;
 using System.Threading.Tasks;
+using static FluentValidation.Validators.PredicateValidator;
 
 namespace EasyIotSharp.Core.Repositories.Project.Impl
 {
@@ -46,6 +49,17 @@ namespace EasyIotSharp.Core.Repositories.Project.Impl
             // 查询数据
             var items = await query.ToListAsync();
             return (totalCount, items);
+        }
+
+        /// <summary>
+        /// 通过网关id获取数据
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public GatewayProtocol GetGatewayProtocol(string id)
+        {
+            return  Client.Queryable<GatewayProtocol>().Where(w=>w.GatewayId.Equals(id))
+                              .First();
         }
     }
 }

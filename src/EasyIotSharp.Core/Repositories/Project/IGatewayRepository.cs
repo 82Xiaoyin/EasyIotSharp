@@ -9,6 +9,20 @@ namespace EasyIotSharp.Core.Repositories.Project
 {
     public interface IGatewayRepository : IMySqlRepositoryBase<Gateway, string>
     {
+
+        /// <summary>
+        /// 根据ID查询网关信息
+        /// </summary>
+        /// <param name="id">id</param>
+        /// <returns></returns>
+        Gateway GetGateway(string id);
+
+        /// <summary>
+        /// 根据ID集合查询网关列表
+        /// </summary>
+        /// <param name="ids">ID集合</param>
+        /// <returns></returns>
+        List<Gateway> GetByIds(List<string> ids);
         /// <summary>
         /// 通过条件分页查询网关列表
         /// </summary>

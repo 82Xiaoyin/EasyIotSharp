@@ -9,6 +9,11 @@ namespace EasyIotSharp.Core.Dto.Queue
     {
         public string id { get; set; }
 
+        public string MqId { get; set; }
+
+        public string ProjectId { get; set; }
+
+        public string RoutingKey { get; set; }
         /// <summary>
         /// 租户ID
         /// </summary>

@@ -10,6 +10,12 @@ namespace EasyIotSharp.Core.Repositories.Hardware
     public interface ISensorQuotaRepository : IMySqlRepositoryBase<SensorQuota, string>
     {
         /// <summary>
+        /// 根据id获取单条指标记录
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        List<SensorQuota> GetSensorQuotaList(string id);
+        /// <summary>
         /// 通过条件分页查询传感器指标列表
         /// </summary>
         /// <param name="tenantNumId">租户NumId</param>

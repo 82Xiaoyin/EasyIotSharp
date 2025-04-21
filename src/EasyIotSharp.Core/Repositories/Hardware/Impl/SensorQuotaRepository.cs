@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
+using static FluentValidation.Validators.PredicateValidator;
 
 namespace EasyIotSharp.Core.Repositories.Hardware.Impl
 {
@@ -69,6 +70,16 @@ namespace EasyIotSharp.Core.Repositories.Hardware.Impl
                 var items = await query.ToListAsync();
                 return (totalCount, items);
             }
+        }
+        /// <summary>
+        /// 根据id获取单条指标记录
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public List<SensorQuota> GetSensorQuotaList(string id)
+        {
+            return Client.Queryable<SensorQuota>().Where(w => w.Id.Equals(id))
+                                 .OrderBy(t => t.Sort, OrderByType.Desc).ToList();
         }
     }
 }

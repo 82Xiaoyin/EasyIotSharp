@@ -49,6 +49,12 @@ namespace EasyIotSharp.Core.Repositories.Mysql
         Task<bool> UpdateAsync(TEntity entity);
 
         /// <summary>
+        /// 更新实体
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <returns></returns>
+        bool Update(TEntity entity);
+        /// <summary>
         /// 查询实体
         /// </summary>
         /// <param name="id"></param>

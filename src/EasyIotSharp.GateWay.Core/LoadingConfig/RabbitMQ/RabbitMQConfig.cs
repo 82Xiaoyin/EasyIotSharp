@@ -6,6 +6,12 @@ using System.Text;
 using System.Linq;
 using EasyIotSharp.GateWay.Core.Model.RaddbitDTO;
 using Microsoft.Extensions.DependencyInjection;
+using EasyIotSharp.Core.Queue;
+using UPrime;
+using EasyIotSharp.Core.Services.Queue.Impl;
+using EasyIotSharp.Core.Services.Queue;
+using EasyIotSharp.Core.Repositories.Queue.Impl;
+using EasyIotSharp.Core.Repositories.Queue;
 
 namespace EasyIotSharp.GateWay.Core.LoadingConfig.RabbitMQ
 {
@@ -46,6 +52,9 @@ namespace EasyIotSharp.GateWay.Core.LoadingConfig.RabbitMQ
         // 修改查询和初始化逻辑
         public static void InitMQ(IServiceProvider serviceProvider = null)
         {
+            var _rabbitServerInfoRepository = UPrimeEngine.Instance.Resolve<IRabbitServerInfoRepository>();
+
+
             // 防止重复初始化
             if (_isInitialized)
             {
@@ -59,17 +68,7 @@ namespace EasyIotSharp.GateWay.Core.LoadingConfig.RabbitMQ
                 
                 try
                 {
-                    // 获取数据库上下文
-                    easyiotsharpContext easyiotsharpContext;
-                    if (serviceProvider != null)
-                    {
-                        easyiotsharpContext = serviceProvider.GetRequiredService<easyiotsharpContext>();
-                    }
-                    else
-                    {
-                        easyiotsharpContext = new easyiotsharpContext();
-                    }
-
+                  
                     LogHelper.Info("开始初始化RabbitMQ配置...");
                     
                     // 清空现有配置
@@ -81,21 +80,7 @@ namespace EasyIotSharp.GateWay.Core.LoadingConfig.RabbitMQ
                     try
                     {
                         // 查询MQ服务器和项目配置信息
-                        var mqlist = (from mqpject in easyiotsharpContext.RabbitProject
-                                      join mqserver in easyiotsharpContext.RabbitServerinfo
-                                      on mqpject.RabbitServerInfoId equals mqserver.Id
-                                      select new RabbitMqInfo
-                                      {
-                                          Host = mqserver.Host,
-                                          Port = mqserver.Port,
-                                          Username = mqserver.Username,
-                                          Password = mqserver.Password,
-                                          Virtualhost = mqserver.VirtualHost,
-                                          Exchange = mqpject.ProjectId.ToString(),
-                                          MqId = mqserver.Id,
-                                          ProjectId = mqpject.ProjectId,
-                                          RoutingKey = mqpject.ProjectId.ToString()
-                                      }).ToList();
+                        var mqlist =   _rabbitServerInfoRepository.GetRabbitProject();
 
 
                         LogHelper.Info($"找到 {mqlist.Count} 个RabbitMQ配置");
@@ -112,7 +97,7 @@ namespace EasyIotSharp.GateWay.Core.LoadingConfig.RabbitMQ
                                     m_MQClient.Port = item.Port;
                                     m_MQClient.UserName = item.Username;
                                     m_MQClient.Password = item.Password;
-                                    m_MQClient.VirtualHost = item.Virtualhost;
+                                    m_MQClient.VirtualHost = item.VirtualHost;
                                     m_MQClient.Exchange = item.Exchange;
                                     m_MQClient.mqid = item.MqId;
                                     

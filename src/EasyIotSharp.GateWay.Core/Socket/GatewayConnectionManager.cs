@@ -1,3 +1,5 @@
+using EasyIotSharp.Core.Domain.Proejct;
+using EasyIotSharp.Core.Repositories.Project;
 using EasyIotSharp.GateWay.Core.Util;
 using System;
 using System.Collections.Concurrent;
@@ -5,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Transactions;
+using UPrime;
 
 namespace EasyIotSharp.GateWay.Core.Socket
 {
@@ -105,7 +108,6 @@ namespace EasyIotSharp.GateWay.Core.Socket
     /// </summary>
     public class GatewayConnectionManager
     {
-        public easyiotsharpContext _easyiotsharpContext;
 
         // 修改为懒加载单例模式
         private static volatile GatewayConnectionManager _instance;
@@ -124,7 +126,7 @@ namespace EasyIotSharp.GateWay.Core.Socket
                     {
                         if (_instance == null)
                         {
-                            _instance = new GatewayConnectionManager(new easyiotsharpContext());
+                            _instance = new GatewayConnectionManager();
                             LogHelper.Info("GatewayConnectionManager单例已初始化");
                         }
                     }
@@ -169,17 +171,17 @@ namespace EasyIotSharp.GateWay.Core.Socket
             _connectionMap.TryAdd(connId, connectionInfo);
         }
 
-        public GatewayConnectionManager(easyiotsharpContext easyiotsharpContext)
+        public GatewayConnectionManager()
         {
-            _easyiotsharpContext = easyiotsharpContext;
             _statusCheckTimer = new Timer(CheckGatewayStatus, null, STATUS_CHECK_INTERVAL, STATUS_CHECK_INTERVAL);
         }
 
         /// <summary>
         /// 检查所有网关状态
         /// </summary>
-        private void CheckGatewayStatus(object state)
+        private  void CheckGatewayStatus(object state)
         {
+            var _gatewayRepository = UPrimeEngine.Instance.Resolve<IGatewayRepository>();
             try
             {
                 var now = DateTime.Now;
@@ -206,16 +208,14 @@ namespace EasyIotSharp.GateWay.Core.Socket
                     {
                         try
                         {
-                            var gateways = _easyiotsharpContext.Gateway
-                                .Where(x => offlineGateways.Contains(x.Id))
-                                .ToList();
+                            var gateways = _gatewayRepository.GetByIds(offlineGateways);
 
                             foreach (var gateway in gateways)
                             {
                                 gateway.State = 2; // 离线状态
+                                 _gatewayRepository.Update(gateway);
                             }
 
-                            _easyiotsharpContext.SaveChanges();
                             scope.Complete();
 
                             foreach (var gatewayId in offlineGateways)
@@ -236,8 +236,9 @@ namespace EasyIotSharp.GateWay.Core.Socket
             }
         }
 
-        public void RegisterGateway(IntPtr connId, string gatewayId)
+        public  void RegisterGateway(IntPtr connId, string gatewayId)
         {
+            var _gatewayRepository = UPrimeEngine.Instance.Resolve<IGatewayRepository>();
             if (_connectionMap.TryGetValue(connId, out var connectionInfo))
             {
                 connectionInfo.GatewayId = gatewayId;
@@ -251,13 +252,12 @@ namespace EasyIotSharp.GateWay.Core.Socket
                 {
                     using (var scope = new TransactionScope())
                     {
-                        var gateway = _easyiotsharpContext.Gateway
-                            .FirstOrDefault(x => x.Id.Equals(gatewayId));
+                        var gateway = _gatewayRepository.GetGateway(gatewayId);
 
                         if (gateway != null)
                         {
                             gateway.State = 1; // 在线状态
-                            _easyiotsharpContext.SaveChanges();
+                             _gatewayRepository.Update(gateway);
                             scope.Complete();
                         }
                     }
@@ -270,8 +270,9 @@ namespace EasyIotSharp.GateWay.Core.Socket
             }
         }
 
-        public void RemoveConnection(IntPtr connId)
+        public  void RemoveConnection(IntPtr connId)
         {
+            var _gatewayRepository = UPrimeEngine.Instance.Resolve<IGatewayRepository>();
             if (_connectionMap.TryRemove(connId, out var connectionInfo) &&
                 !string.IsNullOrEmpty(connectionInfo.GatewayId))
             {
@@ -281,13 +282,12 @@ namespace EasyIotSharp.GateWay.Core.Socket
                 {
                     using (var scope = new TransactionScope())
                     {
-                        var gateway = _easyiotsharpContext.Gateway
-                            .FirstOrDefault(x => x.Id.Equals(connectionInfo.GatewayId));
+                        var gateway = _gatewayRepository.GetGateway(connectionInfo.GatewayId);
 
                         if (gateway != null)
                         {
                             gateway.State = 2; // 离线状态
-                            _easyiotsharpContext.SaveChanges();
+                             _gatewayRepository.Update(gateway);
                             scope.Complete();
                         }
                     }

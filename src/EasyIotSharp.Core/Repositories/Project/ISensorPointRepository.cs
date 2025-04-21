@@ -9,6 +9,14 @@ namespace EasyIotSharp.Core.Repositories.Project
 {
     public interface ISensorPointRepository : IMySqlRepositoryBase<SensorPoint, string>
     {
+
+        /// <summary>
+        /// 根据测点ID获取单条记录
+        /// </summary>
+        /// <param name="projectId"></param>
+        /// <returns></returns>
+        SensorPoint GetBySensorPointId(string sensorPointId);
+
         /// <summary>
         /// 通过条件分页查询项目分类列表
         /// </summary>
