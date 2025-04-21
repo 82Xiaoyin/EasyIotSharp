@@ -7,14 +7,12 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Threading;
 using EasyIotSharp.GateWay.Core.Socket.Factory;
-using EasyIotSharp.GateWay.Core.Domain;
 using System.Linq;
 using System.Text.Json;
 using EasyIotSharp.GateWay.Core.Util.ModbusUtil;
 using EasyIotSharp.GateWay.Core.Services;
 using EasyIotSharp.GateWay.Core.Model.AnalysisDTO;
 using EasyIotSharp.GateWay.Core.Model.ConfigDTO;
-using System.Collections.Generic;
 
 namespace EasyIotSharp.GateWay.Core.Socket.Service
 {

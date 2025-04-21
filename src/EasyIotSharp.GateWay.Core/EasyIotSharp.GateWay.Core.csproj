@@ -19,21 +19,10 @@
 
   <ItemGroup>
     <PackageReference Include="HPSocket.Net" Version="6.0.3" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.1.18" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Abstractions" Version="3.1.18" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Analyzers" Version="3.1.18" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="3.1.18">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="3.1.18" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="3.1.18">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
-    <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="3.2.4" />
     <PackageReference Include="RabbitMQ.Client" Version="6.0.0" />
+    <PackageReference Include="Serilog.AspNetCore" Version="3.4.0" />
+    <PackageReference Include="UPrime.Castle.Log4Net" Version="2.2.0" />
   </ItemGroup>
 
   <ItemGroup>

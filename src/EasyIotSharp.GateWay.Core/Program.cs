@@ -6,6 +6,7 @@ using EasyIotSharp.GateWay.Core.Util;
 using EasyIotSharp.GateWay.Core.Util.Encrypotion;
 using Microsoft.Extensions.Configuration;
 using UPrime.Configuration;
+using Castle.Facilities.Logging;
 using Serilog;
 using System;
 using System.IO;
@@ -13,11 +14,11 @@ using System.Threading;
 using UPrime;
 using UPrime.Castle.Log4Net;
 using UPrime.Configuration;
-using EasyIotSharp.Core;
+using EasyIotSharp.Core.Extensions;
 
 namespace EasyIotSharp.GateWay.Core
 {
-    class Program
+    public class Program
     {
         static EasySocketBase easySocketBase = null;
 
@@ -60,7 +61,6 @@ namespace EasyIotSharp.GateWay.Core
                     Log.Information($"最小线程数没有改变: worker = {minWorker}");
                 }
             }
-
 
             try
             {

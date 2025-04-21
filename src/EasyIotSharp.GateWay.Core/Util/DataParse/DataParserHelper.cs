@@ -1,4 +1,3 @@
-using EasyIotSharp.GateWay.Core.Domain;
 using EasyIotSharp.GateWay.Core.Model.AnalysisDTO;
 using EasyIotSharp.GateWay.Core.Services;
 using EasyIotSharp.GateWay.Core.Socket;

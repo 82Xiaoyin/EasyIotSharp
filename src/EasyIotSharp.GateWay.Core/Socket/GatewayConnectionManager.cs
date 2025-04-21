@@ -1,4 +1,3 @@
-using EasyIotSharp.GateWay.Core.Domain;
 using EasyIotSharp.GateWay.Core.Util;
 using System;
 using System.Collections.Concurrent;
