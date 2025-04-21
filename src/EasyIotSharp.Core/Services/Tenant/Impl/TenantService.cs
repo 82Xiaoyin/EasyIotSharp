@@ -9,6 +9,8 @@ using UPrime.AutoMapper;
 using EasyIotSharp.Core.Repositories.TenantAccount;
 using EasyIotSharp.Core.Services.TenantAccount;
 using EasyIotSharp.Core.Dto.TenantAccount.Params;
+using EasyIotSharp.Core.Caching.Tenant;
+using EasyIotSharp.Core.Events.Tenant;
 
 namespace EasyIotSharp.Core.Services.Tenant.Impl
 {
@@ -17,12 +19,15 @@ namespace EasyIotSharp.Core.Services.Tenant.Impl
         private readonly ITenantRepository _tenantRepository;
 
         private readonly ISoldierService _soldierService;
+        private readonly ITenantCacheService _tenantCacheService;
 
         public TenantService(ITenantRepository tenantRepository,
-                             ISoldierService soldierService)
+                             ISoldierService soldierService,
+                             ITenantCacheService tenantCacheService)
         {
             _tenantRepository = tenantRepository;
             _soldierService = soldierService;
+            _tenantCacheService = tenantCacheService;
         }
 
         public async Task<TenantDto> GetTenant(string id)
@@ -33,10 +38,27 @@ namespace EasyIotSharp.Core.Services.Tenant.Impl
 
         public async Task<PagedResultDto<TenantDto>> QueryTenant(QueryTenantInput input)
         {
-            var query = await _tenantRepository.Query(input.Keyword, input.ExpiredType, input.ContractStartTime, input.ContractEndTime, input.IsFreeze, input.PageIndex, input.PageSize);
-            int totalCount = query.totalCount;
-            var list = query.items.MapTo<List<TenantDto>>();
-            return new PagedResultDto<TenantDto>() { TotalCount = totalCount, Items = list };
+            if (string.IsNullOrEmpty(input.Keyword) && input.ExpiredType.Equals(-1) 
+                && input.ContractEndTime.IsNull() && 
+                input.ContractStartTime.IsNull() 
+                && input.IsPage.Equals(true) 
+                && input.PageIndex <= 5 && input.PageSize == 10)
+            {
+                return await _tenantCacheService.QueryTenant(input, async () =>
+                {
+                    var query = await _tenantRepository.Query(input.Keyword, input.ExpiredType, input.ContractStartTime, input.ContractEndTime, input.IsFreeze, input.PageIndex, input.PageSize);
+                    int totalCount = query.totalCount;
+                    var list = query.items.MapTo<List<TenantDto>>();
+                    return new PagedResultDto<TenantDto>() { TotalCount = totalCount, Items = list };
+                });
+            }
+            else {
+                var query = await _tenantRepository.Query(input.Keyword, input.ExpiredType, input.ContractStartTime, input.ContractEndTime, input.IsFreeze, input.PageIndex, input.PageSize);
+                int totalCount = query.totalCount;
+                var list = query.items.MapTo<List<TenantDto>>();
+                return new PagedResultDto<TenantDto>() { TotalCount = totalCount, Items = list };
+            }
+
         }
 
         public async Task InsertTenant(InsertTenantInput input)
@@ -83,6 +105,8 @@ namespace EasyIotSharp.Core.Services.Tenant.Impl
             model.OperatorId = ContextUser.UserId;
             model.OperatorName = ContextUser.UserName;
             await _tenantRepository.InsertAsync(model);
+            //清除缓存
+            await EventBus.TriggerAsync(new TenantEventData(){});
         }
 
         public async Task UpdateTenant(UpdateTenantInput input)
@@ -114,6 +138,8 @@ namespace EasyIotSharp.Core.Services.Tenant.Impl
             info.OperatorId = ContextUser.UserId;
             info.OperatorName = ContextUser.UserName;
             await _tenantRepository.UpdateAsync(info);
+            //清除缓存
+            await EventBus.TriggerAsync(new TenantEventData() { });
         }
 
         public async Task UpdateIsFreezeTenant(UpdateIsFreezeTenantTenantInput input)
@@ -132,6 +158,8 @@ namespace EasyIotSharp.Core.Services.Tenant.Impl
                 info.OperatorName = ContextUser.UserName;
                 await _tenantRepository.UpdateAsync(info);
             }
+            //清除缓存
+            await EventBus.TriggerAsync(new TenantEventData() { });
         }
 
         public async Task DeleteTenant(DeleteTenantInput input)
@@ -149,6 +177,8 @@ namespace EasyIotSharp.Core.Services.Tenant.Impl
                 info.OperatorName = ContextUser.UserName;
                 await _tenantRepository.UpdateAsync(info);
             }
+            //清除缓存
+            await EventBus.TriggerAsync(new TenantEventData() { });
         }
     }
 }

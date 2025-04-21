@@ -11,6 +11,7 @@ namespace EasyIotSharp.Core.Caching
             /// 项目缓存前缀（清除所有用）
             /// </summary>
             public const string BASE = "service:EasyIotSharp";
+            public const string TenantCache = BASE+ "Tenant_";
         }
 
         /// <summary>
@@ -29,24 +30,9 @@ namespace EasyIotSharp.Core.Caching
         public const int SEARCH_EXPIRES_MINUTES = 60;
 
         /// <summary>
-        /// 用户相关的缓存过期时间 = 2小时
+        /// 租户相关的缓存过期时间 = 2小时
         /// </summary>
-        public const int USER_EXPIRES_MINUTES = 120;
-
-        /// <summary>
-        /// 会员卡相关的缓存过期时间= 1小时
-        /// </summary>
-        public const int CARD_EXPIRES_MINUTES = 60;
-
-        /// <summary>
-        /// 测评相关的缓存过期时间= 1小时
-        /// </summary>
-        public const int EVALUATION_EXPIRES_MINUTES = 60;
-
-        /// <summary>
-        /// 单个专业定位测评详情相关的缓存过期时间= 半小时
-        /// </summary>
-        public const int PROFESSIONORIENTATION_EXPIRES_MINUTES = 30;
+        public const int TENANT_EXPIRES_MINUTES = 120;
 
         /// <summary>
         /// 缓存10分钟过期
@@ -62,10 +48,5 @@ namespace EasyIotSharp.Core.Caching
         /// 缓存24小时过期
         /// </summary>
         public const int TWENTY_FOUR_EXPIRES_HOURS = 24;
-
-        /// <summary>
-        /// 微信开发平台授权ACCESSTOKEN过期时间（官方默认过期时间7200秒，考虑接口调用耗时，本地缓存缩短30秒）
-        /// </summary>
-        public const int ACCESSTOKEN_EXPIRED_SECONDS = 700;
     }
 }

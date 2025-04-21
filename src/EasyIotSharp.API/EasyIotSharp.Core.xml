@@ -49,24 +49,9 @@
             检索相关的缓存过期时间（非精准关键字） = 1小时
             </summary>
         </member>
-        <member name="F:EasyIotSharp.Core.Caching.CachingConsts.USER_EXPIRES_MINUTES">
+        <member name="F:EasyIotSharp.Core.Caching.CachingConsts.TENANT_EXPIRES_MINUTES">
             <summary>
-            用户相关的缓存过期时间 = 2小时
-            </summary>
-        </member>
-        <member name="F:EasyIotSharp.Core.Caching.CachingConsts.CARD_EXPIRES_MINUTES">
-            <summary>
-            会员卡相关的缓存过期时间= 1小时
-            </summary>
-        </member>
-        <member name="F:EasyIotSharp.Core.Caching.CachingConsts.EVALUATION_EXPIRES_MINUTES">
-            <summary>
-            测评相关的缓存过期时间= 1小时
-            </summary>
-        </member>
-        <member name="F:EasyIotSharp.Core.Caching.CachingConsts.PROFESSIONORIENTATION_EXPIRES_MINUTES">
-            <summary>
-            单个专业定位测评详情相关的缓存过期时间= 半小时
+            租户相关的缓存过期时间 = 2小时
             </summary>
         </member>
         <member name="F:EasyIotSharp.Core.Caching.CachingConsts.TEN_EXPIRES_MINUTES">
@@ -82,11 +67,6 @@
         <member name="F:EasyIotSharp.Core.Caching.CachingConsts.TWENTY_FOUR_EXPIRES_HOURS">
             <summary>
             缓存24小时过期
-            </summary>
-        </member>
-        <member name="F:EasyIotSharp.Core.Caching.CachingConsts.ACCESSTOKEN_EXPIRED_SECONDS">
-            <summary>
-            微信开发平台授权ACCESSTOKEN过期时间（官方默认过期时间7200秒，考虑接口调用耗时，本地缓存缩短30秒）
             </summary>
         </member>
         <member name="T:EasyIotSharp.Core.Caching.CachingServiceBase">
@@ -167,6 +147,13 @@
             <summary>
             缓存服务的标记
             </summary>
+        </member>
+        <member name="M:EasyIotSharp.Core.Caching.Tenant.ITenantCacheService.QueryTenant(EasyIotSharp.Core.Dto.Tenant.Params.QueryTenantInput,System.Func{System.Threading.Tasks.Task{UPrime.Services.Dto.PagedResultDto{EasyIotSharp.Core.Dto.Tenant.TenantDto}}})">
+            <summary>
+            通过条件分页查询租户列表
+            </summary>
+            <param name="input"></param>
+            <returns></returns>
         </member>
         <member name="T:EasyIotSharp.Core.Configuration.APIServiceOptions">
             <summary>
