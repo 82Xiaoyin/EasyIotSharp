@@ -24,6 +24,7 @@ namespace EasyIotSharp.Core.Domain.Rule
         /// <summary>
         /// json字符串
         /// </summary>
+        [SugarColumn(ColumnDataType = "TEXT")]
         public string ActionJSON { get; set; }
     }
 }

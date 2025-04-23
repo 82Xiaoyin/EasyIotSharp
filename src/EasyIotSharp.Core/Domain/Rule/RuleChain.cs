@@ -29,11 +29,13 @@ namespace EasyIotSharp.Core.Domain.Rule
         /// <summary>
         /// 条件JSON储存
         /// </summary>
+        [SugarColumn(ColumnDataType = "TEXT")]
         public string RuleContentJson { get; set; }
 
         /// <summary>
         /// 报警JSON
         /// </summary>
+        [SugarColumn(ColumnDataType = "TEXT")]
         public string AlarmsJSON { get; set; }
 
         /// <summary>
