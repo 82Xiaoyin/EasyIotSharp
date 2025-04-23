@@ -67,7 +67,7 @@
         </member>
         <member name="M:EasyIotSharp.API.Controllers.AutomationController.UpdateRuleChainState(EasyIotSharp.Core.Dto.Rule.Params.InsertRuleChain)">
             <summary>
-            修改报警状态
+            修改场景联动状态
             </summary>
             <param name="input"></param>
             <returns></returns>

@@ -98,6 +98,7 @@ namespace EasyIotSharp.Core
             IocManager.Register<IAlarmsConfigRepository, AlarmsConfigRepository>();
             IocManager.Register<INotifyRepository, NotifyRepository>();
             IocManager.Register<IRuleChainRepository, RuleChainRepository>();
+            IocManager.Register<ISceneManagementRepository, SceneManagementRepository>();
             
         }
 
