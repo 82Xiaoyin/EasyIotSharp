@@ -989,57 +989,37 @@
             发生结果
             </summary>
         </member>
-        <member name="T:EasyIotSharp.Core.Domain.Rule.RuleCondition">
+        <member name="T:EasyIotSharp.Core.Domain.Rule.RuleChain">
             <summary>
-            规则链条件表
+            场景联动
             </summary>
         </member>
-        <member name="P:EasyIotSharp.Core.Domain.Rule.RuleCondition.RuleConditionCode">
+        <member name="P:EasyIotSharp.Core.Domain.Rule.RuleChain.Name">
             <summary>
-            条件Code
+            名称
             </summary>
         </member>
-        <member name="P:EasyIotSharp.Core.Domain.Rule.RuleCondition.ParentId">
+        <member name="P:EasyIotSharp.Core.Domain.Rule.RuleChain.ProjectId">
             <summary>
-            父级Id
+            项目Id
             </summary>
         </member>
-        <member name="P:EasyIotSharp.Core.Domain.Rule.RuleCondition.Identifier">
+        <member name="P:EasyIotSharp.Core.Domain.Rule.RuleChain.State">
             <summary>
-            标签
+            状态
             </summary>
         </member>
-        <member name="P:EasyIotSharp.Core.Domain.Rule.RuleCondition.Label">
+        <member name="P:EasyIotSharp.Core.Domain.Rule.RuleChain.RuleContentJson">
             <summary>
-            标签
+            条件JSON储存
             </summary>
         </member>
-        <member name="P:EasyIotSharp.Core.Domain.Rule.RuleCondition.Placeholder">
+        <member name="P:EasyIotSharp.Core.Domain.Rule.RuleChain.AlarmsJSON">
             <summary>
-            文本提示
+            报警JSON
             </summary>
         </member>
-        <member name="P:EasyIotSharp.Core.Domain.Rule.RuleCondition.Tag">
-            <summary>
-            类型
-            </summary>
-        </member>
-        <member name="P:EasyIotSharp.Core.Domain.Rule.RuleCondition.TagType">
-            <summary>
-            标签类型
-            </summary>
-        </member>
-        <member name="P:EasyIotSharp.Core.Domain.Rule.RuleCondition.Sort">
-            <summary>
-            排序
-            </summary>
-        </member>
-        <member name="P:EasyIotSharp.Core.Domain.Rule.RuleCondition.IsEnable">
-            <summary>
-            是否启用
-            </summary>
-        </member>
-        <member name="P:EasyIotSharp.Core.Domain.Rule.RuleCondition.Remark">
+        <member name="P:EasyIotSharp.Core.Domain.Rule.RuleChain.Remark">
             <summary>
             描述
             </summary>
@@ -3397,21 +3377,6 @@
         <member name="P:EasyIotSharp.Core.Dto.Rule.Params.NotifyRecordInput.EndTime">
             <summary>
             结束时间
-            </summary>
-        </member>
-        <member name="P:EasyIotSharp.Core.Dto.Rule.Params.RuleConditionInput.RuleCode">
-            <summary>
-            Code
-            </summary>
-        </member>
-        <member name="P:EasyIotSharp.Core.Dto.Rule.Params.RuleConditionInput.KeyWord">
-            <summary>
-            文本参数
-            </summary>
-        </member>
-        <member name="P:EasyIotSharp.Core.Dto.Rule.Params.RuleConditionInput.IsEnable">
-            <summary>
-            是否有效
             </summary>
         </member>
         <member name="P:EasyIotSharp.Core.Dto.Rule.UserNotifyDto.IsSms">
@@ -6078,13 +6043,11 @@
             <param name="userNotifies"></param>
             <returns></returns>
         </member>
-        <member name="M:EasyIotSharp.Core.Repositories.Rule.Impl.RuleConditionRepository.Query(System.String,System.String,System.Int32,System.Int32,System.Int32)">
+        <member name="M:EasyIotSharp.Core.Repositories.Rule.Impl.RuleChainRepository.Query(System.String,System.Int32,System.Int32)">
             <summary>
-            条件配置列表
+            场景联动列表
             </summary>
-            <param name="ruleCode"></param>
             <param name="keyword"></param>
-            <param name="isEnable"></param>
             <param name="pageIndex"></param>
             <param name="pageSize"></param>
             <returns></returns>
@@ -6130,16 +6093,10 @@
             <param name="userNotifies"></param>
             <returns></returns>
         </member>
-        <member name="M:EasyIotSharp.Core.Repositories.Rule.IRuleConditionRepository.Query(System.String,System.String,System.Int32,System.Int32,System.Int32)">
+        <member name="M:EasyIotSharp.Core.Repositories.Rule.IRuleChainRepository.Query(System.String,System.Int32,System.Int32)">
             <summary>
-            条件配置列表
+            查询规则链列表
             </summary>
-            <param name="ruleCode"></param>
-            <param name="keyword"></param>
-            <param name="isEnable"></param>
-            <param name="pageIndex"></param>
-            <param name="pageSize"></param>
-            <returns></returns>
         </member>
         <member name="M:EasyIotSharp.Core.Repositories.Rule.ISceneManagementRepository.Query(System.String,System.Int32,System.Int32)">
             <summary>
@@ -7289,55 +7246,40 @@
             <param name="input"></param>
             <returns></returns>
         </member>
-        <member name="T:EasyIotSharp.Core.Services.Rule.Impl.RuleConditionService">
+        <member name="T:EasyIotSharp.Core.Services.Rule.Impl.RuleChainService">
             <summary>
-            规则条件服务
+            规则链服务
             </summary>
         </member>
-        <member name="M:EasyIotSharp.Core.Services.Rule.Impl.RuleConditionService.#ctor(EasyIotSharp.Core.Repositories.Rule.IRuleConditionRepository)">
+        <member name="M:EasyIotSharp.Core.Services.Rule.Impl.RuleChainService.#ctor(EasyIotSharp.Core.Repositories.Rule.IRuleChainRepository)">
             <summary>
             构造函数
             </summary>
-            <param name="ruleConditionRepository">规则条件仓储</param>
         </member>
-        <member name="M:EasyIotSharp.Core.Services.Rule.Impl.RuleConditionService.QueryRuleCondition(EasyIotSharp.Core.Dto.Rule.Params.RuleConditionInput)">
+        <member name="M:EasyIotSharp.Core.Services.Rule.Impl.RuleChainService.QueryRuleChain(EasyIotSharp.Core.Dto.Rule.Params.SceneManagementInput)">
             <summary>
-            查询规则条件列表
+            查询规则链列表
             </summary>
-            <param name="input">查询参数</param>
-            <returns>分页结果</returns>
         </member>
-        <member name="M:EasyIotSharp.Core.Services.Rule.Impl.RuleConditionService.InsertRuleCondition(EasyIotSharp.Core.Dto.Rule.Params.InsertRuleCondition)">
+        <member name="M:EasyIotSharp.Core.Services.Rule.Impl.RuleChainService.InsertRuleChain(EasyIotSharp.Core.Dto.Rule.Params.InsertRuleChain)">
             <summary>
-            新增规则条件
+            新增规则链
             </summary>
-            <param name="input">新增参数</param>
-            <returns>执行结果</returns>
-            <exception cref="T:EasyIotSharp.Core.BizException">规则条件标签重复时抛出异常</exception>
         </member>
-        <member name="M:EasyIotSharp.Core.Services.Rule.Impl.RuleConditionService.UpdateRuleCondition(EasyIotSharp.Core.Dto.Rule.Params.InsertRuleCondition)">
+        <member name="M:EasyIotSharp.Core.Services.Rule.Impl.RuleChainService.UpdateRuleChain(EasyIotSharp.Core.Dto.Rule.Params.InsertRuleChain)">
             <summary>
-            修改规则条件
+            修改规则链
             </summary>
-            <param name="input">修改参数</param>
-            <returns>执行结果</returns>
-            <exception cref="T:EasyIotSharp.Core.BizException">未找到指定数据或规则条件标签重复时抛出异常</exception>
         </member>
-        <member name="M:EasyIotSharp.Core.Services.Rule.Impl.RuleConditionService.DeleteRuleCondition(EasyIotSharp.Core.Dto.DeleteInput)">
+        <member name="M:EasyIotSharp.Core.Services.Rule.Impl.RuleChainService.DeleteRuleChain(EasyIotSharp.Core.Dto.DeleteInput)">
             <summary>
-            删除规则条件
+            删除规则链
             </summary>
-            <param name="input">删除参数</param>
-            <returns>执行结果</returns>
-            <exception cref="T:EasyIotSharp.Core.BizException">未找到指定数据时抛出异常</exception>
         </member>
-        <member name="M:EasyIotSharp.Core.Services.Rule.Impl.RuleConditionService.UpdateRuleConditionState(EasyIotSharp.Core.Dto.Rule.Params.InsertRuleCondition)">
+        <member name="M:EasyIotSharp.Core.Services.Rule.Impl.RuleChainService.UpdateRuleChainState(EasyIotSharp.Core.Dto.Rule.Params.InsertRuleChain)">
             <summary>
-            修改规则条件状态
+            修改规则链状态
             </summary>
-            <param name="input">状态参数</param>
-            <returns>执行结果</returns>
-            <exception cref="T:EasyIotSharp.Core.BizException">未找到指定数据时抛出异常</exception>
         </member>
         <member name="T:EasyIotSharp.Core.Services.Rule.Impl.SceneManagementService">
             <summary>
@@ -7411,40 +7353,35 @@
             <param name="input"></param>
             <returns></returns>
         </member>
-        <member name="M:EasyIotSharp.Core.Services.Rule.IRuleConditionService.QueryRuleCondition(EasyIotSharp.Core.Dto.Rule.Params.RuleConditionInput)">
+        <member name="T:EasyIotSharp.Core.Services.Rule.IRuleChainService">
             <summary>
-            查询规则条件列表
+            规则链服务接口
             </summary>
-            <param name="input"></param>
-            <returns></returns>
         </member>
-        <member name="M:EasyIotSharp.Core.Services.Rule.IRuleConditionService.InsertRuleCondition(EasyIotSharp.Core.Dto.Rule.Params.InsertRuleCondition)">
+        <member name="M:EasyIotSharp.Core.Services.Rule.IRuleChainService.QueryRuleChain(EasyIotSharp.Core.Dto.Rule.Params.SceneManagementInput)">
             <summary>
-            新增规则条件
+            查询规则链列表
             </summary>
-            <param name="input"></param>
-            <returns></returns>
         </member>
-        <member name="M:EasyIotSharp.Core.Services.Rule.IRuleConditionService.UpdateRuleCondition(EasyIotSharp.Core.Dto.Rule.Params.InsertRuleCondition)">
+        <member name="M:EasyIotSharp.Core.Services.Rule.IRuleChainService.InsertRuleChain(EasyIotSharp.Core.Dto.Rule.Params.InsertRuleChain)">
             <summary>
-            修改规则条件
+            新增规则链
             </summary>
-            <param name="input"></param>
-            <returns></returns>
         </member>
-        <member name="M:EasyIotSharp.Core.Services.Rule.IRuleConditionService.DeleteRuleCondition(EasyIotSharp.Core.Dto.DeleteInput)">
+        <member name="M:EasyIotSharp.Core.Services.Rule.IRuleChainService.UpdateRuleChain(EasyIotSharp.Core.Dto.Rule.Params.InsertRuleChain)">
             <summary>
-            删除规则条件
+            修改规则链
             </summary>
-            <param name="input"></param>
-            <returns></returns>
         </member>
-        <member name="M:EasyIotSharp.Core.Services.Rule.IRuleConditionService.UpdateRuleConditionState(EasyIotSharp.Core.Dto.Rule.Params.InsertRuleCondition)">
+        <member name="M:EasyIotSharp.Core.Services.Rule.IRuleChainService.DeleteRuleChain(EasyIotSharp.Core.Dto.DeleteInput)">
             <summary>
-            修改规则条件状态
+            删除规则链
             </summary>
-            <param name="input"></param>
-            <returns></returns>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.Rule.IRuleChainService.UpdateRuleChainState(EasyIotSharp.Core.Dto.Rule.Params.InsertRuleChain)">
+            <summary>
+            修改规则链状态
+            </summary>
         </member>
         <member name="T:EasyIotSharp.Core.Services.Rule.ISceneManagementService">
             <summary>
