@@ -28,6 +28,8 @@ using EasyIotSharp.Core.Repositories.Queue;
 using EasyIotSharp.Core.Repositories.Queue.Impl;
 using EasyIotSharp.Core.Services.IO;
 using EasyIotSharp.Core.Services.IO.Impl;
+using EasyIotSharp.Core.Repositories.Rule;
+using EasyIotSharp.Core.Repositories.Rule.Impl;
 
 namespace EasyIotSharp.Core
 {
@@ -89,6 +91,10 @@ namespace EasyIotSharp.Core
             IocManager.Register<ISensorQuotaRepository, SensorQuotaRepository>();
             // 在现有的依赖注入注册代码中添加以下内容
             IocManager.Register<IRabbitServerInfoRepository, RabbitServerInfoRepository>();
+
+            //配置信息
+            IocManager.Register<IAlarmsConfigRepository, AlarmsConfigRepository>();
+            IocManager.Register<INotifyRepository, NotifyRepository>();
         }
 
         /// <summary>

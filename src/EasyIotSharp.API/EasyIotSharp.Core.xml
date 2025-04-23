@@ -894,6 +894,206 @@
             是否启用
             </summary>
         </member>
+        <member name="T:EasyIotSharp.Core.Domain.Rule.AlarmsConfig">
+            <summary>
+            配置项目关系表
+            </summary>
+        </member>
+        <member name="P:EasyIotSharp.Core.Domain.Rule.AlarmsConfig.AlarmsName">
+            <summary>
+            报警名称
+            </summary>
+        </member>
+        <member name="P:EasyIotSharp.Core.Domain.Rule.AlarmsConfig.Remark">
+            <summary>
+            描述
+            </summary>
+        </member>
+        <member name="P:EasyIotSharp.Core.Domain.Rule.AlarmsConfig.Level">
+            <summary>
+            级别
+            </summary>
+        </member>
+        <member name="P:EasyIotSharp.Core.Domain.Rule.AlarmsConfig.State">
+            <summary>
+            状态
+            </summary>
+        </member>
+        <member name="P:EasyIotSharp.Core.Domain.Rule.AlarmsConfig.NotifyId">
+            <summary>
+            通知组Id
+            </summary>
+        </member>
+        <member name="T:EasyIotSharp.Core.Domain.Rule.Notify">
+            <summary>
+            通知组
+            </summary>
+        </member>
+        <member name="P:EasyIotSharp.Core.Domain.Rule.Notify.NotifyName">
+            <summary>
+            通知组名称
+            </summary>
+        </member>
+        <member name="P:EasyIotSharp.Core.Domain.Rule.Notify.Remark">
+            <summary>
+            描述
+            </summary>
+        </member>
+        <member name="P:EasyIotSharp.Core.Domain.Rule.Notify.State">
+            <summary>
+            描述
+            </summary>
+        </member>
+        <member name="P:EasyIotSharp.Core.Domain.Rule.Notify.Type">
+            <summary>
+            类型（1.成员 2.邮箱 3.短信 4.语音 5.钉钉）
+            </summary>
+        </member>
+        <member name="P:EasyIotSharp.Core.Domain.Rule.Notify.NotifyContent">
+            <summary>
+            内容
+            </summary>
+        </member>
+        <member name="T:EasyIotSharp.Core.Domain.Rule.NotifyRecord">
+            <summary>
+            通知记录
+            </summary>
+        </member>
+        <member name="P:EasyIotSharp.Core.Domain.Rule.NotifyRecord.Type">
+            <summary>
+            类型（1.成员 2.邮箱 3.短信 4.语音 5.钉钉）
+            </summary>
+        </member>
+        <member name="P:EasyIotSharp.Core.Domain.Rule.NotifyRecord.SendTime">
+            <summary>
+            发生时间
+            </summary>
+        </member>
+        <member name="P:EasyIotSharp.Core.Domain.Rule.NotifyRecord.SendContent">
+            <summary>
+            发生内容
+            </summary>
+        </member>
+        <member name="P:EasyIotSharp.Core.Domain.Rule.NotifyRecord.SendUserId">
+            <summary>
+            用户Id
+            </summary>
+        </member>
+        <member name="P:EasyIotSharp.Core.Domain.Rule.NotifyRecord.SendUserName">
+            <summary>
+            用户Name
+            </summary>
+        </member>
+        <member name="P:EasyIotSharp.Core.Domain.Rule.NotifyRecord.SendResult">
+            <summary>
+            发生结果
+            </summary>
+        </member>
+        <member name="T:EasyIotSharp.Core.Domain.Rule.RuleCondition">
+            <summary>
+            规则链条件表
+            </summary>
+        </member>
+        <member name="P:EasyIotSharp.Core.Domain.Rule.RuleCondition.RuleConditionCode">
+            <summary>
+            条件Code
+            </summary>
+        </member>
+        <member name="P:EasyIotSharp.Core.Domain.Rule.RuleCondition.ParentId">
+            <summary>
+            父级Id
+            </summary>
+        </member>
+        <member name="P:EasyIotSharp.Core.Domain.Rule.RuleCondition.Identifier">
+            <summary>
+            标签
+            </summary>
+        </member>
+        <member name="P:EasyIotSharp.Core.Domain.Rule.RuleCondition.Label">
+            <summary>
+            标签
+            </summary>
+        </member>
+        <member name="P:EasyIotSharp.Core.Domain.Rule.RuleCondition.Placeholder">
+            <summary>
+            文本提示
+            </summary>
+        </member>
+        <member name="P:EasyIotSharp.Core.Domain.Rule.RuleCondition.Tag">
+            <summary>
+            类型
+            </summary>
+        </member>
+        <member name="P:EasyIotSharp.Core.Domain.Rule.RuleCondition.TagType">
+            <summary>
+            标签类型
+            </summary>
+        </member>
+        <member name="P:EasyIotSharp.Core.Domain.Rule.RuleCondition.Sort">
+            <summary>
+            排序
+            </summary>
+        </member>
+        <member name="P:EasyIotSharp.Core.Domain.Rule.RuleCondition.IsEnable">
+            <summary>
+            是否启用
+            </summary>
+        </member>
+        <member name="P:EasyIotSharp.Core.Domain.Rule.RuleCondition.Remark">
+            <summary>
+            描述
+            </summary>
+        </member>
+        <member name="T:EasyIotSharp.Core.Domain.Rule.SceneManagement">
+            <summary>
+            场景管理
+            </summary>
+        </member>
+        <member name="P:EasyIotSharp.Core.Domain.Rule.SceneManagement.SceneName">
+            <summary>
+            场景名称
+            </summary>
+        </member>
+        <member name="P:EasyIotSharp.Core.Domain.Rule.SceneManagement.SceneRemark">
+            <summary>
+            场景描述
+            </summary>
+        </member>
+        <member name="P:EasyIotSharp.Core.Domain.Rule.SceneManagement.ActionJSON">
+            <summary>
+            json字符串
+            </summary>
+        </member>
+        <member name="T:EasyIotSharp.Core.Domain.Rule.UserNotify">
+            <summary>
+            用户通知关系表
+            </summary>
+        </member>
+        <member name="P:EasyIotSharp.Core.Domain.Rule.UserNotify.NotifyId">
+            <summary>
+            通知组Id
+            </summary>
+        </member>
+        <member name="P:EasyIotSharp.Core.Domain.Rule.UserNotify.UserId">
+            <summary>
+            用户Id
+            </summary>
+        </member>
+        <member name="P:EasyIotSharp.Core.Domain.Rule.UserNotify.IsSms">
+            <summary>
+            是否短信通知
+            </summary>
+        </member>
+        <member name="P:EasyIotSharp.Core.Domain.Rule.UserNotify.IsEmail">
+            <summary>
+            是否邮箱通知
+            </summary>
+        </member>
+        <member name="P:EasyIotSharp.Core.Domain.Rule.UserNotify.IsPhone">
+            <summary>
+            是否语音通知
+            </summary>
+        </member>
         <member name="T:EasyIotSharp.Core.Domain.TenantAccount.Menu">
             <summary>
             租户菜单表
@@ -3192,6 +3392,51 @@
         <member name="P:EasyIotSharp.Core.Dto.Queue.RabbitServerInfoDto.IsEnable">
             <summary>
             是否启用
+            </summary>
+        </member>
+        <member name="P:EasyIotSharp.Core.Dto.Rule.Params.NotifyRecordInput.Type">
+            <summary>
+            类型
+            </summary>
+        </member>
+        <member name="P:EasyIotSharp.Core.Dto.Rule.Params.NotifyRecordInput.StarTime">
+            <summary>
+            开始时间
+            </summary>
+        </member>
+        <member name="P:EasyIotSharp.Core.Dto.Rule.Params.NotifyRecordInput.EndTime">
+            <summary>
+            结束时间
+            </summary>
+        </member>
+        <member name="P:EasyIotSharp.Core.Dto.Rule.Params.RuleConditionInput.RuleCode">
+            <summary>
+            Code
+            </summary>
+        </member>
+        <member name="P:EasyIotSharp.Core.Dto.Rule.Params.RuleConditionInput.KeyWord">
+            <summary>
+            文本参数
+            </summary>
+        </member>
+        <member name="P:EasyIotSharp.Core.Dto.Rule.Params.RuleConditionInput.IsEnable">
+            <summary>
+            是否有效
+            </summary>
+        </member>
+        <member name="P:EasyIotSharp.Core.Dto.Rule.UserNotifyDto.IsSms">
+            <summary>
+            是否短信通知
+            </summary>
+        </member>
+        <member name="P:EasyIotSharp.Core.Dto.Rule.UserNotifyDto.IsEmail">
+            <summary>
+            是否邮箱通知
+            </summary>
+        </member>
+        <member name="P:EasyIotSharp.Core.Dto.Rule.UserNotifyDto.IsPhone">
+            <summary>
+            是否语音通知
             </summary>
         </member>
         <member name="T:EasyIotSharp.Core.Dto.TenantAccount.MenuDto">
@@ -5792,6 +6037,133 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="M:EasyIotSharp.Core.Repositories.Rule.IAlarmsConfigRepository.Query(System.Int32,System.Int32)">
+            <summary>
+            列表
+            </summary>
+            <param name="pageIndex"></param>
+            <param name="pageSize"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EasyIotSharp.Core.Repositories.Rule.Impl.AlarmsConfigRepository.Query(System.Int32,System.Int32)">
+            <summary>
+            列表
+            </summary>
+            <param name="pageIndex"></param>
+            <param name="pageSize"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EasyIotSharp.Core.Repositories.Rule.Impl.NotifyRepository.Query(System.Int32,System.Int32)">
+            <summary>
+            列表
+            </summary>
+            <param name="pageIndex"></param>
+            <param name="pageSize"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EasyIotSharp.Core.Repositories.Rule.Impl.NotifyRepository.QueryNotifyRecordDto(System.Nullable{System.Int32},System.String,System.Nullable{System.DateTime},System.Nullable{System.DateTime},System.Int32,System.Int32)">
+            <summary>
+            获取通知记录
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:EasyIotSharp.Core.Repositories.Rule.Impl.NotifyRepository.QueryUserNotify(System.String)">
+            <summary>
+            通过通知组Id 获取信息
+            </summary>
+            <param name="notifyId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EasyIotSharp.Core.Repositories.Rule.Impl.NotifyRepository.InsertUserNotifyList(System.Collections.Generic.List{EasyIotSharp.Core.Domain.Rule.UserNotify})">
+            <summary>
+            插入中间表数据
+            </summary>
+            <param name="userNotifies"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EasyIotSharp.Core.Repositories.Rule.Impl.NotifyRepository.DeleteableUserNotifyList(System.Collections.Generic.List{EasyIotSharp.Core.Domain.Rule.UserNotify})">
+            <summary>
+            修改中间表数据
+            </summary>
+            <param name="userNotifies"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EasyIotSharp.Core.Repositories.Rule.Impl.RuleConditionRepository.Query(System.String,System.String,System.Int32,System.Int32,System.Int32)">
+            <summary>
+            条件配置列表
+            </summary>
+            <param name="ruleCode"></param>
+            <param name="keyword"></param>
+            <param name="isEnable"></param>
+            <param name="pageIndex"></param>
+            <param name="pageSize"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EasyIotSharp.Core.Repositories.Rule.INotifyRepository.Query(System.Int32,System.Int32)">
+            <summary>
+            列表
+            </summary>
+            <param name="pageIndex"></param>
+            <param name="pageSize"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EasyIotSharp.Core.Repositories.Rule.INotifyRepository.QueryNotifyRecordDto(System.Nullable{System.Int32},System.String,System.Nullable{System.DateTime},System.Nullable{System.DateTime},System.Int32,System.Int32)">
+            <summary>
+            列表
+            </summary>
+            <param name="type"></param>
+            <param name="keyWord"></param>
+            <param name="starTime"></param>
+            <param name="endTime"></param>
+            <param name="pageIndex"></param>
+            <param name="pageSize"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EasyIotSharp.Core.Repositories.Rule.INotifyRepository.QueryUserNotify(System.String)">
+            <summary>
+            通过Id获取用户信息
+            </summary>
+            <param name="notifyId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EasyIotSharp.Core.Repositories.Rule.INotifyRepository.InsertUserNotifyList(System.Collections.Generic.List{EasyIotSharp.Core.Domain.Rule.UserNotify})">
+            <summary>
+            新增用户通知关系
+            </summary>
+            <param name="userNotifies"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EasyIotSharp.Core.Repositories.Rule.INotifyRepository.DeleteableUserNotifyList(System.Collections.Generic.List{EasyIotSharp.Core.Domain.Rule.UserNotify})">
+            <summary>
+            修改用户通知关系表
+            </summary>
+            <param name="userNotifies"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EasyIotSharp.Core.Repositories.Rule.IRuleConditionRepository.Query(System.String,System.String,System.Int32,System.Int32,System.Int32)">
+            <summary>
+            条件配置列表
+            </summary>
+            <param name="ruleCode"></param>
+            <param name="keyword"></param>
+            <param name="isEnable"></param>
+            <param name="pageIndex"></param>
+            <param name="pageSize"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EasyIotSharp.Core.Repositories.Rule.ISceneManagementRepository.Query(System.String,System.Int32,System.Int32)">
+            <summary>
+            分页查询场景列表
+            </summary>
+            <param name="tenantNumId">租户编号</param>
+            <param name="keyword">关键字</param>
+            <param name="type">场景类型</param>
+            <param name="triggerType">触发类型</param>
+            <param name="isEnable">是否启用（-1:全部）</param>
+            <param name="pageIndex">页码</param>
+            <param name="pageSize">每页大小</param>
+            <returns></returns>
+        </member>
         <member name="M:EasyIotSharp.Core.Repositories.TenantAccount.IMenuRepository.Query(System.Int32,System.String,System.Int32,System.Int32,System.Int32,System.Boolean)">
             <summary>
             通过条件分页查询菜单列表
@@ -6806,6 +7178,308 @@
             </summary>
             <param name="input">输入参数</param>
             <returns></returns>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.Rule.IAlarmsConfigService.QueryAlarmsConfig(EasyIotSharp.Core.Dto.PagingInput)">
+            <summary>
+            查询列表
+            </summary>
+            <param name="input"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.Rule.IAlarmsConfigService.InsertAlarmsConfig(EasyIotSharp.Core.Dto.Rule.Params.InsertAlarmsConfig)">
+            <summary>
+            新增报警
+            </summary>
+            <param name="input"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.Rule.IAlarmsConfigService.UpdateAlarmsConfig(EasyIotSharp.Core.Dto.Rule.Params.InsertAlarmsConfig)">
+            <summary>
+            修改报警
+            </summary>
+            <param name="input"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.Rule.IAlarmsConfigService.DeleteAlarmsConfig(EasyIotSharp.Core.Dto.DeleteInput)">
+            <summary>
+            删除报警
+            </summary>
+            <param name="input"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.Rule.IAlarmsConfigService.UpdateAlarmsConfigState(EasyIotSharp.Core.Dto.Rule.Params.InsertAlarmsConfig)">
+            <summary>
+            修改状态
+            </summary>
+            <param name="input"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.Rule.Impl.AlarmsConfigService.QueryAlarmsConfig(EasyIotSharp.Core.Dto.PagingInput)">
+            <summary>
+            列表
+            </summary>
+            <param name="input"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.Rule.Impl.AlarmsConfigService.InsertAlarmsConfig(EasyIotSharp.Core.Dto.Rule.Params.InsertAlarmsConfig)">
+            <summary>
+            新增报警
+            </summary>
+            <param name="input"></param>
+            <returns></returns>
+            <exception cref="T:EasyIotSharp.Core.BizException"></exception>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.Rule.Impl.AlarmsConfigService.UpdateAlarmsConfig(EasyIotSharp.Core.Dto.Rule.Params.InsertAlarmsConfig)">
+            <summary>
+            修改报警
+            </summary>
+            <param name="input"></param>
+            <returns></returns>
+            <exception cref="T:EasyIotSharp.Core.BizException"></exception>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.Rule.Impl.AlarmsConfigService.DeleteAlarmsConfig(EasyIotSharp.Core.Dto.DeleteInput)">
+            <summary>
+            删除报警
+            </summary>
+            <param name="input"></param>
+            <returns></returns>
+            <exception cref="T:EasyIotSharp.Core.BizException"></exception>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.Rule.Impl.AlarmsConfigService.UpdateAlarmsConfigState(EasyIotSharp.Core.Dto.Rule.Params.InsertAlarmsConfig)">
+            <summary>
+            修改状态
+            </summary>
+            <param name="input"></param>
+            <returns></returns>
+            <exception cref="T:EasyIotSharp.Core.BizException"></exception>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.Rule.Impl.NotifyService.QueryNotifyConfig(EasyIotSharp.Core.Dto.PagingInput)">
+            <summary>
+            列表
+            </summary>
+            <param name="input"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.Rule.Impl.NotifyService.InsertNotifyConfig(EasyIotSharp.Core.Dto.Rule.Params.InsertNotify)">
+            <summary>
+            新增通知
+            </summary>
+            <param name="input"></param>
+            <returns></returns>
+            <exception cref="T:EasyIotSharp.Core.BizException"></exception>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.Rule.Impl.NotifyService.UpdateNotifyConfig(EasyIotSharp.Core.Dto.Rule.Params.InsertNotify)">
+            <summary>
+            修改通知
+            </summary>
+            <param name="input"></param>
+            <returns></returns>
+            <exception cref="T:EasyIotSharp.Core.BizException"></exception>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.Rule.Impl.NotifyService.DeleteNotifyConfig(EasyIotSharp.Core.Dto.DeleteInput)">
+            <summary>
+            删除通知
+            </summary>
+            <param name="input"></param>
+            <returns></returns>
+            <exception cref="T:EasyIotSharp.Core.BizException"></exception>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.Rule.Impl.NotifyService.UpdateNotifyConfigState(EasyIotSharp.Core.Dto.Rule.Params.InsertNotify)">
+            <summary>
+            修改状态
+            </summary>
+            <param name="input"></param>
+            <returns></returns>
+            <exception cref="T:EasyIotSharp.Core.BizException"></exception>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.Rule.Impl.NotifyService.QueryNotifyRecord(EasyIotSharp.Core.Dto.Rule.Params.NotifyRecordInput)">
+            <summary>
+            通知记录列表
+            </summary>
+            <param name="input"></param>
+            <returns></returns>
+        </member>
+        <member name="T:EasyIotSharp.Core.Services.Rule.Impl.RuleConditionService">
+            <summary>
+            规则条件服务
+            </summary>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.Rule.Impl.RuleConditionService.#ctor(EasyIotSharp.Core.Repositories.Rule.IRuleConditionRepository)">
+            <summary>
+            构造函数
+            </summary>
+            <param name="ruleConditionRepository">规则条件仓储</param>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.Rule.Impl.RuleConditionService.QueryRuleCondition(EasyIotSharp.Core.Dto.Rule.Params.RuleConditionInput)">
+            <summary>
+            查询规则条件列表
+            </summary>
+            <param name="input">查询参数</param>
+            <returns>分页结果</returns>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.Rule.Impl.RuleConditionService.InsertRuleCondition(EasyIotSharp.Core.Dto.Rule.Params.InsertRuleCondition)">
+            <summary>
+            新增规则条件
+            </summary>
+            <param name="input">新增参数</param>
+            <returns>执行结果</returns>
+            <exception cref="T:EasyIotSharp.Core.BizException">规则条件标签重复时抛出异常</exception>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.Rule.Impl.RuleConditionService.UpdateRuleCondition(EasyIotSharp.Core.Dto.Rule.Params.InsertRuleCondition)">
+            <summary>
+            修改规则条件
+            </summary>
+            <param name="input">修改参数</param>
+            <returns>执行结果</returns>
+            <exception cref="T:EasyIotSharp.Core.BizException">未找到指定数据或规则条件标签重复时抛出异常</exception>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.Rule.Impl.RuleConditionService.DeleteRuleCondition(EasyIotSharp.Core.Dto.DeleteInput)">
+            <summary>
+            删除规则条件
+            </summary>
+            <param name="input">删除参数</param>
+            <returns>执行结果</returns>
+            <exception cref="T:EasyIotSharp.Core.BizException">未找到指定数据时抛出异常</exception>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.Rule.Impl.RuleConditionService.UpdateRuleConditionState(EasyIotSharp.Core.Dto.Rule.Params.InsertRuleCondition)">
+            <summary>
+            修改规则条件状态
+            </summary>
+            <param name="input">状态参数</param>
+            <returns>执行结果</returns>
+            <exception cref="T:EasyIotSharp.Core.BizException">未找到指定数据时抛出异常</exception>
+        </member>
+        <member name="T:EasyIotSharp.Core.Services.Rule.Impl.SceneManagementService">
+            <summary>
+            场景管理服务
+            </summary>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.Rule.Impl.SceneManagementService.#ctor(EasyIotSharp.Core.Repositories.Rule.ISceneManagementRepository)">
+            <summary>
+            构造函数
+            </summary>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.Rule.Impl.SceneManagementService.QuerySceneManagement(EasyIotSharp.Core.Dto.Rule.Params.SceneManagementInput)">
+            <summary>
+            查询场景列表
+            </summary>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.Rule.Impl.SceneManagementService.InsertSceneManagement(EasyIotSharp.Core.Dto.Rule.Params.InsertSceneManagement)">
+            <summary>
+            新增场景
+            </summary>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.Rule.Impl.SceneManagementService.UpdateSceneManagement(EasyIotSharp.Core.Dto.Rule.Params.InsertSceneManagement)">
+            <summary>
+            修改场景
+            </summary>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.Rule.Impl.SceneManagementService.DeleteSceneManagement(EasyIotSharp.Core.Dto.DeleteInput)">
+            <summary>
+            删除场景
+            </summary>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.Rule.INotifyService.QueryNotifyConfig(EasyIotSharp.Core.Dto.PagingInput)">
+            <summary>
+            列表
+            </summary>
+            <param name="input"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.Rule.INotifyService.InsertNotifyConfig(EasyIotSharp.Core.Dto.Rule.Params.InsertNotify)">
+            <summary>
+            新增通知
+            </summary>
+            <param name="input"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.Rule.INotifyService.UpdateNotifyConfig(EasyIotSharp.Core.Dto.Rule.Params.InsertNotify)">
+            <summary>
+            修改通知
+            </summary>
+            <param name="input"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.Rule.INotifyService.DeleteNotifyConfig(EasyIotSharp.Core.Dto.DeleteInput)">
+            <summary>
+            删除通知
+            </summary>
+            <param name="input"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.Rule.INotifyService.UpdateNotifyConfigState(EasyIotSharp.Core.Dto.Rule.Params.InsertNotify)">
+            <summary>
+            修改状态
+            </summary>
+            <param name="input"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.Rule.INotifyService.QueryNotifyRecord(EasyIotSharp.Core.Dto.Rule.Params.NotifyRecordInput)">
+            <summary>
+            获取通知记录
+            </summary>
+            <param name="input"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.Rule.IRuleConditionService.QueryRuleCondition(EasyIotSharp.Core.Dto.Rule.Params.RuleConditionInput)">
+            <summary>
+            查询规则条件列表
+            </summary>
+            <param name="input"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.Rule.IRuleConditionService.InsertRuleCondition(EasyIotSharp.Core.Dto.Rule.Params.InsertRuleCondition)">
+            <summary>
+            新增规则条件
+            </summary>
+            <param name="input"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.Rule.IRuleConditionService.UpdateRuleCondition(EasyIotSharp.Core.Dto.Rule.Params.InsertRuleCondition)">
+            <summary>
+            修改规则条件
+            </summary>
+            <param name="input"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.Rule.IRuleConditionService.DeleteRuleCondition(EasyIotSharp.Core.Dto.DeleteInput)">
+            <summary>
+            删除规则条件
+            </summary>
+            <param name="input"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.Rule.IRuleConditionService.UpdateRuleConditionState(EasyIotSharp.Core.Dto.Rule.Params.InsertRuleCondition)">
+            <summary>
+            修改规则条件状态
+            </summary>
+            <param name="input"></param>
+            <returns></returns>
+        </member>
+        <member name="T:EasyIotSharp.Core.Services.Rule.ISceneManagementService">
+            <summary>
+            场景管理服务接口
+            </summary>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.Rule.ISceneManagementService.QuerySceneManagement(EasyIotSharp.Core.Dto.Rule.Params.SceneManagementInput)">
+            <summary>
+            查询场景列表
+            </summary>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.Rule.ISceneManagementService.InsertSceneManagement(EasyIotSharp.Core.Dto.Rule.Params.InsertSceneManagement)">
+            <summary>
+            新增场景
+            </summary>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.Rule.ISceneManagementService.UpdateSceneManagement(EasyIotSharp.Core.Dto.Rule.Params.InsertSceneManagement)">
+            <summary>
+            修改场景
+            </summary>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.Rule.ISceneManagementService.DeleteSceneManagement(EasyIotSharp.Core.Dto.DeleteInput)">
+            <summary>
+            删除场景
+            </summary>
         </member>
         <member name="M:EasyIotSharp.Core.Services.TenantAccount.IMenuService.GetMenu(System.String)">
             <summary>
