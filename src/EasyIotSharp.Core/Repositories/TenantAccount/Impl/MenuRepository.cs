@@ -153,7 +153,7 @@ namespace EasyIotSharp.Core.Repositories.TenantAccount.Impl
             }
             else if (input.Id != null)
             {
-                IsVerify = await Client.Queryable<Menu>().AnyAsync(x => x.ParentId == input.ParentId && x.IsDelete == false && x.Type == input.Type && x.Url == input.Url);
+                IsVerify = await Client.Queryable<Menu>().Where(x => x.ParentId == input.ParentId && x.IsDelete == false && x.Type == input.Type && x.Url == input.Url).CountAsync()>1;
             }
             else
             {
