@@ -31,6 +31,7 @@ using EasyIotSharp.Core.Services.IO.Impl;
 using EasyIotSharp.Core.Repositories.Rule;
 using EasyIotSharp.Core.Repositories.Rule.Impl;
 using EasyIotSharp.Core.Services.Rule;
+using EasyIotSharp.Core.Domain.Rule;
 
 namespace EasyIotSharp.Core
 {
@@ -96,7 +97,7 @@ namespace EasyIotSharp.Core
             //配置信息
             IocManager.Register<IAlarmsConfigRepository, AlarmsConfigRepository>();
             IocManager.Register<INotifyRepository, NotifyRepository>();
-            IocManager.Register<IRuleConditionRepository, RuleConditionRepository>();
+            IocManager.Register<IRuleChainRepository, RuleChainRepository>();
             
         }
 

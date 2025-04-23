@@ -21,12 +21,10 @@ namespace EasyIotSharp.API.Controllers
     {
         private readonly IAlarmsConfigService _alarmsConfigService;
         private readonly INotifyService _notifyService;
-        private readonly IRuleConditionService _ruleConditionService;
         public RuleController()
         {
             _alarmsConfigService = UPrime.UPrimeEngine.Instance.Resolve<IAlarmsConfigService>();
             _notifyService = UPrime.UPrimeEngine.Instance.Resolve<INotifyService>();
-            _ruleConditionService = UPrime.UPrimeEngine.Instance.Resolve<IRuleConditionService>();
         }
 
         #region 报警
@@ -183,76 +181,6 @@ namespace EasyIotSharp.API.Controllers
             UPrimeResponse<PagedResultDto<NotifyRecordDto>> res = new UPrimeResponse<PagedResultDto<NotifyRecordDto>>();
             res.Result = await _notifyService.QueryNotifyRecord(input);
             return res;
-        }
-
-        #endregion
-
-        #region 规则条件配置
-
-        /// <summary>
-        /// 通过条件分页查询报警配置
-        /// </summary>
-        /// <param name="input"></param>
-        /// <returns></returns>
-        [HttpPost("/Rule/RuleCondition/Query")]
-        [Authorize]
-        public async Task<UPrimeResponse<PagedResultDto<RuleConditionDto>>> QueryProjectBase([FromBody] RuleConditionInput input)
-        {
-            UPrimeResponse<PagedResultDto<RuleConditionDto>> res = new UPrimeResponse<PagedResultDto<RuleConditionDto>>();
-            res.Result = await _ruleConditionService.QueryRuleCondition(input);
-            return res;
-        }
-
-        /// <summary>
-        /// 新增通知组
-        /// </summary>
-        /// <param name="input"></param>
-        /// <returns></returns>
-        [HttpPost("/Rule/RuleCondition/Insert")]
-        [Authorize]
-        public async Task<UPrimeResponse> InsertRuleCondition([FromBody] InsertRuleCondition input)
-        {
-            await _ruleConditionService.InsertRuleCondition(input);
-            return new UPrimeResponse();
-        }
-
-        /// <summary>
-        /// 修改通知组
-        /// </summary>
-        /// <param name="input"></param>
-        /// <returns></returns>
-        [HttpPost("/Rule/RuleCondition/Update")]
-        [Authorize]
-        public async Task<UPrimeResponse> UpdateRuleCondition([FromBody] InsertRuleCondition input)
-        {
-            await _ruleConditionService.UpdateRuleCondition(input);
-            return new UPrimeResponse();
-        }
-
-        /// <summary>
-        /// 删除通知组
-        /// </summary>
-        /// <param name="input"></param>
-        /// <returns></returns>
-        [HttpPost("/Rule/RuleCondition/Delete")]
-        [Authorize]
-        public async Task<UPrimeResponse> DeleteRuleCondition([FromBody] DeleteInput input)
-        {
-            await _ruleConditionService.DeleteRuleCondition(input);
-            return new UPrimeResponse();
-        }
-
-        /// <summary>
-        /// 修改通知组
-        /// </summary>
-        /// <param name="input"></param>
-        /// <returns></returns>
-        [HttpPost("/Rule/RuleCondition/UpdateState")]
-        [Authorize]
-        public async Task<UPrimeResponse> UpdateRuleConditionState([FromBody] InsertRuleCondition input)
-        {
-            await _ruleConditionService.UpdateRuleConditionState(input);
-            return new UPrimeResponse();
         }
 
         #endregion

@@ -16,15 +16,17 @@ namespace EasyIotSharp.API.Controllers
     public class AutomationController : ApiControllerBase
     {
         private readonly ISceneManagementService _sceneManagementService;
+        private readonly IRuleChainService _ruleChainService;
         public AutomationController()
         {
             _sceneManagementService = UPrime.UPrimeEngine.Instance.Resolve<ISceneManagementService>();
+            _ruleChainService = UPrime.UPrimeEngine.Instance.Resolve<IRuleChainService>();
         }
 
         #region 场景管理
 
         /// <summary>
-        /// 通过条件分页查询报警配置
+        /// 通过条件分页查询场景管理
         /// </summary>
         /// <param name="input"></param>
         /// <returns></returns>
@@ -38,7 +40,7 @@ namespace EasyIotSharp.API.Controllers
         }
 
         /// <summary>
-        /// 新增报警信息
+        /// 新增场景管理
         /// </summary>
         /// <param name="input"></param>
         /// <returns></returns>
@@ -51,7 +53,7 @@ namespace EasyIotSharp.API.Controllers
         }
 
         /// <summary>
-        /// 修改报警信息
+        /// 修改场景管理
         /// </summary>
         /// <param name="input"></param>
         /// <returns></returns>
@@ -64,7 +66,7 @@ namespace EasyIotSharp.API.Controllers
         }
 
         /// <summary>
-        /// 删除报警信息
+        /// 删除场景管理
         /// </summary>
         /// <param name="input"></param>
         /// <returns></returns>
@@ -78,5 +80,75 @@ namespace EasyIotSharp.API.Controllers
 
         #endregion
 
+
+        #region 场景联动
+
+        /// <summary>
+        /// 通过条件分页查询场景联动
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
+        [HttpPost("/Automation/RuleChain/Query")]
+        [Authorize]
+        public async Task<UPrimeResponse<PagedResultDto<RuleChainDto>>> QueryRuleChain([FromBody] SceneManagementInput input)
+        {
+            UPrimeResponse<PagedResultDto<RuleChainDto>> res = new UPrimeResponse<PagedResultDto<RuleChainDto>>();
+            res.Result = await _ruleChainService.QueryRuleChain(input);
+            return res;
+        }
+
+        /// <summary>
+        /// 新增场景联动
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
+        [HttpPost("/Automation/RuleChain/Insert")]
+        [Authorize]
+        public async Task<UPrimeResponse> InsertRuleChain([FromBody] InsertRuleChain input)
+        {
+            await _ruleChainService.InsertRuleChain(input);
+            return new UPrimeResponse();
+        }
+
+        /// <summary>
+        /// 修改场景联动
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
+        [HttpPost("/Automation/RuleChain/Update")]
+        [Authorize]
+        public async Task<UPrimeResponse> UpdateRuleChain([FromBody] InsertRuleChain input)
+        {
+            await _ruleChainService.UpdateRuleChain(input);
+            return new UPrimeResponse();
+        }
+
+        /// <summary>
+        /// 删除场景联动
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
+        [HttpPost("/Automation/RuleChain/Delete")]
+        [Authorize]
+        public async Task<UPrimeResponse> DeleteRuleChain([FromBody] DeleteInput input)
+        {
+            await _ruleChainService.DeleteRuleChain(input);
+            return new UPrimeResponse();
+        }
+
+        /// <summary>
+        /// 修改场景联动状态
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
+        [HttpPost("/Automation/RuleChain/UpdateState")]
+        [Authorize]
+        public async Task<UPrimeResponse> UpdateRuleChainState([FromBody] InsertRuleChain input)
+        {
+            await _ruleChainService.UpdateRuleChainState(input);
+            return new UPrimeResponse();
+        }
+
+        #endregion
     }
 }
