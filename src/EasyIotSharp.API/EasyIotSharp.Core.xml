@@ -941,7 +941,7 @@
         </member>
         <member name="P:EasyIotSharp.Core.Domain.Rule.Notify.State">
             <summary>
-            描述
+            状态
             </summary>
         </member>
         <member name="P:EasyIotSharp.Core.Domain.Rule.Notify.Type">
@@ -2359,16 +2359,6 @@
         <member name="T:EasyIotSharp.Core.Dto.OperateUserInput">
             <summary>
             操作用户信息输入
-            </summary>
-        </member>
-        <member name="P:EasyIotSharp.Core.Dto.OperateUserInput.OperatorId">
-            <summary>
-            操作人标识
-            </summary>
-        </member>
-        <member name="P:EasyIotSharp.Core.Dto.OperateUserInput.OperatorName">
-            <summary>
-            操作人
             </summary>
         </member>
         <member name="T:EasyIotSharp.Core.Dto.PagingInput">

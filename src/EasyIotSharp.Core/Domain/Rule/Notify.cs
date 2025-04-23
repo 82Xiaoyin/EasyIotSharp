@@ -22,7 +22,7 @@ namespace EasyIotSharp.Core.Domain.Rule
         public string Remark { get; set; }
 
         /// <summary>
-        /// 描述
+        /// 状态
         /// </summary>
         public bool State { get; set; }
 

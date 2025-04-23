@@ -72,14 +72,14 @@ namespace EasyIotSharp.Core.Repositories.Rule.Impl
             var sql = Client.Queryable<NotifyRecord>()
                 .Where(w => w.IsDelete == false);
 
-            if (type != null)
+            if (type > -1)
             {
                 sql.Where(w => w.Type == type);
             }
 
             if (!string.IsNullOrEmpty(keyWord))
             {
-                sql.Where(w => w.SendUserName == keyWord);
+                sql.Where(w => w.SendUserName .Contains(keyWord));
             }
 
             if (starTime.HasValue)

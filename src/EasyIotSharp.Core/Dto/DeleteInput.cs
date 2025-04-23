@@ -10,7 +10,6 @@ namespace EasyIotSharp.Core.Dto
         /// <summary>
         /// 对象id
         /// </summary>
-        [RegularExpression(RegexExpressions.OBJECT_ID)]
         public string Id { get; set; }
     }
 }

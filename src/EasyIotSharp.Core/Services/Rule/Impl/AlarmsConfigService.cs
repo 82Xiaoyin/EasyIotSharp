@@ -63,7 +63,7 @@ namespace EasyIotSharp.Core.Services.Rule.Impl
             model.AlarmsName = input.AlarmsName;
             model.Remark = input.Remark;
             model.Level = input.Level;
-            model.State = input.State;
+            model.State = true;
             model.NotifyId = input.NotifyId;
             model.IsDelete = false;
             model.CreationTime = DateTime.Now;
