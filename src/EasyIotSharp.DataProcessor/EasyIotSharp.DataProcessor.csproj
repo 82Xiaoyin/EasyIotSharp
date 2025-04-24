@@ -6,7 +6,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Util\DataParse\" />
+    <Compile Remove="Util\DataParse\**" />
+    <EmbeddedResource Remove="Util\DataParse\**" />
+    <None Remove="Util\DataParse\**" />
   </ItemGroup>
 
   <ItemGroup>
@@ -17,6 +19,21 @@
 
   <ItemGroup>
     <ProjectReference Include="..\EasyIotSharp.Core\EasyIotSharp.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="appsettings.dev.yml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="appsettings.pro.yml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="appsettings.qa.yml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="appsettings.yml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>

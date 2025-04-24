@@ -228,6 +228,13 @@
             <param name="action"></param>
             <returns></returns>
         </member>
+        <member name="M:EasyIotSharp.Core.Caching.Queue.IRabbitServerInfoCacheService.GetRabbitProject(System.Func{System.Collections.Generic.List{EasyIotSharp.Core.Dto.Queue.RabbitServerInfoDto}})">
+            <summary>
+            
+            </summary>
+            <param name="action"></param>
+            <returns></returns>
+        </member>
         <member name="M:EasyIotSharp.Core.Caching.Rule.IAlarmsConfigCacheService.QueryAlarmsConfig(EasyIotSharp.Core.Dto.PagingInput,System.Func{System.Threading.Tasks.Task{UPrime.Services.Dto.PagedResultDto{EasyIotSharp.Core.Dto.Rule.AlarmsConfigDto}}})">
             <summary>
             配置项目关系
@@ -1423,6 +1430,11 @@
             租户名称
             </summary>
         </member>
+        <member name="P:EasyIotSharp.Core.Domain.Tenant.Tenant.Abbreviation">
+            <summary>
+            租户简称
+            </summary>
+        </member>
         <member name="P:EasyIotSharp.Core.Domain.Tenant.Tenant.StoreKey">
             <summary>
             机构的（唯一的等同Id）
@@ -2559,6 +2571,11 @@
         <member name="P:EasyIotSharp.Core.Dto.Project.ClassificationDto.OperatorName">
             <summary>
             操作人
+            </summary>
+        </member>
+        <member name="P:EasyIotSharp.Core.Dto.Project.GatewayBaseDto.TenantAbbreviation">
+            <summary>
+            租户简称
             </summary>
         </member>
         <member name="T:EasyIotSharp.Core.Dto.Project.GatewayDto">
@@ -4488,6 +4505,11 @@
             租户名称
             </summary>
         </member>
+        <member name="P:EasyIotSharp.Core.Dto.Tenant.Params.InsertTenantInput.Abbreviation">
+            <summary>
+            租户简称
+            </summary>
+        </member>
         <member name="P:EasyIotSharp.Core.Dto.Tenant.Params.InsertTenantInput.ContractName">
             <summary>
             合同名称
@@ -4634,6 +4656,11 @@
             租户名称
             </summary>
         </member>
+        <member name="P:EasyIotSharp.Core.Dto.Tenant.Params.UpdateTenantInput.Abbreviation">
+            <summary>
+            租户简称
+            </summary>
+        </member>
         <member name="P:EasyIotSharp.Core.Dto.Tenant.Params.UpdateTenantInput.StoreKey">
             <summary>
             机构的（唯一的等同Id）
@@ -4751,6 +4778,11 @@
         <member name="P:EasyIotSharp.Core.Dto.Tenant.TenantDto.Name">
             <summary>
             租户名称
+            </summary>
+        </member>
+        <member name="P:EasyIotSharp.Core.Dto.Tenant.TenantDto.Abbreviation">
+            <summary>
+            租户简称
             </summary>
         </member>
         <member name="P:EasyIotSharp.Core.Dto.Tenant.TenantDto.StoreKey">

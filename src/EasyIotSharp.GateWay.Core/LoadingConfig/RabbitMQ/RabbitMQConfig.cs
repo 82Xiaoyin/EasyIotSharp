@@ -52,7 +52,7 @@ namespace EasyIotSharp.GateWay.Core.LoadingConfig.RabbitMQ
         // 修改查询和初始化逻辑
         public static void InitMQ(IServiceProvider serviceProvider = null)
         {
-            var rabbitServerInfoService = UPrimeEngine.Instance.Resolve<IRabbitServerInfoService>();
+            var rabbitServerInfoService = UPrimeEngine.Instance.Resolve<IRabbitServerInfoRepository>();
 
 
             // 防止重复初始化
@@ -124,6 +124,7 @@ namespace EasyIotSharp.GateWay.Core.LoadingConfig.RabbitMQ
                                 {
                                     // 单个 MQ 初始化失败，不影响其他
                                     LogHelper.Error($"MQ Client 初始化失败: {ex.ToString()}");
+                                    continue;
                                 }
                             }
                         }
@@ -131,6 +132,7 @@ namespace EasyIotSharp.GateWay.Core.LoadingConfig.RabbitMQ
                     catch (Exception ex)
                     {
                         LogHelper.Error($"获取MQ配置失败: {ex.ToString()}");
+                        return;
                     }
 
                     _isInitialized = true;
@@ -139,6 +141,7 @@ namespace EasyIotSharp.GateWay.Core.LoadingConfig.RabbitMQ
                 catch (Exception ex)
                 {
                     LogHelper.Error($"RabbitMQ初始化过程中发生异常: {ex.ToString()}");
+                    return;
                 }
             }
         }

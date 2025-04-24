@@ -129,7 +129,7 @@ namespace EasyIotSharp.GateWay.Core.Socket.Service
                             continue;
                         }
 
-                        var sensor = _sensorRepository.GetBySensor(sensorPoint.Id);
+                        var sensor = _sensorRepository.GetBySensor(sensorPoint.SensorId);
                         if (sensor == null)
                         {
                             LogHelper.Error($"未找到测点类型信息，测点类型id: {sensorPoint.SensorId}");

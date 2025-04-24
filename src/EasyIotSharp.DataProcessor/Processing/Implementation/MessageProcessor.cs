@@ -8,6 +8,7 @@ using System.Threading.Channels;
 using EasyIotSharp.DataProcessor.Model.AnalysisDTO;
 using EasyIotSharp.DataProcessor.Processing.Interfaces;
 using EasyIotSharp.DataProcessor.Util;
+using EasyIotSharp.Core.Repositories.Influxdb;
 
 namespace EasyIotSharp.DataProcessor.Processing.Implementation
 {
@@ -27,6 +28,7 @@ namespace EasyIotSharp.DataProcessor.Processing.Implementation
         // 性能监控器
         private readonly IPerformanceMonitor _performanceMonitor;
         
+
         /// <summary>
         /// 构造函数
         /// </summary>
@@ -117,7 +119,6 @@ namespace EasyIotSharp.DataProcessor.Processing.Implementation
                 
                 // 使用批处理提高性能
                 var batch = new List<ProcessingItem>(100);
-                
                 await foreach (var item in _processingChannel.Reader.ReadAllAsync(stoppingToken))
                 {
                     try
@@ -153,7 +154,7 @@ namespace EasyIotSharp.DataProcessor.Processing.Implementation
         /// <summary>
         /// 处理消息
         /// </summary>
-        private void ProcessMessage(string projectId, string message)
+        private async void ProcessMessage(string projectId, string message)
         {
             try
             {
@@ -171,8 +172,42 @@ namespace EasyIotSharp.DataProcessor.Processing.Implementation
                     else
                     {
                         // 处理低频数据
-                        var data = LowFrequencyData.FromEncryptedString<SensorDataBase>(message);
+                        var data = LowFrequencyData.FromEncryptedString<LowFrequencyData>(message);
                         LogHelper.Debug($"成功解析低频数据，项目ID: {projectId}");
+                        
+                        // 创建测量名称
+                        var measurementName = $"raw_{data.PointType}";
+                        
+                        // 创建仓储实例（只创建一次）
+                        var repository = InfluxdbRepositoryFactory.Create<Dictionary<string, object>>(
+                            measurementName: measurementName,
+                            tenantDatabase: data.TenantAbbreviation
+                        );
+                        
+                        // 批量处理所有测点数据
+                        var dataPoints = new List<Dictionary<string, object>>();
+                        
+                        foreach (var point in data.Points)
+                        {
+                            var dynamicData = new Dictionary<string, object>
+                            {
+                                ["projectId"] = projectId,
+                                ["pointType"] = data.PointType,
+                                ["pointId"] = point.PointId,
+                                ["time"] = data.Time
+                            };
+                            
+                            // 添加所有指标值
+                            foreach (var metric in point.Values)
+                            {
+                                dynamicData[metric.Name.ToLower()] = metric.Value;
+                            }
+                            
+                            dataPoints.Add(dynamicData);
+                        }
+                        
+                        // 批量保存所有数据点
+                        await repository.BulkInsertAsync(dataPoints);
                     }
                 }
                 catch (Exception parseEx)

@@ -27,7 +27,7 @@ namespace EasyIotSharp.Core.Repositories.Project.Impl
         {
             return Client.Queryable<Gateway>()
                 .LeftJoin<EasyIotSharp.Core.Domain.Tenant.Tenant>((g, t) => g.TenantNumId == t.NumId)
-                .Where(w => w.Id.Equals(id))
+                .Where((g, t) =>g.Id.Equals(id))
                 .Select((g, t) => new GatewayBaseDto
                 { 
                     Id = g.Id, 

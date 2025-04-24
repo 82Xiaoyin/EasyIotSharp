@@ -60,7 +60,7 @@ namespace EasyIotSharp.GateWay.Core.UI
                 Console.Write("FAIL");
                 Console.ResetColor();
                 Console.WriteLine($" - {ex.Message}");
-                throw;
+                return;
             }
         }
 

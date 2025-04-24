@@ -7,18 +7,42 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using EasyIotSharp.DataProcessor.Processing.Interfaces;
-using EasyIotSharp.DataProcessor.Processing.Implementation; // 添加这个命名空间
-
+using EasyIotSharp.DataProcessor.Processing.Implementation;
+using UPrime;
+using EasyIotSharp.Core.Configuration;
+using System.IO;
+using UPrime.Configuration;
+using Serilog; // 添加这个命名空间
+using EasyIotSharp.Core.Extensions;
 namespace EasyIotSharp.DataProcessor
 {
     class Program
     {
         private static DataProcessingService _dataProcessingService;
-
         public static void Main(string[] args)
         {
             try
             {
+
+                string environment = GetEnv(args);
+                var config = new ConfigurationBuilder()
+                        .SetBasePath(Directory.GetCurrentDirectory())
+                        .AddYamlFile("appsettings.yml", optional: true, reloadOnChange: true)
+                        .AddYamlFile($"appsettings.{environment}.yml", optional: true, reloadOnChange: true)
+                        .AddCommandLine(args)
+                        .Build();
+                var appOptions = AppOptions.ReadFromConfiguration(config);
+                UPrimeStarter.Create<DataProcessorModule>(
+                   (options) =>
+                   {
+                       options.IocManager.AddAppOptions(appOptions);
+                   }
+                   ).Initialize();
+
+                var configDictionary = config.ToDictionary("Serilog");
+                var loggerConfig = new LoggerConfiguration().ReadFrom.Configuration(config);
+                Log.Logger = loggerConfig.CreateLogger();
+                Log.Information("Settings {@Settings}", configDictionary);
                 AppDomain.CurrentDomain.ProcessExit += AppDomain_ProcessExit;
 
                 ConsoleUI.ShowBanner();
@@ -110,6 +134,21 @@ namespace EasyIotSharp.DataProcessor
             {
                 LogHelper.Error($"资源清理异常: {ex.ToString()}");
             }
+        }
+        private static string GetEnv(string[] args)
+        {
+            string env = "dev";
+            if (args.Length > 0)
+            {
+                foreach (string argValue in args)
+                {
+                    if (argValue.Contains("--env"))
+                    {
+                        env = argValue.ReplaceByEmpty("--env=").Trim();
+                    }
+                }
+            }
+            return env;
         }
     }
 }
