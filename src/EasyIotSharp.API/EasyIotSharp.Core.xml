@@ -6187,7 +6187,7 @@
             <param name="userNotifies"></param>
             <returns></returns>
         </member>
-        <member name="M:EasyIotSharp.Core.Repositories.Rule.Impl.RuleChainRepository.Query(System.String,System.Int32,System.Int32)">
+        <member name="M:EasyIotSharp.Core.Repositories.Rule.Impl.RuleChainRepository.Query(System.String,System.String,System.Int32,System.Int32)">
             <summary>
             场景联动列表
             </summary>
@@ -6237,7 +6237,7 @@
             <param name="userNotifies"></param>
             <returns></returns>
         </member>
-        <member name="M:EasyIotSharp.Core.Repositories.Rule.IRuleChainRepository.Query(System.String,System.Int32,System.Int32)">
+        <member name="M:EasyIotSharp.Core.Repositories.Rule.IRuleChainRepository.Query(System.String,System.String,System.Int32,System.Int32)">
             <summary>
             查询规则链列表
             </summary>
@@ -7230,6 +7230,12 @@
             分页查询RabbitMQ服务器配置信息列表
             </summary>
         </member>
+        <member name="M:EasyIotSharp.Core.Services.Queue.Impl.RabbitServerInfoService.GetRabbitProject">
+            <summary>
+            获取rabbit配置信息列表
+            </summary>
+            <returns></returns>
+        </member>
         <member name="T:EasyIotSharp.Core.Services.Queue.IRabbitServerInfoService">
             <summary>
             RabbitMQ服务器配置信息服务接口
@@ -7268,6 +7274,12 @@
             分页查询RabbitMQ服务器配置信息列表
             </summary>
             <param name="input">输入参数</param>
+            <returns></returns>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.Queue.IRabbitServerInfoService.GetRabbitProject">
+            <summary>
+            获取rabbit配置信息列表
+            </summary>
             <returns></returns>
         </member>
         <member name="M:EasyIotSharp.Core.Services.Rule.IAlarmsConfigService.QueryAlarmsConfig(EasyIotSharp.Core.Dto.PagingInput)">

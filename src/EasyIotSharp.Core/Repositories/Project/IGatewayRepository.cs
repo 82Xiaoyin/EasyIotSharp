@@ -1,4 +1,5 @@
 ﻿using EasyIotSharp.Core.Domain.Proejct;
+using EasyIotSharp.Core.Dto.Project;
 using EasyIotSharp.Core.Repositories.Mysql;
 using System;
 using System.Collections.Generic;
@@ -15,7 +16,7 @@ namespace EasyIotSharp.Core.Repositories.Project
         /// </summary>
         /// <param name="id">id</param>
         /// <returns></returns>
-        Gateway GetGateway(string id);
+        GatewayBaseDto GetGateway(string id);
 
         /// <summary>
         /// 根据ID集合查询网关列表

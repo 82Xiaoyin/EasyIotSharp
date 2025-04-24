@@ -1,5 +1,6 @@
 using EasyIotSharp.Core.Dto.Queue;
 using EasyIotSharp.Core.Dto.Queue.Params;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using UPrime.Services.Dto;
 
@@ -44,5 +45,11 @@ namespace EasyIotSharp.Core.Services.Queue
         /// <param name="input">输入参数</param>
         /// <returns></returns>
         Task<PagedResultDto<RabbitServerInfoDto>> QueryRabbitServerInfo(QueryRabbitServerInfoInput input);
+
+        /// <summary>
+        /// 获取rabbit配置信息列表
+        /// </summary>
+        /// <returns></returns>
+        List<RabbitServerInfoDto> GetRabbitProject();
     }
 }

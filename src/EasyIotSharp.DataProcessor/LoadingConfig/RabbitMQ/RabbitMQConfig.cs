@@ -7,6 +7,7 @@ using EasyIotSharp.DataProcessor.Model.RaddbitDTO;
 using Microsoft.Extensions.DependencyInjection;
 using EasyIotSharp.Core.Repositories.Queue;
 using UPrime;
+using EasyIotSharp.Core.Services.Queue;
 
 namespace EasyIotSharp.DataProcessor.LoadingConfig.RabbitMQ
 {
@@ -47,7 +48,7 @@ namespace EasyIotSharp.DataProcessor.LoadingConfig.RabbitMQ
         // 修改查询和初始化逻辑
         public static void InitMQ(IServiceProvider serviceProvider = null)
         {
-            var _rabbitServerInfoRepository = UPrimeEngine.Instance.Resolve<IRabbitServerInfoRepository>();
+            var rabbitServerInfoService = UPrimeEngine.Instance.Resolve<IRabbitServerInfoService>();
 
 
             // 防止重复初始化
@@ -75,8 +76,7 @@ namespace EasyIotSharp.DataProcessor.LoadingConfig.RabbitMQ
                     try
                     {
                         // 查询MQ服务器和项目配置信息
-                        var mqlist = _rabbitServerInfoRepository.GetRabbitProject();
-
+                        var mqlist = rabbitServerInfoService.GetRabbitProject();
 
                         LogHelper.Info($"找到 {mqlist.Count} 个RabbitMQ配置");
 

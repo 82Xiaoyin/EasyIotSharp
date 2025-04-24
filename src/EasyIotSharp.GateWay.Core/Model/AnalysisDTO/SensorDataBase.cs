@@ -28,6 +28,10 @@ namespace EasyIotSharp.GateWay.Core.Model.AnalysisDTO
     public class SensorDataBase
     {
         /// <summary>
+        /// 租户简称
+        /// </summary>
+        public string TenantAbbreviation { get; set; }
+        /// <summary>
         /// 项目ID
         /// </summary>
         public string ProjectId { get; set; }

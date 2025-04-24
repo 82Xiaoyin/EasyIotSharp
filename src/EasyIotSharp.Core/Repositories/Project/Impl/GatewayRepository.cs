@@ -1,4 +1,5 @@
 ﻿using EasyIotSharp.Core.Domain.Proejct;
+using EasyIotSharp.Core.Dto.Project;
 using EasyIotSharp.Core.Repositories.Mysql;
 using LinqKit;
 using SqlSugar;
@@ -22,10 +23,21 @@ namespace EasyIotSharp.Core.Repositories.Project.Impl
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public Gateway GetGateway(string id)
+        public GatewayBaseDto GetGateway(string id)
         {
-            return Client.Queryable<Gateway>().Where(w => w.Id.Equals(id))
-                            .First();
+            return Client.Queryable<Gateway>()
+                .LeftJoin<EasyIotSharp.Core.Domain.Tenant.Tenant>((g, t) => g.TenantNumId == t.NumId)
+                .Where(w => w.Id.Equals(id))
+                .Select((g, t) => new GatewayBaseDto
+                { 
+                    Id = g.Id, 
+                    TenantNumId = g.TenantNumId, 
+                    TenantAbbreviation = t.Abbreviation,
+                    Name = g.Name,
+                    ProjectId = g.ProjectId,
+                    State = g.State,
+                    ProtocolId = g.ProtocolId,
+                }).First();
         }
 
         /// <summary>

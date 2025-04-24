@@ -17,5 +17,12 @@ namespace EasyIotSharp.Core.Caching.Queue
         /// <param name="action"></param>
         /// <returns></returns>
         Task<PagedResultDto<RabbitServerInfoDto>> QueryRabbitServerInfo(QueryRabbitServerInfoInput input, Func<Task<PagedResultDto<RabbitServerInfoDto>>> action);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="action"></param>
+        /// <returns></returns>
+        List<RabbitServerInfoDto> GetRabbitProject(Func<List<RabbitServerInfoDto>> action);
     }
 }

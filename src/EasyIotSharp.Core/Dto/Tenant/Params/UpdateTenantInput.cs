@@ -26,6 +26,11 @@ namespace EasyIotSharp.Core.Dto.Tenant.Params
         /// </summary>
         public string Name { get; set; }
 
+        /// <summary>
+        /// 租户简称
+        /// </summary>
+        public string Abbreviation { get; set; }
+
         #region 基本信息
 
         /// <summary>

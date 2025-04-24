@@ -24,6 +24,7 @@ namespace EasyIotSharp.GateWay.Core.Util
             {
                 try
                 {
+                    sensorData.TenantAbbreviation = gateway.TenantAbbreviation;
                     string encryptedData = sensorData.ToEncryptedString();
                     rabbitMQService.SendMessage(gateway.ProjectId, encryptedData);
                     LogHelper.Info($"发送加密数据到RabbitMQ成功, 网关ID: {connectionInfo.GatewayId}");

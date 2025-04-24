@@ -99,6 +99,7 @@ namespace EasyIotSharp.Core.Services.Tenant.Impl
             model.IsFreeze = input.IsFreeze;
             model.FreezeDes = input.FreezeDes;
             model.ManagerId = managerId;
+            model.Abbreviation = input.Abbreviation;
             model.IsDelete = false;
             model.CreationTime = DateTime.Now;
             model.UpdatedAt = DateTime.Now;
@@ -134,6 +135,7 @@ namespace EasyIotSharp.Core.Services.Tenant.Impl
             info.VersionTypeId = input.VersionTypeId;
             info.IsFreeze = input.IsFreeze;
             info.FreezeDes = input.FreezeDes;
+            input.Abbreviation = input.Abbreviation;
             info.UpdatedAt = DateTime.Now;
             info.OperatorId = ContextUser.UserId;
             info.OperatorName = ContextUser.UserName;

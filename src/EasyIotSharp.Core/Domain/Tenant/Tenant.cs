@@ -12,7 +12,7 @@ namespace EasyIotSharp.Core.Domain.Tenant
     /// 租户表
     /// </summary>
     [SugarTable("Tenants")]
-    public class Tenant: BaseEntity<string>
+    public class Tenant : BaseEntity<string>
     {
         /// <summary>
         /// numId
@@ -25,6 +25,10 @@ namespace EasyIotSharp.Core.Domain.Tenant
         [SugarColumn(ColumnDataType = "NVARCHAR(50)")]
         public string Name { get; set; }
 
+        /// <summary>
+        /// 租户简称
+        /// </summary>
+        public string Abbreviation { get; set; }
         #region 基本信息
 
         /// <summary>

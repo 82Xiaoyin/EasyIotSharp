@@ -25,7 +25,7 @@ namespace EasyIotSharp.Core.Services.Queue.Impl
         private readonly IRabbitServerInfoCacheService _rabbitServerInfoCacheService;
 
         public RabbitServerInfoService(IRabbitServerInfoRepository rabbitServerInfoRepository,
-                                       IRabbitServerInfoCacheService rabbitServerInfoCacheService) 
+                                       IRabbitServerInfoCacheService rabbitServerInfoCacheService)
         {
             _rabbitServerInfoRepository = rabbitServerInfoRepository;
             _rabbitServerInfoCacheService = rabbitServerInfoCacheService;
@@ -79,6 +79,7 @@ namespace EasyIotSharp.Core.Services.Queue.Impl
 
             //清除缓存
             await EventBus.TriggerAsync(new RabbitServerInfoEventData() { });
+            await EventBus.TriggerAsync(new RabbitProjectEventData() { });
         }
 
         /// <summary>
@@ -118,6 +119,7 @@ namespace EasyIotSharp.Core.Services.Queue.Impl
 
             //清除缓存
             await EventBus.TriggerAsync(new RabbitServerInfoEventData() { });
+            await EventBus.TriggerAsync(new RabbitProjectEventData() { });
         }
 
         /// <summary>
@@ -138,6 +140,7 @@ namespace EasyIotSharp.Core.Services.Queue.Impl
 
             //清除缓存
             await EventBus.TriggerAsync(new RabbitServerInfoEventData() { });
+            await EventBus.TriggerAsync(new RabbitProjectEventData() { });
         }
 
         /// <summary>
@@ -163,6 +166,20 @@ namespace EasyIotSharp.Core.Services.Queue.Impl
                 var list = query.items.MapTo<List<RabbitServerInfoDto>>();
                 return new PagedResultDto<RabbitServerInfoDto>(query.totalCount, list);
             }
+        }
+
+        /// <summary>
+        /// 获取rabbit配置信息列表
+        /// </summary>
+        /// <returns></returns>
+        public List<RabbitServerInfoDto> GetRabbitProject()
+        {
+            var list = _rabbitServerInfoRepository.GetRabbitProject();
+            if (list.Count == 0)
+            {
+                list = _rabbitServerInfoRepository.GetRabbitProject();
+            }
+            return list;
         }
     }
 }

@@ -16,6 +16,7 @@ namespace EasyIotSharp.Core.Caching.Queue.Impl
     {
         public ICache Cache => CacheManager.GetCache($"{CachingConsts.Keys.Queue}RabbitServerInfo");
         public const string KEY_QUEUE_RABBITSERVERINFO_QUERY = "Queue:RabbitServerInfo-{0}-{1}";
+        public const string KEY_QUEUE_RABBITPROJECT_QUERY = "Queue:RabbitProject";
         public void Clear()
         {
             Cache.Clear();
@@ -26,5 +27,12 @@ namespace EasyIotSharp.Core.Caching.Queue.Impl
                                           input.PageSize);
             return await Cache.GetAsyncExt(key, action, TimeSpan.FromHours(CachingConsts.THIRTY_EXPIRES_MINUTES));
         }
+
+        public List<RabbitServerInfoDto> GetRabbitProject(Func<List<RabbitServerInfoDto>> action)
+        {
+            var key = KEY_QUEUE_RABBITPROJECT_QUERY.FormatWith();
+            return Cache.GetExt(key, action, 60);
+        }
+        
     }
 }
