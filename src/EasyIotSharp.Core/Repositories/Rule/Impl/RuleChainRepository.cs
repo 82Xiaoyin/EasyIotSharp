@@ -36,7 +36,7 @@ namespace EasyIotSharp.Core.Repositories.Rule.Impl
 
             if (!string.IsNullOrWhiteSpace(projectId))
             {
-                predicate = predicate.And(x => x.ProjectId.Contains(projectId));
+                predicate = predicate.And(x => x.ProjectId.Equals(projectId));
             }
 
             var totalCount = await CountAsync(predicate);
