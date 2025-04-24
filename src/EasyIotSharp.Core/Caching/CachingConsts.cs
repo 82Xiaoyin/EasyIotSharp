@@ -12,6 +12,11 @@ namespace EasyIotSharp.Core.Caching
             /// </summary>
             public const string BASE = "service:EasyIotSharp";
             public const string TenantCache = BASE+ "Tenant_";
+            public const string HardwareCache = BASE + "Hardware_";
+            public const string Project = BASE + "Project_";
+            public const string Queue = BASE + "Queue_";
+            public const string Rule = BASE + "Rule_";
+            public const string TenantAccount = BASE + "TenantAccount_";
         }
 
         /// <summary>

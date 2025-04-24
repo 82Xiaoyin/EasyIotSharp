@@ -1,6 +1,9 @@
-﻿using EasyIotSharp.Core.Domain.Proejct;
+﻿using EasyIotSharp.Core.Caching.Project;
+using EasyIotSharp.Core.Domain.Proejct;
 using EasyIotSharp.Core.Dto.Project;
 using EasyIotSharp.Core.Dto.Project.Params;
+using EasyIotSharp.Core.Events.Project;
+using EasyIotSharp.Core.Events.Tenant;
 using EasyIotSharp.Core.Repositories.Project;
 using EasyIotSharp.Core.Services.Hardware;
 using System;
@@ -17,12 +20,15 @@ namespace EasyIotSharp.Core.Services.Project.Impl
     {
         private readonly IProjectBaseRepository _projectBaseRepository;
         private readonly IClassificationRepository _classificationRepository;
+        private readonly IClassificationCacheService _classificationCacheService;
 
         public ClassificationService(IClassificationRepository classificationRepository,
-                                     IProjectBaseRepository projectBaseRepository)
+                                     IProjectBaseRepository projectBaseRepository,
+                                     IClassificationCacheService classificationCacheService)
         {
             _projectBaseRepository = projectBaseRepository;
             _classificationRepository = classificationRepository;
+            _classificationCacheService = classificationCacheService;
         }
 
         public async Task<ClassificationDto> GetClassification(string id)
@@ -42,19 +48,43 @@ namespace EasyIotSharp.Core.Services.Project.Impl
 
         public async Task<PagedResultDto<ClassificationDto>> QueryClassification(QueryClassificationInput input)
         {
-            var query = await _classificationRepository.Query(ContextUser.TenantNumId, input.ProjectId, input.PageIndex, input.PageSize, input.IsPage);
-            int totalCount = query.totalCount;
-            var list = query.items.MapTo<List<ClassificationDto>>();
-            var projects = await _projectBaseRepository.QueryByIds(list.Select(x => x.ProjectId).ToList());
-            foreach (var item in list)
+            if (input.ProjectId.IsNull()
+                && input.IsPage.Equals(true)
+                && input.PageIndex <= 5 && input.PageSize == 10)
             {
-                var project = projects.FirstOrDefault(x => x.Id == item.ProjectId);
-                if (project.IsNotNull())
+                return await _classificationCacheService.QueryClassification(input, async () =>
                 {
-                    item.ProjectName = project.Name;
-                }
+                    var query = await _classificationRepository.Query(ContextUser.TenantNumId, input.ProjectId, input.PageIndex, input.PageSize, input.IsPage);
+                    int totalCount = query.totalCount;
+                    var list = query.items.MapTo<List<ClassificationDto>>();
+                    var projects = await _projectBaseRepository.QueryByIds(list.Select(x => x.ProjectId).ToList());
+                    foreach (var item in list)
+                    {
+                        var project = projects.FirstOrDefault(x => x.Id == item.ProjectId);
+                        if (project.IsNotNull())
+                        {
+                            item.ProjectName = project.Name;
+                        }
+                    }
+                    return new PagedResultDto<ClassificationDto>() { TotalCount = totalCount, Items = list };
+                });
             }
-            return new PagedResultDto<ClassificationDto>() { TotalCount = totalCount, Items = list };
+            else
+            {
+                var query = await _classificationRepository.Query(ContextUser.TenantNumId, input.ProjectId, input.PageIndex, input.PageSize, input.IsPage);
+                int totalCount = query.totalCount;
+                var list = query.items.MapTo<List<ClassificationDto>>();
+                var projects = await _projectBaseRepository.QueryByIds(list.Select(x => x.ProjectId).ToList());
+                foreach (var item in list)
+                {
+                    var project = projects.FirstOrDefault(x => x.Id == item.ProjectId);
+                    if (project.IsNotNull())
+                    {
+                        item.ProjectName = project.Name;
+                    }
+                }
+                return new PagedResultDto<ClassificationDto>() { TotalCount = totalCount, Items = list };
+            }
         }
 
         public async Task InsertClassification(InsertClassificationInput input)
@@ -76,6 +106,9 @@ namespace EasyIotSharp.Core.Services.Project.Impl
             model.OperatorId = ContextUser.UserId;
             model.OperatorName = ContextUser.UserName;
             await _classificationRepository.InsertAsync(model);
+
+            //清除缓存
+            await EventBus.TriggerAsync(new ClassificationEventData() { });
         }
 
         public async Task UpdateClassification(UpdateClassificationInput input)
@@ -96,6 +129,9 @@ namespace EasyIotSharp.Core.Services.Project.Impl
             info.OperatorId = ContextUser.UserId;
             info.OperatorName = ContextUser.UserName;
             await _classificationRepository.UpdateAsync(info);
+
+            //清除缓存
+            await EventBus.TriggerAsync(new ClassificationEventData() { });
         }
 
         public async Task DeleteClassification(DeleteClassificationInput input)
@@ -105,6 +141,9 @@ namespace EasyIotSharp.Core.Services.Project.Impl
             {
                 await _classificationRepository.DeleteByIdAsync(info.Id);
             }
+
+            //清除缓存
+            await EventBus.TriggerAsync(new ClassificationEventData() { });
         }
     }
 }

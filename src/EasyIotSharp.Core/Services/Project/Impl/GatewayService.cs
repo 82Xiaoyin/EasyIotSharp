@@ -10,22 +10,29 @@ using System.Threading.Tasks;
 using UPrime.AutoMapper;
 using UPrime.Services.Dto;
 using System.Linq;
+using EasyIotSharp.Core.Caching.Project;
+using EasyIotSharp.Core.Caching.Project.Impl;
+using EasyIotSharp.Core.Events.Tenant;
+using EasyIotSharp.Core.Events.Project;
 
 namespace EasyIotSharp.Core.Services.Project.Impl
 {
-    public class GatewayService:ServiceBase,IGatewayService
+    public class GatewayService : ServiceBase, IGatewayService
     {
         private readonly IProjectBaseRepository _projectBaseRepository;
         private readonly IGatewayRepository _gatewayRepository;
         private readonly IProtocolRepository _protocolRepository;
+        private readonly IGatewayCacheService _gatewayCacheService;
 
         public GatewayService(IGatewayRepository gatewayRepository,
                               IProjectBaseRepository projectBaseRepository,
-                              IProtocolRepository protocolRepository)
+                              IProtocolRepository protocolRepository,
+                              IGatewayCacheService gatewayCacheService)
         {
             _projectBaseRepository = projectBaseRepository;
             _gatewayRepository = gatewayRepository;
             _protocolRepository = protocolRepository;
+            _gatewayCacheService = gatewayCacheService;
         }
 
         public async Task<GatewayDto> GetGateway(string id)
@@ -39,7 +46,7 @@ namespace EasyIotSharp.Core.Services.Project.Impl
                 {
                     output.ProjectName = project.Name;
                 }
-                var protocol=await _protocolRepository.GetByIdAsync(output.ProtocolId);
+                var protocol = await _protocolRepository.GetByIdAsync(output.ProtocolId);
                 if (protocol.IsNotNull())
                 {
                     output.ProtocolName = protocol.Name;
@@ -50,25 +57,58 @@ namespace EasyIotSharp.Core.Services.Project.Impl
 
         public async Task<PagedResultDto<GatewayDto>> QueryGateway(QueryGatewayInput input)
         {
-            var query = await _gatewayRepository.Query(ContextUser.TenantNumId, input.Keyword, input.State, input.ProtocolId, input.ProjectId, input.PageIndex, input.PageSize);
-            int totalCount = query.totalCount;
-            var list = query.items.MapTo<List<GatewayDto>>();
-            var projects = await _projectBaseRepository.QueryByIds(list.Select(x => x.ProjectId).ToList());
-            var protocols = await _protocolRepository.QueryByIds(list.Select(x => x.ProtocolId).ToList());
-            foreach (var item in list)
+            if (string.IsNullOrEmpty(input.Keyword)
+                && string.IsNullOrEmpty(input.ProjectId)
+                && string.IsNullOrEmpty(input.ProtocolId)
+                && input.State.Equals(-1)
+                && input.IsPage.Equals(true)
+                && input.PageIndex <= 5 && input.PageSize == 10)
             {
-                var project = projects.FirstOrDefault(x => x.Id == item.ProjectId);
-                if (project.IsNotNull())
+                return await _gatewayCacheService.QueryGateway(input, async () =>
                 {
-                    item.ProjectName = project.Name;
-                }
-                var protocol = protocols.FirstOrDefault(x => x.Id == item.ProtocolId);
-                if (protocol.IsNotNull())
-                {
-                    item.ProtocolName = protocol.Name;
-                }
+                    var query = await _gatewayRepository.Query(ContextUser.TenantNumId, input.Keyword, input.State, input.ProtocolId, input.ProjectId, input.PageIndex, input.PageSize);
+                    int totalCount = query.totalCount;
+                    var list = query.items.MapTo<List<GatewayDto>>();
+                    var projects = await _projectBaseRepository.QueryByIds(list.Select(x => x.ProjectId).ToList());
+                    var protocols = await _protocolRepository.QueryByIds(list.Select(x => x.ProtocolId).ToList());
+                    foreach (var item in list)
+                    {
+                        var project = projects.FirstOrDefault(x => x.Id == item.ProjectId);
+                        if (project.IsNotNull())
+                        {
+                            item.ProjectName = project.Name;
+                        }
+                        var protocol = protocols.FirstOrDefault(x => x.Id == item.ProtocolId);
+                        if (protocol.IsNotNull())
+                        {
+                            item.ProtocolName = protocol.Name;
+                        }
+                    }
+                    return new PagedResultDto<GatewayDto>() { TotalCount = totalCount, Items = list };
+                });
             }
-            return new PagedResultDto<GatewayDto>() { TotalCount = totalCount, Items = list };
+            else
+            {
+                var query = await _gatewayRepository.Query(ContextUser.TenantNumId, input.Keyword, input.State, input.ProtocolId, input.ProjectId, input.PageIndex, input.PageSize);
+                int totalCount = query.totalCount;
+                var list = query.items.MapTo<List<GatewayDto>>();
+                var projects = await _projectBaseRepository.QueryByIds(list.Select(x => x.ProjectId).ToList());
+                var protocols = await _protocolRepository.QueryByIds(list.Select(x => x.ProtocolId).ToList());
+                foreach (var item in list)
+                {
+                    var project = projects.FirstOrDefault(x => x.Id == item.ProjectId);
+                    if (project.IsNotNull())
+                    {
+                        item.ProjectName = project.Name;
+                    }
+                    var protocol = protocols.FirstOrDefault(x => x.Id == item.ProtocolId);
+                    if (protocol.IsNotNull())
+                    {
+                        item.ProtocolName = protocol.Name;
+                    }
+                }
+                return new PagedResultDto<GatewayDto>() { TotalCount = totalCount, Items = list };
+            }
         }
 
         public async Task InsertGateway(InsertGatewayInput input)
@@ -91,6 +131,9 @@ namespace EasyIotSharp.Core.Services.Project.Impl
             model.OperatorId = ContextUser.UserId;
             model.OperatorName = ContextUser.UserName;
             await _gatewayRepository.InsertAsync(model);
+
+            //清除缓存
+            await EventBus.TriggerAsync(new GatewayEventData() { });
         }
 
         public async Task UpdateGateway(UpdateGatewayInput input)
@@ -113,6 +156,9 @@ namespace EasyIotSharp.Core.Services.Project.Impl
             info.OperatorId = ContextUser.UserId;
             info.OperatorName = ContextUser.UserName;
             await _gatewayRepository.UpdateAsync(info);
+
+            //清除缓存
+            await EventBus.TriggerAsync(new GatewayEventData() { });
         }
 
         public async Task DeleteGateway(DeleteGatewayInput input)
@@ -126,6 +172,9 @@ namespace EasyIotSharp.Core.Services.Project.Impl
                 info.OperatorName = ContextUser.UserName;
                 await _gatewayRepository.UpdateAsync(info);
             }
+
+            //清除缓存
+            await EventBus.TriggerAsync(new GatewayEventData() { });
         }
     }
 }

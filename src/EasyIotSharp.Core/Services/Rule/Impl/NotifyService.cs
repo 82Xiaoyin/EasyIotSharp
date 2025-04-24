@@ -11,16 +11,25 @@ using SqlSugar;
 using EasyIotSharp.Core.Dto;
 using System.Linq;
 using Nest;
+using EasyIotSharp.Core.Caching.Rule;
+using EasyIotSharp.Core.Events.Tenant;
+using EasyIotSharp.Core.Events.Rule;
 
 namespace EasyIotSharp.Core.Services.Rule.Impl
 {
     public class NotifyService : ServiceBase, INotifyService
     {
         private readonly INotifyRepository _notifyRepository;
+        private readonly INotifyCacheService _notifyCacheService;
+        private readonly INotifyRecordCacheService _notifyRecordCacheService;
 
-        public NotifyService(INotifyRepository notifyRepository)
+        public NotifyService(INotifyRepository notifyRepository,
+                             INotifyCacheService notifyCacheService,
+                             INotifyRecordCacheService notifyRecordCacheService)
         {
             _notifyRepository = notifyRepository;
+            _notifyCacheService = notifyCacheService;
+            _notifyRecordCacheService = notifyRecordCacheService;
         }
 
         /// <summary>
@@ -30,10 +39,24 @@ namespace EasyIotSharp.Core.Services.Rule.Impl
         /// <returns></returns>
         public async Task<PagedResultDto<NotifyDto>> QueryNotifyConfig(Dto.PagingInput input)
         {
-            var query = await _notifyRepository.Query(input.PageIndex, input.PageSize);
-            int totalCount = query.totalCount;
-            var list = query.items.MapTo<List<NotifyDto>>();
-            return new PagedResultDto<NotifyDto>() { TotalCount = totalCount, Items = list };
+            if (input.IsPage.Equals(true)
+               && input.PageIndex <= 5 && input.PageSize == 10)
+            {
+                return await _notifyCacheService.QueryNotifyConfig(input, async () =>
+                {
+                    var query = await _notifyRepository.Query(input.PageIndex, input.PageSize);
+                    int totalCount = query.totalCount;
+                    var list = query.items.MapTo<List<NotifyDto>>();
+                    return new PagedResultDto<NotifyDto>() { TotalCount = totalCount, Items = list };
+                });
+            }
+            else
+            {
+                var query = await _notifyRepository.Query(input.PageIndex, input.PageSize);
+                int totalCount = query.totalCount;
+                var list = query.items.MapTo<List<NotifyDto>>();
+                return new PagedResultDto<NotifyDto>() { TotalCount = totalCount, Items = list };
+            }
         }
 
         /// <summary>
@@ -69,6 +92,8 @@ namespace EasyIotSharp.Core.Services.Rule.Impl
                 await AddUserNotify(input.Users, model.Id);
             }
 
+            //清除缓存
+            await EventBus.TriggerAsync(new AlarmsConfigEventData() { });
         }
 
         /// <summary>
@@ -117,6 +142,9 @@ namespace EasyIotSharp.Core.Services.Rule.Impl
             }
 
             await _notifyRepository.UpdateAsync(info);
+
+            //清除缓存
+            await EventBus.TriggerAsync(new TenantEventData() { });
         }
 
         /// <summary>
@@ -143,6 +171,9 @@ namespace EasyIotSharp.Core.Services.Rule.Impl
                 await _notifyRepository.DeleteableUserNotifyList(notifyUsers);
             }
             await _notifyRepository.UpdateAsync(info);
+
+            //清除缓存
+            await EventBus.TriggerAsync(new TenantEventData() { });
         }
 
         /// <summary>
@@ -164,6 +195,9 @@ namespace EasyIotSharp.Core.Services.Rule.Impl
             info.OperatorId = ContextUser.UserId;
             info.OperatorName = ContextUser.UserName;
             await _notifyRepository.UpdateAsync(info);
+
+            //清除缓存
+            await EventBus.TriggerAsync(new TenantEventData() { });
         }
 
         /// <summary>
@@ -173,10 +207,28 @@ namespace EasyIotSharp.Core.Services.Rule.Impl
         /// <returns></returns>
         public async Task<PagedResultDto<NotifyRecordDto>> QueryNotifyRecord(NotifyRecordInput input)
         {
-            var query = await _notifyRepository.QueryNotifyRecordDto(input.Type, input.KeyWord, input.StarTime, input.EndTime, input.PageIndex, input.PageSize);
-            int totalCount = query.totalCount;
-            var list = query.items.MapTo<List<NotifyRecordDto>>();
-            return new PagedResultDto<NotifyRecordDto>() { TotalCount = totalCount, Items = list };
+            if (string.IsNullOrEmpty(input.KeyWord)
+               && input.Type.Equals(-1)
+               && input.StarTime.IsNull()
+               && input.EndTime.IsNull()
+               && input.IsPage.Equals(true)
+               && input.PageIndex <= 5 && input.PageSize == 10)
+            {
+                return await _notifyRecordCacheService.QueryNotifyRecord(input, async () =>
+                {
+                    var query = await _notifyRepository.QueryNotifyRecordDto(input.Type, input.KeyWord, input.StarTime, input.EndTime, input.PageIndex, input.PageSize);
+                    int totalCount = query.totalCount;
+                    var list = query.items.MapTo<List<NotifyRecordDto>>();
+                    return new PagedResultDto<NotifyRecordDto>() { TotalCount = totalCount, Items = list };
+                });
+            }
+            else
+            {
+                var query = await _notifyRepository.QueryNotifyRecordDto(input.Type, input.KeyWord, input.StarTime, input.EndTime, input.PageIndex, input.PageSize);
+                int totalCount = query.totalCount;
+                var list = query.items.MapTo<List<NotifyRecordDto>>();
+                return new PagedResultDto<NotifyRecordDto>() { TotalCount = totalCount, Items = list };
+            }
 
         }
 

@@ -9,22 +9,27 @@ using System.Threading.Tasks;
 using UPrime.AutoMapper;
 using UPrime.Services.Dto;
 using EasyIotSharp.Core.Domain.TenantAccount;
+using EasyIotSharp.Core.Caching.TenantAccount;
+using EasyIotSharp.Core.Events.TenantAccount;
 
 namespace EasyIotSharp.Core.Services.TenantAccount.Impl
 {
-    public class RoleService :ServiceBase,IRoleService
+    public class RoleService : ServiceBase, IRoleService
     {
         private readonly IRoleRepository _roleRepository;
         private readonly IRoleMenuRepository _roleMenuRepository;
         private readonly IMenuRepository _menuRepository;
+        private readonly IRoleCacheService _roleCacheService;
 
         public RoleService(IRoleRepository roleRepository,
                            IRoleMenuRepository roleMenuRepository,
-                           IMenuRepository menuRepository)
+                           IMenuRepository menuRepository,
+                           IRoleCacheService roleCacheService)
         {
             _roleRepository = roleRepository;
             _roleMenuRepository = roleMenuRepository;
             _menuRepository = menuRepository;
+            _roleCacheService = roleCacheService;
         }
 
         public async Task<GetRoleMenuOutput> GetRoleMenu(string id)
@@ -32,13 +37,13 @@ namespace EasyIotSharp.Core.Services.TenantAccount.Impl
             var role = await _roleRepository.FirstOrDefaultAsync(x => x.Id == id && x.IsDelete == false);
             if (role.IsNull())
             {
-                throw new BizException(BizError.BIND_EXCEPTION_ERROR,"未请求到指定的资源");
+                throw new BizException(BizError.BIND_EXCEPTION_ERROR, "未请求到指定的资源");
             }
             GetRoleMenuOutput output = new GetRoleMenuOutput();
             output = role.MapTo<GetRoleMenuOutput>();
             output.Menus = new List<string>();
             var roleMenus = await _roleMenuRepository.GetListAsync(x => x.RoleId == id);
-            if (roleMenus.Count>0)
+            if (roleMenus.Count > 0)
             {
                 var menus = roleMenus.Select(x => x.MenuId).ToList();
                 output.Menus = menus.MapTo<List<string>>();
@@ -48,10 +53,26 @@ namespace EasyIotSharp.Core.Services.TenantAccount.Impl
 
         public async Task<PagedResultDto<RoleDto>> QueryRole(QueryRoleInput input)
         {
-            var query = await _roleRepository.Query(ContextUser.TenantNumId, input.Keyword, input.IsEnable, input.PageIndex, input.PageSize, input.IsPage);
-            int totalCount = query.totalCount;
-            var list = query.items.MapTo<List<RoleDto>>();
-            return new PagedResultDto<RoleDto>() { TotalCount = totalCount, Items = list };
+            if (string.IsNullOrEmpty(input.Keyword)
+                                && input.IsEnable.Equals(-1)
+                                && input.IsPage.Equals(true)
+                                && input.PageIndex <= 5 && input.PageSize == 10)
+            {
+                return await _roleCacheService.QueryRole(input, async () =>
+                {
+                    var query = await _roleRepository.Query(ContextUser.TenantNumId, input.Keyword, input.IsEnable, input.PageIndex, input.PageSize, input.IsPage);
+                    int totalCount = query.totalCount;
+                    var list = query.items.MapTo<List<RoleDto>>();
+                    return new PagedResultDto<RoleDto>() { TotalCount = totalCount, Items = list };
+                });
+            }
+            else
+            {
+                var query = await _roleRepository.Query(ContextUser.TenantNumId, input.Keyword, input.IsEnable, input.PageIndex, input.PageSize, input.IsPage);
+                int totalCount = query.totalCount;
+                var list = query.items.MapTo<List<RoleDto>>();
+                return new PagedResultDto<RoleDto>() { TotalCount = totalCount, Items = list };
+            }
         }
 
         public async Task InsertRole(InsertRoleInput input)
@@ -88,10 +109,13 @@ namespace EasyIotSharp.Core.Services.TenantAccount.Impl
                     OperatorName = ContextUser.UserName
                 });
             }
-            if (roleMenuInsertList.Count>0)
+            if (roleMenuInsertList.Count > 0)
             {
                 await _roleMenuRepository.InserManyAsync(roleMenuInsertList);
             }
+
+            //清除缓存
+            await EventBus.TriggerAsync(new RoleEventData() { });
         }
 
         public async Task<string> InsertAdminRole(InsertAdminRoleInput input)
@@ -152,7 +176,7 @@ namespace EasyIotSharp.Core.Services.TenantAccount.Impl
             role.OperatorId = ContextUser.UserId;
             role.OperatorName = ContextUser.UserName;
             await _roleRepository.UpdateAsync(role);
-            if (input.IsUpdateMenu==true)
+            if (input.IsUpdateMenu == true)
             {
                 //批量删除老的角色菜单表
                 await _roleMenuRepository.DeleteManyByRoleId(role.Id);
@@ -177,7 +201,10 @@ namespace EasyIotSharp.Core.Services.TenantAccount.Impl
                 {
                     await _roleMenuRepository.InserManyAsync(roleMenuInsertList);
                 }
-            }   
+            }
+
+            //清除缓存
+            await EventBus.TriggerAsync(new RoleEventData() { });
         }
 
         public async Task UpdateIsEnableRole(UpdateIsEnableRoleInput input)
@@ -208,7 +235,7 @@ namespace EasyIotSharp.Core.Services.TenantAccount.Impl
             {
                 throw new BizException(BizError.BIND_EXCEPTION_ERROR, "未找到指定数据");
             }
-            if (info.IsManager==1)
+            if (info.IsManager == 1)
             {
                 throw new BizException(BizError.BIND_EXCEPTION_ERROR, "管理员角色不可删除");
             }
@@ -220,6 +247,9 @@ namespace EasyIotSharp.Core.Services.TenantAccount.Impl
                 info.UpdatedAt = DateTime.Now;
                 await _roleRepository.UpdateAsync(info);
             }
+
+            //清除缓存
+            await EventBus.TriggerAsync(new RoleEventData() { });
         }
     }
 }

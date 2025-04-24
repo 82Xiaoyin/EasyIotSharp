@@ -10,6 +10,9 @@ using EasyIotSharp.Core.Repositories.Hardware.Impl;
 using UPrime.AutoMapper;
 using EasyIotSharp.Core.Domain.Hardware;
 using System.Linq;
+using EasyIotSharp.Core.Caching.Hardware;
+using EasyIotSharp.Core.Events.Tenant;
+using EasyIotSharp.Core.Events.Hardware;
 
 namespace EasyIotSharp.Core.Services.Hardware.Impl
 {
@@ -17,12 +20,15 @@ namespace EasyIotSharp.Core.Services.Hardware.Impl
     {
         private readonly ISensorQuotaRepository _sensorQuotaRepository;
         private readonly ISensorRepository _sensorRepository;
+        private readonly ISensorQuotaCacheService _sensorQuotaCacheService;
 
         public SensorQuotaService(ISensorQuotaRepository sensorQuotaRepository,
-                                  ISensorRepository sensorRepository)
+                                  ISensorRepository sensorRepository,
+                                  ISensorQuotaCacheService sensorQuotaCacheService)
         {
             _sensorQuotaRepository = sensorQuotaRepository;
             _sensorRepository = sensorRepository;
+            _sensorQuotaCacheService = sensorQuotaCacheService;
         }
 
         public async Task<SensorQuotaDto> GetSensorQuota(string id)
@@ -42,23 +48,53 @@ namespace EasyIotSharp.Core.Services.Hardware.Impl
 
         public async Task<PagedResultDto<SensorQuotaDto>> QuerySensorQuota(QuerySensorQuotaInput input)
         {
-            var query = await _sensorQuotaRepository.Query(ContextUser.TenantNumId, input.SensorId, input.Keyword, input.DataType, input.PageIndex, input.PageSize, input.IsPage);
-            int totalCount = query.totalCount;
-            var list = query.items.MapTo<List<SensorQuotaDto>>();
-            var sensorIds = list.Select(x => x.SensorId).ToList();
-            if (sensorIds.Count>0)
+            if (string.IsNullOrEmpty(input.Keyword) 
+                && string.IsNullOrEmpty(input.SensorId)
+                && input.DataType.Equals(DataTypeMenu.None)
+                && input.IsPage.Equals(true)
+                && input.PageIndex <= 5 && input.PageSize == 10)
             {
-                var sensors = await _sensorRepository.QueryByIds(sensorIds);
-                foreach (var item in list)
+                return await _sensorQuotaCacheService.QuerySensorQuota(input, async () =>
                 {
-                    var sensor = sensors.FirstOrDefault(x => x.Id == item.SensorId);
-                    if (sensor.IsNotNull())
+                    var query = await _sensorQuotaRepository.Query(ContextUser.TenantNumId, input.SensorId, input.Keyword, input.DataType, input.PageIndex, input.PageSize, input.IsPage);
+                    int totalCount = query.totalCount;
+                    var list = query.items.MapTo<List<SensorQuotaDto>>();
+                    var sensorIds = list.Select(x => x.SensorId).ToList();
+                    if (sensorIds.Count > 0)
                     {
-                        item.SensorName = sensor.Name;
+                        var sensors = await _sensorRepository.QueryByIds(sensorIds);
+                        foreach (var item in list)
+                        {
+                            var sensor = sensors.FirstOrDefault(x => x.Id == item.SensorId);
+                            if (sensor.IsNotNull())
+                            {
+                                item.SensorName = sensor.Name;
+                            }
+                        }
+                    }
+                    return new PagedResultDto<SensorQuotaDto>() { TotalCount = totalCount, Items = list };
+                });
+            }
+            else
+            {
+                var query = await _sensorQuotaRepository.Query(ContextUser.TenantNumId, input.SensorId, input.Keyword, input.DataType, input.PageIndex, input.PageSize, input.IsPage);
+                int totalCount = query.totalCount;
+                var list = query.items.MapTo<List<SensorQuotaDto>>();
+                var sensorIds = list.Select(x => x.SensorId).ToList();
+                if (sensorIds.Count > 0)
+                {
+                    var sensors = await _sensorRepository.QueryByIds(sensorIds);
+                    foreach (var item in list)
+                    {
+                        var sensor = sensors.FirstOrDefault(x => x.Id == item.SensorId);
+                        if (sensor.IsNotNull())
+                        {
+                            item.SensorName = sensor.Name;
+                        }
                     }
                 }
+                return new PagedResultDto<SensorQuotaDto>() { TotalCount = totalCount, Items = list };
             }
-            return new PagedResultDto<SensorQuotaDto>() { TotalCount = totalCount, Items = list };
         }
 
         public async Task InsertSensorQuota(InsertSensorQuotaInput input)
@@ -91,6 +127,9 @@ namespace EasyIotSharp.Core.Services.Hardware.Impl
             model.OperatorId = ContextUser.UserId;
             model.OperatorName = ContextUser.UserName;
             await _sensorQuotaRepository.InsertAsync(model);
+
+            //清除缓存
+            await EventBus.TriggerAsync(new SensorQuotaEventData() { });
         }
 
         public async Task UpdateSensorQuota(UpdateSensorQuotaInput input)
@@ -122,6 +161,9 @@ namespace EasyIotSharp.Core.Services.Hardware.Impl
             info.OperatorId = ContextUser.UserId;
             info.OperatorName = ContextUser.UserName;
             await _sensorQuotaRepository.UpdateAsync(info);
+
+            //清除缓存
+            await EventBus.TriggerAsync(new SensorQuotaEventData() { });
         }
 
         public async Task DeleteSensorQuota(DeleteSensorQuotaInput input)
@@ -139,6 +181,9 @@ namespace EasyIotSharp.Core.Services.Hardware.Impl
                 info.OperatorName = ContextUser.UserName;
                 await _sensorQuotaRepository.UpdateAsync(info);
             }
+
+            //清除缓存
+            await EventBus.TriggerAsync(new SensorQuotaEventData() { });
         }
     }
 }

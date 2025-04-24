@@ -13,6 +13,7 @@ namespace EasyIotSharp.Core.Repositories.Rule
         /// </summary>
         Task<(int totalCount, List<RuleChainDto> items)> Query(
             string keyword,
+            string projectId,
             int pageIndex,
             int pageSize);
     }

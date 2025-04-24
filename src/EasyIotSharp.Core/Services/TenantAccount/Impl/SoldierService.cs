@@ -14,15 +14,19 @@ using static EasyIotSharp.Core.GlobalConsts;
 using EasyIotSharp.Core.Dto.Tenant;
 using System.Linq;
 using SixLabors.ImageSharp.Processing.Processors.Dithering;
+using EasyIotSharp.Core.Caching.TenantAccount;
+using EasyIotSharp.Core.Caching.TenantAccount.Impl;
+using EasyIotSharp.Core.Events.TenantAccount;
 
 namespace EasyIotSharp.Core.Services.TenantAccount.Impl
 {
-    public class SoldierService:ServiceBase, ISoldierService
+    public class SoldierService : ServiceBase, ISoldierService
     {
         private readonly ISoldierRepository _soldierRepository;
         private readonly ITenantRepository _tenantRepository;
         private readonly ISoldierRoleRepository _soldierRoleRepository;
         private readonly IRoleRepository _roleRepository;
+        private readonly ISoldierCacheService _soldierCacheService;
 
         private readonly IRoleService _roleService;
 
@@ -30,7 +34,8 @@ namespace EasyIotSharp.Core.Services.TenantAccount.Impl
                               ITenantRepository tenantRepository,
                               ISoldierRoleRepository soldierRoleRepository,
                               IRoleService roleService,
-                              IRoleRepository roleRepository)
+                              IRoleRepository roleRepository,
+                              ISoldierCacheService soldierCacheService)
         {
             _soldierRepository = soldierRepository;
             _tenantRepository = tenantRepository;
@@ -38,6 +43,7 @@ namespace EasyIotSharp.Core.Services.TenantAccount.Impl
             _roleRepository = roleRepository;
 
             _roleService = roleService;
+            _soldierCacheService = soldierCacheService;
         }
 
         public async Task<SoldierDto> GetSoldier(string id)
@@ -62,7 +68,7 @@ namespace EasyIotSharp.Core.Services.TenantAccount.Impl
                 res.Status = ValidateSoldierStatus.InvalidNameOrPassword;
                 return res;
             }
-            if (user.IsEnable==false)
+            if (user.IsEnable == false)
             {
                 res.Status = ValidateSoldierStatus.SoldiersIsDisable;
                 return res;
@@ -98,24 +104,55 @@ namespace EasyIotSharp.Core.Services.TenantAccount.Impl
 
         public async Task<PagedResultDto<SoldierDto>> QuerySoldier(QuerySoldierInput input)
         {
-            var query = await _soldierRepository.Query(ContextUser.TenantNumId, input.Keyword, input.IsEnable, input.PageIndex, input.PageSize);
-            int totalCount = query.totalCount;
-            var list = query.items.MapTo<List<SoldierDto>>();
-            var soldierIds = list.Select(x => x.Id).ToList();
-            if (soldierIds.Count>0)
+
+            if (string.IsNullOrEmpty(input.Keyword)
+                                && input.IsEnable.Equals(-1)
+                                && input.IsPage.Equals(true)
+                                && input.PageIndex <= 5 && input.PageSize == 10)
             {
-                var soldierRoles = await _soldierRoleRepository.QueryBySoldierIds(soldierIds);
-                var roles = await _roleRepository.QueryByIds(soldierRoles.Select(x => x.RoleId).ToList());
-                foreach (var item in list)
+                return await _soldierCacheService.QuerySoldier(input, async () =>
                 {
-                    var soldierRole = soldierRoles.FirstOrDefault(x => x.SoldierId == item.Id);
-                    if (soldierRole.IsNotNull())
+                    var query = await _soldierRepository.Query(ContextUser.TenantNumId, input.Keyword, input.IsEnable, input.PageIndex, input.PageSize);
+                    int totalCount = query.totalCount;
+                    var list = query.items.MapTo<List<SoldierDto>>();
+                    var soldierIds = list.Select(x => x.Id).ToList();
+                    if (soldierIds.Count > 0)
                     {
-                        item.RoleId = roles.FirstOrDefault(x => x.Id == soldierRole.RoleId)?.Id;
+                        var soldierRoles = await _soldierRoleRepository.QueryBySoldierIds(soldierIds);
+                        var roles = await _roleRepository.QueryByIds(soldierRoles.Select(x => x.RoleId).ToList());
+                        foreach (var item in list)
+                        {
+                            var soldierRole = soldierRoles.FirstOrDefault(x => x.SoldierId == item.Id);
+                            if (soldierRole.IsNotNull())
+                            {
+                                item.RoleId = roles.FirstOrDefault(x => x.Id == soldierRole.RoleId)?.Id;
+                            }
+                        }
+                    }
+                    return new PagedResultDto<SoldierDto>() { TotalCount = totalCount, Items = list };
+                });
+            }
+            else
+            {
+                var query = await _soldierRepository.Query(ContextUser.TenantNumId, input.Keyword, input.IsEnable, input.PageIndex, input.PageSize);
+                int totalCount = query.totalCount;
+                var list = query.items.MapTo<List<SoldierDto>>();
+                var soldierIds = list.Select(x => x.Id).ToList();
+                if (soldierIds.Count > 0)
+                {
+                    var soldierRoles = await _soldierRoleRepository.QueryBySoldierIds(soldierIds);
+                    var roles = await _roleRepository.QueryByIds(soldierRoles.Select(x => x.RoleId).ToList());
+                    foreach (var item in list)
+                    {
+                        var soldierRole = soldierRoles.FirstOrDefault(x => x.SoldierId == item.Id);
+                        if (soldierRole.IsNotNull())
+                        {
+                            item.RoleId = roles.FirstOrDefault(x => x.Id == soldierRole.RoleId)?.Id;
+                        }
                     }
                 }
+                return new PagedResultDto<SoldierDto>() { TotalCount = totalCount, Items = list };
             }
-            return new PagedResultDto<SoldierDto>() { TotalCount = totalCount, Items = list };
         }
 
         public async Task<string> InsertSoldier(InsertSoldierInput input)
@@ -163,7 +200,7 @@ namespace EasyIotSharp.Core.Services.TenantAccount.Impl
             //添加一个用户角色信息
             await _soldierRoleRepository.InsertAsync(new SoldierRole()
             {
-                Id= Guid.NewGuid().ToString().Replace("-", ""),
+                Id = Guid.NewGuid().ToString().Replace("-", ""),
                 TenantNumId = ContextUser.TenantNumId,
                 IsManager = model.IsManager,
                 SoldierId = model.Id,
@@ -171,6 +208,9 @@ namespace EasyIotSharp.Core.Services.TenantAccount.Impl
                 OperatorId = ContextUser.UserId,
                 OperatorName = ContextUser.UserName,
             });
+
+            //清除缓存
+            await EventBus.TriggerAsync(new SoldierEventData() { });
 
             return model.Id;
         }
@@ -215,6 +255,9 @@ namespace EasyIotSharp.Core.Services.TenantAccount.Impl
                 OperatorId = ContextUser.UserId,
                 OperatorName = ContextUser.UserName,
             });
+
+            //清除缓存
+            await EventBus.TriggerAsync(new SoldierEventData() { });
             return model.Id;
         }
 
@@ -239,7 +282,7 @@ namespace EasyIotSharp.Core.Services.TenantAccount.Impl
             info.UpdatedAt = DateTime.Now;
             await _soldierRepository.UpdateAsync(info);
 
-            if (input.IsUpdateRole==true)
+            if (input.IsUpdateRole == true)
             {
                 var isExistManager = await _soldierRoleRepository.FirstOrDefaultAsync(x => x.IsManager == 2 && x.RoleId == input.RoleId && x.TenantNumId == ContextUser.TenantNumId && x.IsDelete == false);
                 if (isExistManager.IsNotNull() && input.Id != isExistManager.Id)
@@ -262,6 +305,8 @@ namespace EasyIotSharp.Core.Services.TenantAccount.Impl
                 });
             }
 
+            //清除缓存
+            await EventBus.TriggerAsync(new SoldierEventData() { });
 
             return info.Id;
         }
@@ -273,7 +318,7 @@ namespace EasyIotSharp.Core.Services.TenantAccount.Impl
             {
                 throw new BizException(BizError.BIND_EXCEPTION_ERROR, "用户信息不存在");
             }
-            if (info.IsEnable!=input.IsEnable)
+            if (info.IsEnable != input.IsEnable)
             {
                 info.IsEnable = input.IsEnable;
                 info.OperatorId = ContextUser.UserId;
@@ -281,6 +326,9 @@ namespace EasyIotSharp.Core.Services.TenantAccount.Impl
                 info.UpdatedAt = DateTime.Now;
                 await _soldierRepository.UpdateAsync(info);
             }
+
+            //清除缓存
+            await EventBus.TriggerAsync(new SoldierEventData() { });
 
             return info.Id;
         }
@@ -300,6 +348,9 @@ namespace EasyIotSharp.Core.Services.TenantAccount.Impl
                 info.OperatorName = ContextUser.UserName;
                 await _soldierRepository.UpdateAsync(info);
             }
+
+            //清除缓存
+            await EventBus.TriggerAsync(new SoldierEventData() { });
         }
     }
 }

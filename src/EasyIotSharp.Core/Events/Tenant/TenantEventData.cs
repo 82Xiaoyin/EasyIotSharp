@@ -5,7 +5,7 @@ using UPrime.Events.Bus;
 
 namespace EasyIotSharp.Core.Events.Tenant
 {
-    public class TenantEventData: EventData
+    public class TenantEventData : EventData
     {
 
     }

@@ -18,17 +18,23 @@ using EasyIotSharp.Core.Services.TenantAccount.Impl;
 using EasyIotSharp.Core.Dto.Rule.Params;
 using EasyIotSharp.Core.Domain.Rule;
 using SqlSugar;
+using EasyIotSharp.Core.Caching.Rule.Impl;
+using EasyIotSharp.Core.Caching.Rule;
+using EasyIotSharp.Core.Events.Tenant;
+using EasyIotSharp.Core.Events.Rule;
 
 namespace EasyIotSharp.Core.Services.Rule.Impl
 {
     public class AlarmsConfigService : ServiceBase, IAlarmsConfigService
     {
         private readonly IAlarmsConfigRepository _alarmsConfigRepository;
+        private readonly IAlarmsConfigCacheService _alarmsConfigCacheService;
 
-
-        public AlarmsConfigService(IAlarmsConfigRepository alarmsConfigRepository)
+        public AlarmsConfigService(IAlarmsConfigRepository alarmsConfigRepository,
+                                   IAlarmsConfigCacheService alarmsConfigCacheService)
         {
             _alarmsConfigRepository = alarmsConfigRepository;
+            _alarmsConfigCacheService = alarmsConfigCacheService;
         }
 
         /// <summary>
@@ -38,10 +44,24 @@ namespace EasyIotSharp.Core.Services.Rule.Impl
         /// <returns></returns>
         public async Task<PagedResultDto<AlarmsConfigDto>> QueryAlarmsConfig(PagingInput input)
         {
-            var query = await _alarmsConfigRepository.Query(input.PageIndex, input.PageSize);
-            int totalCount = query.totalCount;
-            var list = query.items.MapTo<List<AlarmsConfigDto>>();
-            return new PagedResultDto<AlarmsConfigDto>() { TotalCount = totalCount, Items = list };
+            if (input.IsPage.Equals(true)
+               && input.PageIndex <= 5 && input.PageSize == 10)
+            {
+                return await _alarmsConfigCacheService.QueryAlarmsConfig(input, async () =>
+                {
+                    var query = await _alarmsConfigRepository.Query(input.PageIndex, input.PageSize);
+                    int totalCount = query.totalCount;
+                    var list = query.items.MapTo<List<AlarmsConfigDto>>();
+                    return new PagedResultDto<AlarmsConfigDto>() { TotalCount = totalCount, Items = list };
+                });
+            }
+            else
+            {
+                var query = await _alarmsConfigRepository.Query(input.PageIndex, input.PageSize);
+                int totalCount = query.totalCount;
+                var list = query.items.MapTo<List<AlarmsConfigDto>>();
+                return new PagedResultDto<AlarmsConfigDto>() { TotalCount = totalCount, Items = list };
+            }
         }
 
         /// <summary>
@@ -71,6 +91,9 @@ namespace EasyIotSharp.Core.Services.Rule.Impl
             model.OperatorId = ContextUser.UserId;
             model.OperatorName = ContextUser.UserName;
             await _alarmsConfigRepository.InsertAsync(model);
+
+            //清除缓存
+            await EventBus.TriggerAsync(new AlarmsConfigEventData() { });
         }
 
         /// <summary>
@@ -100,6 +123,9 @@ namespace EasyIotSharp.Core.Services.Rule.Impl
             info.OperatorId = ContextUser.UserId;
             info.OperatorName = ContextUser.UserName;
             await _alarmsConfigRepository.UpdateAsync(info);
+
+            //清除缓存
+            await EventBus.TriggerAsync(new AlarmsConfigEventData() { });
         }
 
         /// <summary>
@@ -121,6 +147,9 @@ namespace EasyIotSharp.Core.Services.Rule.Impl
             info.OperatorId = ContextUser.UserId;
             info.OperatorName = ContextUser.UserName;
             await _alarmsConfigRepository.UpdateAsync(info);
+
+            //清除缓存
+            await EventBus.TriggerAsync(new AlarmsConfigEventData() { });
         }
 
         /// <summary>
@@ -142,6 +171,9 @@ namespace EasyIotSharp.Core.Services.Rule.Impl
             info.OperatorId = ContextUser.UserId;
             info.OperatorName = ContextUser.UserName;
             await _alarmsConfigRepository.UpdateAsync(info);
+
+            //清除缓存
+            await EventBus.TriggerAsync(new AlarmsConfigEventData() { });
         }
     }
 }

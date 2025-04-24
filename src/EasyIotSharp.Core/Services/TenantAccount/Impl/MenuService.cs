@@ -1,6 +1,9 @@
-﻿using EasyIotSharp.Core.Domain.TenantAccount;
+﻿using EasyIotSharp.Core.Caching.TenantAccount;
+using EasyIotSharp.Core.Domain.TenantAccount;
 using EasyIotSharp.Core.Dto.TenantAccount;
 using EasyIotSharp.Core.Dto.TenantAccount.Params;
+using EasyIotSharp.Core.Events.Tenant;
+using EasyIotSharp.Core.Events.TenantAccount;
 using EasyIotSharp.Core.Repositories.TenantAccount;
 using System;
 using System.Collections.Generic;
@@ -19,18 +22,21 @@ namespace EasyIotSharp.Core.Services.TenantAccount.Impl
         private readonly IRoleRepository _roleRepository;
         private readonly IRoleMenuRepository _roleMenuRepository;
         private readonly ISoldierRoleRepository _soldierRoleRepository;
+        private readonly IMenuCacheService  _menuCacheService;
 
         public MenuService(IMenuRepository menuRepository,
                            IRoleMenuRepository roleMenuRepository,
                            ISoldierRoleRepository soldierRoleRepository,
                            ISoldierRepository soldierRepository,
-                           IRoleRepository roleRepository)
+                           IRoleRepository roleRepository,
+                           IMenuCacheService menuCacheService)
         {
             _menuRepository = menuRepository;
             _roleMenuRepository = roleMenuRepository;
             _soldierRoleRepository = soldierRoleRepository;
             _soldierRepository = soldierRepository;
             _roleRepository = roleRepository;
+            _menuCacheService = menuCacheService;
         }
 
         public async Task<MenuDto> GetMenu(string id)
@@ -41,19 +47,44 @@ namespace EasyIotSharp.Core.Services.TenantAccount.Impl
 
         public async Task<PagedResultDto<MenuTreeDto>> QueryMenu(QueryMenuInput input)
         {
-            var soldier = await _soldierRepository.FirstOrDefaultAsync(x => x.IsDelete == false && x.Id == ContextUser.UserId);
-            if (soldier.IsNull())
+            if (string.IsNullOrEmpty(input.Keyword) 
+                && input.IsEnable.Equals(-1)
+                && input.IsPage.Equals(true)
+                && input.PageIndex <= 5 && input.PageSize == 10)
             {
-                throw new BizException(BizError.BIND_EXCEPTION_ERROR, "未找到指定资源");
-            }
-            // 查询菜单数据
-            var query = await _menuRepository.Query(soldier.IsSuperAdmin == true ? -1 : 0, input.Keyword, input.IsEnable, input.PageIndex, input.PageSize, false);
-            int totalCount = query.totalCount;
-            var list = query.items.MapTo<List<MenuDto>>();
+                return await _menuCacheService.QueryMenu(input, async () =>
+                {
+                    var soldier = await _soldierRepository.FirstOrDefaultAsync(x => x.IsDelete == false && x.Id == ContextUser.UserId);
+                    if (soldier.IsNull())
+                    {
+                        throw new BizException(BizError.BIND_EXCEPTION_ERROR, "未找到指定资源");
+                    }
+                    // 查询菜单数据
+                    var query = await _menuRepository.Query(soldier.IsSuperAdmin == true ? -1 : 0, input.Keyword, input.IsEnable, input.PageIndex, input.PageSize, false);
+                    int totalCount = query.totalCount;
+                    var list = query.items.MapTo<List<MenuDto>>();
 
-            // 构建树形结构
-            var tree = _menuRepository.BuildMenuTree(list);
-            return new PagedResultDto<MenuTreeDto>() { TotalCount = totalCount, Items = tree };
+                    // 构建树形结构
+                    var tree = _menuRepository.BuildMenuTree(list);
+                    return new PagedResultDto<MenuTreeDto>() { TotalCount = totalCount, Items = tree };
+                });
+            }
+            else
+            {
+                var soldier = await _soldierRepository.FirstOrDefaultAsync(x => x.IsDelete == false && x.Id == ContextUser.UserId);
+                if (soldier.IsNull())
+                {
+                    throw new BizException(BizError.BIND_EXCEPTION_ERROR, "未找到指定资源");
+                }
+                // 查询菜单数据
+                var query = await _menuRepository.Query(soldier.IsSuperAdmin == true ? -1 : 0, input.Keyword, input.IsEnable, input.PageIndex, input.PageSize, false);
+                int totalCount = query.totalCount;
+                var list = query.items.MapTo<List<MenuDto>>();
+
+                // 构建树形结构
+                var tree = _menuRepository.BuildMenuTree(list);
+                return new PagedResultDto<MenuTreeDto>() { TotalCount = totalCount, Items = tree };
+            }
         }
 
         public async Task<(List<QueryMenuBySoldierIdOutput> output, List<Menu> menus)> QueryMenuBySoldierId(bool isTreeResult = true)
@@ -173,6 +204,9 @@ namespace EasyIotSharp.Core.Services.TenantAccount.Impl
             model.OperatorId = ContextUser.UserId;
             model.OperatorName = ContextUser.UserName;
             await _menuRepository.InsertAsync(model);
+
+            //清除缓存
+            await EventBus.TriggerAsync(new MenuEventData() { });
         }
 
         public async Task UpdateMenu(InsertMenuInput input)
@@ -197,6 +231,9 @@ namespace EasyIotSharp.Core.Services.TenantAccount.Impl
             info.OperatorName = ContextUser.UserName;
             info.UpdatedAt = DateTime.Now;
             await _menuRepository.UpdateAsync(info);
+
+            //清除缓存
+            await EventBus.TriggerAsync(new MenuEventData() { });
         }
 
         public async Task UpdateIsEnableMenu(UpdateIsEnableMenuInput input)
@@ -214,6 +251,9 @@ namespace EasyIotSharp.Core.Services.TenantAccount.Impl
                 info.UpdatedAt = DateTime.Now;
                 await _menuRepository.UpdateAsync(info);
             }
+
+            //清除缓存
+            await EventBus.TriggerAsync(new MenuEventData() { });
         }
 
         public async Task DeleteMenu(DeleteMenuInput input)
@@ -231,6 +271,9 @@ namespace EasyIotSharp.Core.Services.TenantAccount.Impl
                 info.UpdatedAt = DateTime.Now;
                 await _menuRepository.UpdateAsync(info);
             }
+
+            //清除缓存
+            await EventBus.TriggerAsync(new MenuEventData() { });
         }
     }
 }

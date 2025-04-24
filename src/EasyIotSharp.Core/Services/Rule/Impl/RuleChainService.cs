@@ -1,9 +1,12 @@
 using System;
 using System.Threading.Tasks;
+using EasyIotSharp.Core.Caching.Rule;
+using EasyIotSharp.Core.Caching.Rule.Impl;
 using EasyIotSharp.Core.Domain.Rule;
 using EasyIotSharp.Core.Dto;
 using EasyIotSharp.Core.Dto.Rule;
 using EasyIotSharp.Core.Dto.Rule.Params;
+using EasyIotSharp.Core.Events.Rule;
 using EasyIotSharp.Core.Repositories.Rule;
 using UPrime.AutoMapper;
 using UPrime.Services.Dto;
@@ -16,13 +19,16 @@ namespace EasyIotSharp.Core.Services.Rule.Impl
     public class RuleChainService : ServiceBase, IRuleChainService
     {
         private readonly IRuleChainRepository _ruleChainRepository;
+        private readonly IRuleChainCacheService _ruleChainCacheService;
 
         /// <summary>
         /// 构造函数
         /// </summary>
-        public RuleChainService(IRuleChainRepository ruleChainRepository)
+        public RuleChainService(IRuleChainRepository ruleChainRepository,
+                                IRuleChainCacheService ruleChainCacheService)
         {
             _ruleChainRepository = ruleChainRepository;
+            _ruleChainCacheService = ruleChainCacheService;
         }
 
         /// <summary>
@@ -30,16 +36,39 @@ namespace EasyIotSharp.Core.Services.Rule.Impl
         /// </summary>
         public async Task<PagedResultDto<RuleChainDto>> QueryRuleChain(SceneManagementInput input)
         {
-            var query = await _ruleChainRepository.Query(
+            if (string.IsNullOrEmpty(input.Keyword)
+               && input.IsPage.Equals(true)
+               && input.PageIndex <= 5 && input.PageSize == 10)
+            {
+                return await _ruleChainCacheService.QueryRuleChain(input, async () =>
+                {
+                    var query = await _ruleChainRepository.Query(
+                    input.Keyword,
+                    input.ProjectId,
+                    input.PageIndex,
+                    input.PageSize);
+
+                    return new PagedResultDto<RuleChainDto>()
+                    {
+                        TotalCount = query.totalCount,
+                        Items = query.items
+                    };
+                });
+            }
+            else
+            {
+                var query = await _ruleChainRepository.Query(
                 input.Keyword,
+                input.ProjectId,
                 input.PageIndex,
                 input.PageSize);
 
-            return new PagedResultDto<RuleChainDto>()
-            {
-                TotalCount = query.totalCount,
-                Items = query.items
-            };
+                return new PagedResultDto<RuleChainDto>()
+                {
+                    TotalCount = query.totalCount,
+                    Items = query.items
+                };
+            }
         }
 
         /// <summary>
@@ -72,6 +101,9 @@ namespace EasyIotSharp.Core.Services.Rule.Impl
             };
 
             await _ruleChainRepository.InsertAsync(model);
+
+            //清除缓存
+            await EventBus.TriggerAsync(new RuleChainEventData() { });
         }
 
         /// <summary>
@@ -106,6 +138,9 @@ namespace EasyIotSharp.Core.Services.Rule.Impl
             info.OperatorName = ContextUser.UserName;
 
             await _ruleChainRepository.UpdateAsync(info);
+
+            //清除缓存
+            await EventBus.TriggerAsync(new RuleChainEventData() { });
         }
 
         /// <summary>
@@ -125,6 +160,9 @@ namespace EasyIotSharp.Core.Services.Rule.Impl
             info.OperatorName = ContextUser.UserName;
 
             await _ruleChainRepository.UpdateAsync(info);
+
+            //清除缓存
+            await EventBus.TriggerAsync(new RuleChainEventData() { });
         }
 
         /// <summary>
@@ -144,6 +182,9 @@ namespace EasyIotSharp.Core.Services.Rule.Impl
             info.OperatorName = ContextUser.UserName;
 
             await _ruleChainRepository.UpdateAsync(info);
+
+            //清除缓存
+            await EventBus.TriggerAsync(new RuleChainEventData() { });
         }
     }
 }

@@ -22,6 +22,7 @@ namespace EasyIotSharp.Core.Repositories.Rule.Impl
         /// <returns></returns>
         public async Task<(int totalCount, List<RuleChainDto> items)> Query(
             string keyword,
+            string projectId,
             int pageIndex,
             int pageSize)
         {
@@ -31,6 +32,11 @@ namespace EasyIotSharp.Core.Repositories.Rule.Impl
             {
                 keyword = keyword.Trim();
                 predicate = predicate.And(x => x.Name.Contains(keyword));
+            }
+
+            if (!string.IsNullOrWhiteSpace(projectId))
+            {
+                predicate = predicate.And(x => x.ProjectId.Contains(projectId));
             }
 
             var totalCount = await CountAsync(predicate);

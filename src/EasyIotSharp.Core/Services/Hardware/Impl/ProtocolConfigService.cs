@@ -1,6 +1,10 @@
-﻿using EasyIotSharp.Core.Domain.Hardware;
+﻿using EasyIotSharp.Core.Caching.Hardware;
+using EasyIotSharp.Core.Caching.Tenant;
+using EasyIotSharp.Core.Domain.Hardware;
 using EasyIotSharp.Core.Dto.Hardware;
 using EasyIotSharp.Core.Dto.Hardware.Params;
+using EasyIotSharp.Core.Events.Hardware;
+using EasyIotSharp.Core.Events.Tenant;
 using EasyIotSharp.Core.Repositories.Hardware;
 using System;
 using System.Collections.Generic;
@@ -12,19 +16,23 @@ using UPrime.Services.Dto;
 
 namespace EasyIotSharp.Core.Services.Hardware.Impl
 {
-    public class ProtocolConfigService:ServiceBase, IProtocolConfigService
+    public class ProtocolConfigService : ServiceBase, IProtocolConfigService
     {
         private readonly IProtocolRepository _protocolRepository;
         private readonly IProtocolConfigRepository _protocolConfigRepository;
         private readonly IProtocolConfigExtRepository _protocolConfigExtRepository;
 
+        private readonly IProtocolConfigCacheService _protocolConfigCacheService;
+
         public ProtocolConfigService(IProtocolRepository protocolRepository,
                                      IProtocolConfigRepository protocolConfigRepository,
-                                     IProtocolConfigExtRepository protocolConfigExtRepository)
+                                     IProtocolConfigExtRepository protocolConfigExtRepository,
+                                     IProtocolConfigCacheService protocolConfigCacheService)
         {
             _protocolRepository = protocolRepository;
             _protocolConfigRepository = protocolConfigRepository;
             _protocolConfigExtRepository = protocolConfigExtRepository;
+            _protocolConfigCacheService = protocolConfigCacheService;
         }
 
         public async Task<ProtocolConfigDto> GetProtocolConfig(string id)
@@ -44,29 +52,66 @@ namespace EasyIotSharp.Core.Services.Hardware.Impl
 
         public async Task<PagedResultDto<QueryProtocolConfigByProtocolIdOutput>> QueryProtocolConfig(QueryProtocolConfigInput input)
         {
-            var query = await _protocolConfigRepository.Query(input.ProtocolId, input.Keyword,input.TagType, input.PageIndex, input.PageSize, input.IsPage);
-            int totalCount = query.totalCount;
-            var list = query.items.MapTo<List<QueryProtocolConfigByProtocolIdOutput>>();
-            var protocols = await _protocolRepository.QueryByIds(list.Select(x => x.ProtocolId).ToList());
-            var configExts = await _protocolConfigExtRepository.QueryByConfigIds(list.Select(x => x.Id).ToList());
-            foreach (var item in list)
+            if (string.IsNullOrEmpty(input.Keyword)
+                && input.TagType.Equals(TagTypeMenu.None)
+                && input.ProtocolId.IsNull()
+                && input.IsPage.Equals(true)
+                && input.PageIndex <= 5 && input.PageSize == 10)
             {
-                var protocol = protocols.FirstOrDefault(x => x.Id == item.ProtocolId);
-                if (protocol.IsNotNull())
+                return await _protocolConfigCacheService.QueryProtocolConfig(input, async () =>
                 {
-                    item.ProtocolName = protocol.Name;
-                }
-                var configExtList = configExts.Where(x => x.ProtocolConfigId == item.Id).ToList();
-                Dictionary<string, string> dic = new Dictionary<string, string>();
-                foreach (var item1 in configExtList)
+                    var query = await _protocolConfigRepository.Query(input.ProtocolId, input.Keyword, input.TagType, input.PageIndex, input.PageSize, input.IsPage);
+                    int totalCount = query.totalCount;
+                    var list = query.items.MapTo<List<QueryProtocolConfigByProtocolIdOutput>>();
+                    var protocols = await _protocolRepository.QueryByIds(list.Select(x => x.ProtocolId).ToList());
+                    var configExts = await _protocolConfigExtRepository.QueryByConfigIds(list.Select(x => x.Id).ToList());
+                    foreach (var item in list)
+                    {
+                        var protocol = protocols.FirstOrDefault(x => x.Id == item.ProtocolId);
+                        if (protocol.IsNotNull())
+                        {
+                            item.ProtocolName = protocol.Name;
+                        }
+                        var configExtList = configExts.Where(x => x.ProtocolConfigId == item.Id).ToList();
+                        Dictionary<string, string> dic = new Dictionary<string, string>();
+                        foreach (var item1 in configExtList)
+                        {
+                            dic.Add(item1.Value, item1.Label);
+                        }
+                        item.Options = new Dictionary<string, string>();
+                        item.Options = dic;
+                    }
+
+                    return new PagedResultDto<QueryProtocolConfigByProtocolIdOutput>() { TotalCount = totalCount, Items = list };
+                });
+            }
+            else
+            {
+                var query = await _protocolConfigRepository.Query(input.ProtocolId, input.Keyword, input.TagType, input.PageIndex, input.PageSize, input.IsPage);
+                int totalCount = query.totalCount;
+                var list = query.items.MapTo<List<QueryProtocolConfigByProtocolIdOutput>>();
+                var protocols = await _protocolRepository.QueryByIds(list.Select(x => x.ProtocolId).ToList());
+                var configExts = await _protocolConfigExtRepository.QueryByConfigIds(list.Select(x => x.Id).ToList());
+                foreach (var item in list)
                 {
-                    dic.Add(item1.Value, item1.Label);
+                    var protocol = protocols.FirstOrDefault(x => x.Id == item.ProtocolId);
+                    if (protocol.IsNotNull())
+                    {
+                        item.ProtocolName = protocol.Name;
+                    }
+                    var configExtList = configExts.Where(x => x.ProtocolConfigId == item.Id).ToList();
+                    Dictionary<string, string> dic = new Dictionary<string, string>();
+                    foreach (var item1 in configExtList)
+                    {
+                        dic.Add(item1.Value, item1.Label);
+                    }
+                    item.Options = new Dictionary<string, string>();
+                    item.Options = dic;
                 }
-                item.Options = new Dictionary<string, string>();
-                item.Options = dic;
+
+                return new PagedResultDto<QueryProtocolConfigByProtocolIdOutput>() { TotalCount = totalCount, Items = list };
             }
 
-            return new PagedResultDto<QueryProtocolConfigByProtocolIdOutput>() { TotalCount = totalCount, Items = list };
         }
 
         public async Task InsertProtocolConfig(InsertProtocolConfigInput input)
@@ -110,10 +155,13 @@ namespace EasyIotSharp.Core.Services.Hardware.Impl
                     OperatorName = ContextUser.UserName
                 });
             }
-            if (protocolConfigExts.Count>0)
+            if (protocolConfigExts.Count > 0)
             {
                 await _protocolConfigExtRepository.InserManyAsync(protocolConfigExts);
             }
+
+            //清除缓存
+            await EventBus.TriggerAsync(new ProtocolConfigEventData() { });
         }
 
         public async Task UpdateProtocolConfig(UpdateProtocolConfigInput input)
@@ -141,7 +189,7 @@ namespace EasyIotSharp.Core.Services.Hardware.Impl
             info.OperatorName = ContextUser.UserName;
             await _protocolConfigRepository.UpdateAsync(info);
 
-            if (input.IsUpdateExt==true)
+            if (input.IsUpdateExt == true)
             {
                 //批量删除老的协议配置表
                 await _protocolConfigExtRepository.DeleteManyByConfigId(input.Id);
@@ -166,7 +214,10 @@ namespace EasyIotSharp.Core.Services.Hardware.Impl
                 {
                     await _protocolConfigExtRepository.InserManyAsync(protocolConfigExts);
                 }
-            }    
+            }
+
+            //清除缓存
+            await EventBus.TriggerAsync(new ProtocolConfigEventData() { });
         }
 
         public async Task DeleteProtocolConfig(DeleteProtocolConfigInput input)
@@ -184,6 +235,9 @@ namespace EasyIotSharp.Core.Services.Hardware.Impl
                 info.UpdatedAt = DateTime.Now;
                 await _protocolConfigRepository.UpdateAsync(info);
             }
+
+            //清除缓存
+            await EventBus.TriggerAsync(new ProtocolConfigEventData() { });
         }
     }
 }

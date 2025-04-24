@@ -1,6 +1,9 @@
-﻿using EasyIotSharp.Core.Domain.Hardware;
+﻿using EasyIotSharp.Core.Caching.Hardware;
+using EasyIotSharp.Core.Domain.Hardware;
 using EasyIotSharp.Core.Dto.Hardware;
 using EasyIotSharp.Core.Dto.Hardware.Params;
+using EasyIotSharp.Core.Events.Hardware;
+using EasyIotSharp.Core.Events.Tenant;
 using EasyIotSharp.Core.Repositories.Hardware;
 using System;
 using System.Collections.Generic;
@@ -14,10 +17,14 @@ namespace EasyIotSharp.Core.Services.Hardware.Impl
     public class ProtocolService : ServiceBase, IProtocolService
     {
         private readonly IProtocolRepository _protocolRepository;
+        private readonly IProtocolCacheService _protocolCacheService;
 
-        public ProtocolService(IProtocolRepository protocolRepository)
+
+        public ProtocolService(IProtocolRepository protocolRepository,
+            IProtocolCacheService protocolCacheService)
         {
             _protocolRepository = protocolRepository;
+            _protocolCacheService = protocolCacheService;
         }
 
         public async Task<ProtocolDto> GetProtocol(string id)
@@ -28,16 +35,32 @@ namespace EasyIotSharp.Core.Services.Hardware.Impl
 
         public async Task<PagedResultDto<ProtocolDto>> QueryProtocol(QueryProtocolInput input)
         {
-            var query = await _protocolRepository.Query(input.IsEnable, input.Keyword, input.PageIndex, input.PageSize,input.IsPage);
-            int totalCount = query.totalCount;
-            var list = query.items.MapTo<List<ProtocolDto>>();
+            if(string.IsNullOrEmpty(input.Keyword) && input.IsEnable.Equals(-1)
+                && input.IsPage.Equals(true)
+                && input.PageIndex <= 5 && input.PageSize == 10)
+            {
+                return await _protocolCacheService.QueryProtocol(input, async () =>
+                {
+                    var query = await _protocolRepository.Query(input.IsEnable, input.Keyword, input.PageIndex, input.PageSize, input.IsPage);
+                    int totalCount = query.totalCount;
+                    var list = query.items.MapTo<List<ProtocolDto>>();
 
-            return new PagedResultDto<ProtocolDto>() { TotalCount = totalCount, Items = list };
+                    return new PagedResultDto<ProtocolDto>() { TotalCount = totalCount, Items = list };
+                });
+            }
+            else
+            {
+                var query = await _protocolRepository.Query(input.IsEnable, input.Keyword, input.PageIndex, input.PageSize, input.IsPage);
+                int totalCount = query.totalCount;
+                var list = query.items.MapTo<List<ProtocolDto>>();
+
+                return new PagedResultDto<ProtocolDto>() { TotalCount = totalCount, Items = list };
+            }
         }
 
         public async Task InsertProtocol(InsertProtocolInput input)
         {
-            var isExistName = await _protocolRepository.FirstOrDefaultAsync(x =>x.Name == input.Name && x.IsDelete == false);
+            var isExistName = await _protocolRepository.FirstOrDefaultAsync(x => x.Name == input.Name && x.IsDelete == false);
             if (isExistName.IsNotNull())
             {
                 throw new BizException(BizError.BIND_EXCEPTION_ERROR, "协议名称重复");
@@ -53,6 +76,9 @@ namespace EasyIotSharp.Core.Services.Hardware.Impl
             model.OperatorId = ContextUser.UserId;
             model.OperatorName = ContextUser.UserName;
             await _protocolRepository.InsertAsync(model);
+
+            //清除缓存
+            await EventBus.TriggerAsync(new ProtocolEventData() { });
         }
 
         public async Task UpdateProtocol(UpdateProtocolInput input)
@@ -74,6 +100,9 @@ namespace EasyIotSharp.Core.Services.Hardware.Impl
             info.OperatorId = ContextUser.UserId;
             info.OperatorName = ContextUser.UserName;
             await _protocolRepository.UpdateAsync(info);
+
+            //清除缓存
+            await EventBus.TriggerAsync(new ProtocolEventData() { });
         }
 
         public async Task DeleteProtocol(DeleteProtocolInput input)
@@ -91,6 +120,9 @@ namespace EasyIotSharp.Core.Services.Hardware.Impl
                 info.UpdatedAt = DateTime.Now;
                 await _protocolRepository.UpdateAsync(info);
             }
+
+            //清除缓存
+            await EventBus.TriggerAsync(new ProtocolEventData() { });
         }
     }
 }

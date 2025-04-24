@@ -1,6 +1,10 @@
-﻿using EasyIotSharp.Core.Domain.Hardware;
+﻿using EasyIotSharp.Core.Caching.Hardware;
+using EasyIotSharp.Core.Caching.Hardware.Impl;
+using EasyIotSharp.Core.Domain.Hardware;
 using EasyIotSharp.Core.Dto.Hardware;
 using EasyIotSharp.Core.Dto.Hardware.Params;
+using EasyIotSharp.Core.Events.Hardware;
+using EasyIotSharp.Core.Events.Tenant;
 using EasyIotSharp.Core.Repositories.Hardware;
 using System;
 using System.Collections.Generic;
@@ -11,13 +15,16 @@ using UPrime.Services.Dto;
 
 namespace EasyIotSharp.Core.Services.Hardware.Impl
 {
-    public class SensorService:ServiceBase,ISensorService
+    public class SensorService : ServiceBase, ISensorService
     {
         private readonly ISensorRepository _sensorRepository;
+        private readonly ISensorCacheService _sensorCacheService;
 
-        public SensorService(ISensorRepository sensorRepository)
+        public SensorService(ISensorRepository sensorRepository,
+            ISensorCacheService sensorCacheService)
         {
             _sensorRepository = sensorRepository;
+            _sensorCacheService = sensorCacheService;
         }
 
         public async Task<SensorDto> GetSensor(string id)
@@ -28,11 +35,27 @@ namespace EasyIotSharp.Core.Services.Hardware.Impl
 
         public async Task<PagedResultDto<SensorDto>> QuerySensor(QuerySensorInput input)
         {
-            var query = await _sensorRepository.Query(ContextUser.TenantNumId,input.Keyword, input.PageIndex, input.PageSize, input.IsPage);
-            int totalCount = query.totalCount;
-            var list = query.items.MapTo<List<SensorDto>>();
+            if (string.IsNullOrEmpty(input.Keyword)
+                                    && input.IsPage.Equals(true)
+                                    && input.PageIndex <= 5 && input.PageSize == 10)
+            {
+                return await _sensorCacheService.QuerySensor(input, async () =>
+                {
+                    var query = await _sensorRepository.Query(ContextUser.TenantNumId, input.Keyword, input.PageIndex, input.PageSize, input.IsPage);
+                    int totalCount = query.totalCount;
+                    var list = query.items.MapTo<List<SensorDto>>();
 
-            return new PagedResultDto<SensorDto>() { TotalCount = totalCount, Items = list };
+                    return new PagedResultDto<SensorDto>() { TotalCount = totalCount, Items = list };
+                });
+            }
+            else
+            {
+                var query = await _sensorRepository.Query(ContextUser.TenantNumId, input.Keyword, input.PageIndex, input.PageSize, input.IsPage);
+                int totalCount = query.totalCount;
+                var list = query.items.MapTo<List<SensorDto>>();
+
+                return new PagedResultDto<SensorDto>() { TotalCount = totalCount, Items = list };
+            }
         }
 
         public async Task InsertSensor(InsertSensorInput input)
@@ -47,7 +70,7 @@ namespace EasyIotSharp.Core.Services.Hardware.Impl
             model.TenantNumId = ContextUser.TenantNumId;
             model.Name = input.Name;
             model.BriefName = input.BriefName;
-            model.Supplier=input.Supplier;
+            model.Supplier = input.Supplier;
             model.SensorModel = input.SensorModel;
             model.Remark = input.Remark;
             model.IsDelete = false;
@@ -56,6 +79,9 @@ namespace EasyIotSharp.Core.Services.Hardware.Impl
             model.OperatorId = ContextUser.UserId;
             model.OperatorName = ContextUser.UserName;
             await _sensorRepository.InsertAsync(model);
+
+            //清除缓存
+            await EventBus.TriggerAsync(new SensorEventData() { });
         }
 
         public async Task UpdateSensor(UpdateSensorInput input)
@@ -79,6 +105,9 @@ namespace EasyIotSharp.Core.Services.Hardware.Impl
             info.OperatorId = ContextUser.UserId;
             info.OperatorName = ContextUser.UserName;
             await _sensorRepository.UpdateAsync(info);
+
+            //清除缓存
+            await EventBus.TriggerAsync(new SensorEventData() { });
         }
 
         public async Task DeleteSensor(DeleteSensorInput input)
@@ -96,6 +125,9 @@ namespace EasyIotSharp.Core.Services.Hardware.Impl
                 info.OperatorName = ContextUser.UserName;
                 await _sensorRepository.UpdateAsync(info);
             }
+
+            //清除缓存
+            await EventBus.TriggerAsync(new SensorEventData() { });
         }
     }
 }

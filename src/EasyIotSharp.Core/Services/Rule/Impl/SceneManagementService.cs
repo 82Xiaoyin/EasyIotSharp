@@ -1,9 +1,11 @@
 using System;
 using System.Threading.Tasks;
+using EasyIotSharp.Core.Caching.Rule;
 using EasyIotSharp.Core.Domain.Rule;
 using EasyIotSharp.Core.Dto;
 using EasyIotSharp.Core.Dto.Rule;
 using EasyIotSharp.Core.Dto.Rule.Params;
+using EasyIotSharp.Core.Events.Rule;
 using EasyIotSharp.Core.Repositories.Rule;
 using UPrime.AutoMapper;
 using UPrime.Services.Dto;
@@ -16,13 +18,16 @@ namespace EasyIotSharp.Core.Services.Rule.Impl
     public class SceneManagementService : ServiceBase, ISceneManagementService
     {
         private readonly ISceneManagementRepository _sceneManagementRepository;
+        private readonly ISceneManagementCacheService _sceneManagementCacheService;
 
         /// <summary>
         /// 构造函数
         /// </summary>
-        public SceneManagementService(ISceneManagementRepository sceneManagementRepository)
+        public SceneManagementService(ISceneManagementRepository sceneManagementRepository,
+                                      ISceneManagementCacheService sceneManagementCacheService)
         {
             _sceneManagementRepository = sceneManagementRepository;
+            _sceneManagementCacheService = sceneManagementCacheService;
         }
 
         /// <summary>
@@ -30,16 +35,37 @@ namespace EasyIotSharp.Core.Services.Rule.Impl
         /// </summary>
         public async Task<PagedResultDto<SceneManagementDto>> QuerySceneManagement(SceneManagementInput input)
         {
-            var query = await _sceneManagementRepository.Query(
+            if (string.IsNullOrEmpty(input.Keyword)
+               && input.IsPage.Equals(true)
+               && input.PageIndex <= 5 && input.PageSize == 10)
+            {
+                return await _sceneManagementCacheService.QuerySceneManagement(input, async () =>
+                {
+                    var query = await _sceneManagementRepository.Query(
+                    input.Keyword,
+                    input.PageIndex,
+                    input.PageSize);
+
+                    return new PagedResultDto<SceneManagementDto>()
+                    {
+                        TotalCount = query.totalCount,
+                        Items = query.items
+                    };
+                });
+            }
+            else
+            {
+                var query = await _sceneManagementRepository.Query(
                 input.Keyword,
                 input.PageIndex,
                 input.PageSize);
 
-            return new PagedResultDto<SceneManagementDto>()
-            {
-                TotalCount = query.totalCount,
-                Items = query.items
-            };
+                return new PagedResultDto<SceneManagementDto>()
+                {
+                    TotalCount = query.totalCount,
+                    Items = query.items
+                };
+            }
         }
 
         /// <summary>
@@ -69,6 +95,9 @@ namespace EasyIotSharp.Core.Services.Rule.Impl
             };
 
             await _sceneManagementRepository.InsertAsync(model);
+
+            //清除缓存
+            await EventBus.TriggerAsync(new SceneManagementEventData() { });
         }
 
         /// <summary>
@@ -100,6 +129,9 @@ namespace EasyIotSharp.Core.Services.Rule.Impl
             info.OperatorName = ContextUser.UserName;
 
             await _sceneManagementRepository.UpdateAsync(info);
+
+            //清除缓存
+            await EventBus.TriggerAsync(new SceneManagementEventData() { });
         }
 
         /// <summary>
@@ -119,6 +151,9 @@ namespace EasyIotSharp.Core.Services.Rule.Impl
             info.OperatorName = ContextUser.UserName;
 
             await _sceneManagementRepository.UpdateAsync(info);
+
+            //清除缓存
+            await EventBus.TriggerAsync(new SceneManagementEventData() { });
         }
     }
 }

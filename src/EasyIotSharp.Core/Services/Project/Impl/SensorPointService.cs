@@ -1,6 +1,9 @@
-﻿using EasyIotSharp.Core.Domain.Proejct;
+﻿using EasyIotSharp.Core.Caching.Project;
+using EasyIotSharp.Core.Domain.Proejct;
 using EasyIotSharp.Core.Dto.Project;
 using EasyIotSharp.Core.Dto.Project.Params;
+using EasyIotSharp.Core.Events.Project;
+using EasyIotSharp.Core.Events.Tenant;
 using EasyIotSharp.Core.Repositories.Hardware;
 using EasyIotSharp.Core.Repositories.Project;
 using System;
@@ -20,18 +23,21 @@ namespace EasyIotSharp.Core.Services.Project.Impl
         private readonly IGatewayRepository _gatewayRepository;
         private readonly ISensorPointRepository _sensorPointRepository;
         private readonly ISensorRepository _sensorRepository;
+        private readonly ISensorPointCacheService _sensorPointCacheService;
 
         public SensorPointService(ISensorPointRepository sensorPointRepository,
                                   IProjectBaseRepository projectBaseRepository,
                                   IClassificationRepository classificationRepository,
                                   IGatewayRepository gatewayRepository,
-                                  ISensorRepository sensorRepository)
+                                  ISensorRepository sensorRepository,
+                                  ISensorPointCacheService sensorPointCacheService)
         {
             _projectBaseRepository = projectBaseRepository;
             _classificationRepository = classificationRepository;
             _gatewayRepository = gatewayRepository;
             _sensorRepository = sensorRepository;
             _sensorPointRepository = sensorPointRepository;
+            _sensorPointCacheService = sensorPointCacheService;
         }
 
         public async Task<SensorPointDto> GetSensorPoint(string id)
@@ -66,37 +72,84 @@ namespace EasyIotSharp.Core.Services.Project.Impl
 
         public async Task<PagedResultDto<SensorPointDto>> QuerySensorPoint(QuerySensorPointInput input)
         {
-            var query = await _sensorPointRepository.Query(ContextUser.TenantNumId, input.Keyword, input.ProjectId, input.ClassificationId, input.GatewayId, input.SensorId, input.State, input.PageIndex, input.PageSize, input.IsPage);
-            int totalCount = query.totalCount;
-            var list = query.items.MapTo<List<SensorPointDto>>();
-            var projects = await _projectBaseRepository.QueryByIds(list.Select(x => x.ProjectId).ToList());
-            var classifications = await _classificationRepository.QueryByIds(list.Select(x => x.ClassificationId).ToList());
-            var gateways = await _gatewayRepository.QueryByIds(list.Select(x => x.GatewayId).ToList());
-            var sensors = await _sensorRepository.QueryByIds(list.Select(x => x.SensorId).ToList());
-            foreach (var item in list)
+            if (string.IsNullOrEmpty(input.Keyword)
+               && input.State.Equals(-1)
+               && string.IsNullOrEmpty(input.ProjectId)
+               && string.IsNullOrEmpty(input.ClassificationId)
+               && string.IsNullOrEmpty(input.GatewayId)
+               && string.IsNullOrEmpty(input.SensorId)
+               && input.IsPage.Equals(true)
+               && input.PageIndex <= 5 && input.PageSize == 10)
             {
-                var project = projects.FirstOrDefault(x => x.Id == item.ProjectId);
-                if (project.IsNotNull())
+                return await _sensorPointCacheService.QuerySensorPoint(input, async () =>
                 {
-                    item.ProjectName = project.Name;
-                }
-                var classification = classifications.FirstOrDefault(x => x.Id == item.ClassificationId);
-                if (classification.IsNotNull())
-                {
-                    item.ClassificationName = classification.Name;
-                }
-                var gateway = gateways.FirstOrDefault(x => x.Id == item.GatewayId);
-                if (gateway.IsNotNull())
-                {
-                    item.GatewayName = gateway.Name;
-                }
-                var sensor = sensors.FirstOrDefault(x => x.Id == item.SensorId);
-                if (sensor.IsNotNull())
-                {
-                    item.SensorName = sensor.Name;
-                }
+                    var query = await _sensorPointRepository.Query(ContextUser.TenantNumId, input.Keyword, input.ProjectId, input.ClassificationId, input.GatewayId, input.SensorId, input.State, input.PageIndex, input.PageSize, input.IsPage);
+                    int totalCount = query.totalCount;
+                    var list = query.items.MapTo<List<SensorPointDto>>();
+                    var projects = await _projectBaseRepository.QueryByIds(list.Select(x => x.ProjectId).ToList());
+                    var classifications = await _classificationRepository.QueryByIds(list.Select(x => x.ClassificationId).ToList());
+                    var gateways = await _gatewayRepository.QueryByIds(list.Select(x => x.GatewayId).ToList());
+                    var sensors = await _sensorRepository.QueryByIds(list.Select(x => x.SensorId).ToList());
+                    foreach (var item in list)
+                    {
+                        var project = projects.FirstOrDefault(x => x.Id == item.ProjectId);
+                        if (project.IsNotNull())
+                        {
+                            item.ProjectName = project.Name;
+                        }
+                        var classification = classifications.FirstOrDefault(x => x.Id == item.ClassificationId);
+                        if (classification.IsNotNull())
+                        {
+                            item.ClassificationName = classification.Name;
+                        }
+                        var gateway = gateways.FirstOrDefault(x => x.Id == item.GatewayId);
+                        if (gateway.IsNotNull())
+                        {
+                            item.GatewayName = gateway.Name;
+                        }
+                        var sensor = sensors.FirstOrDefault(x => x.Id == item.SensorId);
+                        if (sensor.IsNotNull())
+                        {
+                            item.SensorName = sensor.Name;
+                        }
+                    }
+                    return new PagedResultDto<SensorPointDto>() { TotalCount = totalCount, Items = list };
+                });
             }
-            return new PagedResultDto<SensorPointDto>() { TotalCount = totalCount, Items = list };
+            else
+            {
+                var query = await _sensorPointRepository.Query(ContextUser.TenantNumId, input.Keyword, input.ProjectId, input.ClassificationId, input.GatewayId, input.SensorId, input.State, input.PageIndex, input.PageSize, input.IsPage);
+                int totalCount = query.totalCount;
+                var list = query.items.MapTo<List<SensorPointDto>>();
+                var projects = await _projectBaseRepository.QueryByIds(list.Select(x => x.ProjectId).ToList());
+                var classifications = await _classificationRepository.QueryByIds(list.Select(x => x.ClassificationId).ToList());
+                var gateways = await _gatewayRepository.QueryByIds(list.Select(x => x.GatewayId).ToList());
+                var sensors = await _sensorRepository.QueryByIds(list.Select(x => x.SensorId).ToList());
+                foreach (var item in list)
+                {
+                    var project = projects.FirstOrDefault(x => x.Id == item.ProjectId);
+                    if (project.IsNotNull())
+                    {
+                        item.ProjectName = project.Name;
+                    }
+                    var classification = classifications.FirstOrDefault(x => x.Id == item.ClassificationId);
+                    if (classification.IsNotNull())
+                    {
+                        item.ClassificationName = classification.Name;
+                    }
+                    var gateway = gateways.FirstOrDefault(x => x.Id == item.GatewayId);
+                    if (gateway.IsNotNull())
+                    {
+                        item.GatewayName = gateway.Name;
+                    }
+                    var sensor = sensors.FirstOrDefault(x => x.Id == item.SensorId);
+                    if (sensor.IsNotNull())
+                    {
+                        item.SensorName = sensor.Name;
+                    }
+                }
+                return new PagedResultDto<SensorPointDto>() { TotalCount = totalCount, Items = list };
+            }
         }
 
         public async Task InsertSensorPoint(InsertSensorPointInput input)
@@ -120,6 +173,9 @@ namespace EasyIotSharp.Core.Services.Project.Impl
             model.OperatorId = ContextUser.UserId;
             model.OperatorName = ContextUser.UserName;
             await _sensorPointRepository.InsertAsync(model);
+
+            //清除缓存
+            await EventBus.TriggerAsync(new SensorPointEventData() { });
         }
 
         public async Task UpdateSensorPoint(UpdateSensorPointInput input)
@@ -143,6 +199,9 @@ namespace EasyIotSharp.Core.Services.Project.Impl
             info.OperatorId = ContextUser.UserId;
             info.OperatorName = ContextUser.UserName;
             await _sensorPointRepository.UpdateAsync(info);
+
+            //清除缓存
+            await EventBus.TriggerAsync(new SensorPointEventData() { });
         }
 
         public async Task DeleteSensorPoint(DeleteSensorPointInput input)
@@ -156,6 +215,9 @@ namespace EasyIotSharp.Core.Services.Project.Impl
                 info.OperatorName = ContextUser.UserName;
                 await _sensorPointRepository.UpdateAsync(info);
             }
+
+            //清除缓存
+            await EventBus.TriggerAsync(new SensorPointEventData() { });
         }
 
         /// <summary>

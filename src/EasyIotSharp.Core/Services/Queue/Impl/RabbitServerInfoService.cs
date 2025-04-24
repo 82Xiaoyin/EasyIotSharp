@@ -1,7 +1,11 @@
 using AutoMapper;
+using EasyIotSharp.Core.Caching.Queue;
+using EasyIotSharp.Core.Caching.Queue.Impl;
 using EasyIotSharp.Core.Domain.Queue;
 using EasyIotSharp.Core.Dto.Queue;
 using EasyIotSharp.Core.Dto.Queue.Params;
+using EasyIotSharp.Core.Events.Queue;
+using EasyIotSharp.Core.Events.Tenant;
 using EasyIotSharp.Core.Repositories.Queue;
 using System;
 using System.Collections.Generic;
@@ -18,10 +22,13 @@ namespace EasyIotSharp.Core.Services.Queue.Impl
     public class RabbitServerInfoService : ServiceBase, IRabbitServerInfoService
     {
         private readonly IRabbitServerInfoRepository _rabbitServerInfoRepository;
+        private readonly IRabbitServerInfoCacheService _rabbitServerInfoCacheService;
 
-        public RabbitServerInfoService(IRabbitServerInfoRepository rabbitServerInfoRepository)
+        public RabbitServerInfoService(IRabbitServerInfoRepository rabbitServerInfoRepository,
+                                       IRabbitServerInfoCacheService rabbitServerInfoCacheService) 
         {
             _rabbitServerInfoRepository = rabbitServerInfoRepository;
+            _rabbitServerInfoCacheService = rabbitServerInfoCacheService;
         }
 
         /// <summary>
@@ -69,6 +76,9 @@ namespace EasyIotSharp.Core.Services.Queue.Impl
             };
 
             await _rabbitServerInfoRepository.InsertAsync(entity);
+
+            //清除缓存
+            await EventBus.TriggerAsync(new RabbitServerInfoEventData() { });
         }
 
         /// <summary>
@@ -105,6 +115,9 @@ namespace EasyIotSharp.Core.Services.Queue.Impl
             entity.OperatorName = ContextUser.UserName;
 
             await _rabbitServerInfoRepository.UpdateAsync(entity);
+
+            //清除缓存
+            await EventBus.TriggerAsync(new RabbitServerInfoEventData() { });
         }
 
         /// <summary>
@@ -122,6 +135,9 @@ namespace EasyIotSharp.Core.Services.Queue.Impl
             entity.OperatorName = ContextUser.UserName;
 
             await _rabbitServerInfoRepository.UpdateAsync(entity);
+
+            //清除缓存
+            await EventBus.TriggerAsync(new RabbitServerInfoEventData() { });
         }
 
         /// <summary>
@@ -129,9 +145,24 @@ namespace EasyIotSharp.Core.Services.Queue.Impl
         /// </summary>
         public async Task<PagedResultDto<RabbitServerInfoDto>> QueryRabbitServerInfo(QueryRabbitServerInfoInput input)
         {
-            var query = await _rabbitServerInfoRepository.Query(ContextUser.TenantNumId, input.Keyword, input.IsEnable, input.PageIndex, input.PageSize, input.IsPage);
-            var list = query.items.MapTo<List<RabbitServerInfoDto>>();
-            return new PagedResultDto<RabbitServerInfoDto>(query.totalCount, list);
+            if (string.IsNullOrEmpty(input.Keyword)
+               && input.IsEnable.Equals(-1)
+               && input.IsPage.Equals(true)
+               && input.PageIndex <= 5 && input.PageSize == 10)
+            {
+                return await _rabbitServerInfoCacheService.QueryRabbitServerInfo(input, async () =>
+                {
+                    var query = await _rabbitServerInfoRepository.Query(ContextUser.TenantNumId, input.Keyword, input.IsEnable, input.PageIndex, input.PageSize, input.IsPage);
+                    var list = query.items.MapTo<List<RabbitServerInfoDto>>();
+                    return new PagedResultDto<RabbitServerInfoDto>(query.totalCount, list);
+                });
+            }
+            else
+            {
+                var query = await _rabbitServerInfoRepository.Query(ContextUser.TenantNumId, input.Keyword, input.IsEnable, input.PageIndex, input.PageSize, input.IsPage);
+                var list = query.items.MapTo<List<RabbitServerInfoDto>>();
+                return new PagedResultDto<RabbitServerInfoDto>(query.totalCount, list);
+            }
         }
     }
 }

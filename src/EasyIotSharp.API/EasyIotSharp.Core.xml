@@ -143,10 +143,154 @@
         <member name="M:EasyIotSharp.Core.Caching.Extensions.Seconds(System.Int32)">
             <summary>按秒缓存时间</summary>
         </member>
+        <member name="M:EasyIotSharp.Core.Caching.Hardware.IProtocolCacheService.QueryProtocol(EasyIotSharp.Core.Dto.Hardware.Params.QueryProtocolInput,System.Func{System.Threading.Tasks.Task{UPrime.Services.Dto.PagedResultDto{EasyIotSharp.Core.Dto.Hardware.ProtocolDto}}})">
+            <summary>
+            获取协议列表
+            </summary>
+            <param name="input"></param>
+            <param name="action"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EasyIotSharp.Core.Caching.Hardware.IProtocolConfigCacheService.QueryProtocolConfig(EasyIotSharp.Core.Dto.Hardware.Params.QueryProtocolConfigInput,System.Func{System.Threading.Tasks.Task{UPrime.Services.Dto.PagedResultDto{EasyIotSharp.Core.Dto.Hardware.Params.QueryProtocolConfigByProtocolIdOutput}}})">
+            <summary>
+            通过条件分页查询配置信息列表
+            </summary>
+            <param name="input"></param>
+            <param name="action"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EasyIotSharp.Core.Caching.Hardware.ISensorCacheService.QuerySensor(EasyIotSharp.Core.Dto.Hardware.Params.QuerySensorInput,System.Func{System.Threading.Tasks.Task{UPrime.Services.Dto.PagedResultDto{EasyIotSharp.Core.Dto.Hardware.SensorDto}}})">
+            <summary>
+            传感器类型
+            </summary>
+            <param name="input"></param>
+            <param name="action"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EasyIotSharp.Core.Caching.Hardware.ISensorQuotaCacheService.QuerySensorQuota(EasyIotSharp.Core.Dto.Hardware.Params.QuerySensorQuotaInput,System.Func{System.Threading.Tasks.Task{UPrime.Services.Dto.PagedResultDto{EasyIotSharp.Core.Dto.Hardware.SensorQuotaDto}}})">
+            <summary>
+            传感器列表
+            </summary>
+            <param name="input"></param>
+            <param name="action"></param>
+            <returns></returns>
+        </member>
         <member name="T:EasyIotSharp.Core.Caching.ICacheService">
             <summary>
             缓存服务的标记
             </summary>
+        </member>
+        <member name="M:EasyIotSharp.Core.Caching.Project.IClassificationCacheService.QueryClassification(EasyIotSharp.Core.Dto.Project.Params.QueryClassificationInput,System.Func{System.Threading.Tasks.Task{UPrime.Services.Dto.PagedResultDto{EasyIotSharp.Core.Dto.Project.ClassificationDto}}})">
+            <summary>
+            获取项目分类
+            </summary>
+            <param name="input"></param>
+            <param name="action"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EasyIotSharp.Core.Caching.Project.IGatewayCacheService.QueryGateway(EasyIotSharp.Core.Dto.Project.Params.QueryGatewayInput,System.Func{System.Threading.Tasks.Task{UPrime.Services.Dto.PagedResultDto{EasyIotSharp.Core.Dto.Project.GatewayDto}}})">
+            <summary>
+            网关设备
+            </summary>
+            <param name="input"></param>
+            <param name="action"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EasyIotSharp.Core.Caching.Project.IGatewayProtocolCacheService.QueryGatewayProtocol(EasyIotSharp.Core.Dto.Project.Params.QueryGatewayProtocolInput,System.Func{System.Threading.Tasks.Task{UPrime.Services.Dto.PagedResultDto{EasyIotSharp.Core.Dto.Project.GatewayProtocolDto}}})">
+            <summary>
+            获取网关
+            </summary>
+            <param name="input"></param>
+            <param name="action"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EasyIotSharp.Core.Caching.Project.IProjectBaseCacheService.QueryProjectBase(EasyIotSharp.Core.Dto.Project.Params.QueryProjectBaseInput,System.Func{System.Threading.Tasks.Task{UPrime.Services.Dto.PagedResultDto{EasyIotSharp.Core.Dto.Project.ProjectBaseDto}}})">
+            <summary>
+            项目
+            </summary>
+            <param name="input"></param>
+            <param name="action"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EasyIotSharp.Core.Caching.Project.ISensorPointCacheService.QuerySensorPoint(EasyIotSharp.Core.Dto.Project.Params.QuerySensorPointInput,System.Func{System.Threading.Tasks.Task{UPrime.Services.Dto.PagedResultDto{EasyIotSharp.Core.Dto.Project.SensorPointDto}}})">
+            <summary>
+            测点
+            </summary>
+            <param name="input"></param>
+            <param name="action"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EasyIotSharp.Core.Caching.Queue.IRabbitServerInfoCacheService.QueryRabbitServerInfo(EasyIotSharp.Core.Dto.Queue.Params.QueryRabbitServerInfoInput,System.Func{System.Threading.Tasks.Task{UPrime.Services.Dto.PagedResultDto{EasyIotSharp.Core.Dto.Queue.RabbitServerInfoDto}}})">
+            <summary>
+            MQ服务器配置信息
+            </summary>
+            <param name="input"></param>
+            <param name="action"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EasyIotSharp.Core.Caching.Rule.IAlarmsConfigCacheService.QueryAlarmsConfig(EasyIotSharp.Core.Dto.PagingInput,System.Func{System.Threading.Tasks.Task{UPrime.Services.Dto.PagedResultDto{EasyIotSharp.Core.Dto.Rule.AlarmsConfigDto}}})">
+            <summary>
+            配置项目关系
+            </summary>
+            <param name="input"></param>
+            <param name="action"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EasyIotSharp.Core.Caching.Rule.INotifyCacheService.QueryNotifyConfig(EasyIotSharp.Core.Dto.PagingInput,System.Func{System.Threading.Tasks.Task{UPrime.Services.Dto.PagedResultDto{EasyIotSharp.Core.Dto.Rule.NotifyDto}}})">
+            <summary>
+            通知组列表
+            </summary>
+            <param name="input"></param>
+            <param name="action"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EasyIotSharp.Core.Caching.Rule.INotifyRecordCacheService.QueryNotifyRecord(EasyIotSharp.Core.Dto.Rule.Params.NotifyRecordInput,System.Func{System.Threading.Tasks.Task{UPrime.Services.Dto.PagedResultDto{EasyIotSharp.Core.Dto.Rule.NotifyRecordDto}}})">
+            <summary>
+            通知记录列表
+            </summary>
+            <param name="input"></param>
+            <param name="action"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EasyIotSharp.Core.Caching.Rule.IRuleChainCacheService.QueryRuleChain(EasyIotSharp.Core.Dto.Rule.Params.SceneManagementInput,System.Func{System.Threading.Tasks.Task{UPrime.Services.Dto.PagedResultDto{EasyIotSharp.Core.Dto.Rule.RuleChainDto}}})">
+            <summary>
+            场景联动
+            </summary>
+            <param name="input"></param>
+            <param name="action"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EasyIotSharp.Core.Caching.Rule.ISceneManagementCacheService.QuerySceneManagement(EasyIotSharp.Core.Dto.Rule.Params.SceneManagementInput,System.Func{System.Threading.Tasks.Task{UPrime.Services.Dto.PagedResultDto{EasyIotSharp.Core.Dto.Rule.SceneManagementDto}}})">
+            <summary>
+            场景管理
+            </summary>
+            <param name="input"></param>
+            <param name="action"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EasyIotSharp.Core.Caching.TenantAccount.IMenuCacheService.QueryMenu(EasyIotSharp.Core.Dto.TenantAccount.Params.QueryMenuInput,System.Func{System.Threading.Tasks.Task{UPrime.Services.Dto.PagedResultDto{EasyIotSharp.Core.Dto.TenantAccount.MenuTreeDto}}})">
+            <summary>
+            获取菜单
+            </summary>
+            <param name="input"></param>
+            <param name="action"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EasyIotSharp.Core.Caching.TenantAccount.IRoleCacheService.QueryRole(EasyIotSharp.Core.Dto.TenantAccount.Params.QueryRoleInput,System.Func{System.Threading.Tasks.Task{UPrime.Services.Dto.PagedResultDto{EasyIotSharp.Core.Dto.TenantAccount.RoleDto}}})">
+            <summary>
+            角色
+            </summary>
+            <param name="input"></param>
+            <param name="action"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EasyIotSharp.Core.Caching.TenantAccount.ISoldierCacheService.QuerySoldier(EasyIotSharp.Core.Dto.TenantAccount.Params.QuerySoldierInput,System.Func{System.Threading.Tasks.Task{UPrime.Services.Dto.PagedResultDto{EasyIotSharp.Core.Dto.TenantAccount.SoldierDto}}})">
+            <summary>
+            用户
+            </summary>
+            <param name="input"></param>
+            <param name="action"></param>
+            <returns></returns>
         </member>
         <member name="M:EasyIotSharp.Core.Caching.Tenant.ITenantCacheService.QueryTenant(EasyIotSharp.Core.Dto.Tenant.Params.QueryTenantInput,System.Func{System.Threading.Tasks.Task{UPrime.Services.Dto.PagedResultDto{EasyIotSharp.Core.Dto.Tenant.TenantDto}}})">
             <summary>
@@ -7251,7 +7395,7 @@
             规则链服务
             </summary>
         </member>
-        <member name="M:EasyIotSharp.Core.Services.Rule.Impl.RuleChainService.#ctor(EasyIotSharp.Core.Repositories.Rule.IRuleChainRepository)">
+        <member name="M:EasyIotSharp.Core.Services.Rule.Impl.RuleChainService.#ctor(EasyIotSharp.Core.Repositories.Rule.IRuleChainRepository,EasyIotSharp.Core.Caching.Rule.IRuleChainCacheService)">
             <summary>
             构造函数
             </summary>
@@ -7286,7 +7430,7 @@
             场景管理服务
             </summary>
         </member>
-        <member name="M:EasyIotSharp.Core.Services.Rule.Impl.SceneManagementService.#ctor(EasyIotSharp.Core.Repositories.Rule.ISceneManagementRepository)">
+        <member name="M:EasyIotSharp.Core.Services.Rule.Impl.SceneManagementService.#ctor(EasyIotSharp.Core.Repositories.Rule.ISceneManagementRepository,EasyIotSharp.Core.Caching.Rule.ISceneManagementCacheService)">
             <summary>
             构造函数
             </summary>

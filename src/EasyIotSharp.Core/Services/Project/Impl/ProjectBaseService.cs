@@ -11,16 +11,23 @@ using UPrime.AutoMapper;
 using EasyIotSharp.Core.Dto.TenantAccount.Params;
 using EasyIotSharp.Core.Domain.Proejct;
 using EasyIotSharp.Core.Domain.Queue;
+using EasyIotSharp.Core.Caching.Project;
+using EasyIotSharp.Core.Caching.Project.Impl;
+using EasyIotSharp.Core.Events.Tenant;
+using EasyIotSharp.Core.Events.Project;
 
 namespace EasyIotSharp.Core.Services.Project.Impl
 {
     public class ProjectBaseService : ServiceBase, IProjectBaseService
     {
         private readonly IProjectBaseRepository _projectBaseRepository;
+        private readonly IProjectBaseCacheService _projectBaseCacheService;
 
-        public ProjectBaseService(IProjectBaseRepository projectBaseRepository)
+        public ProjectBaseService(IProjectBaseRepository projectBaseRepository,
+                                  IProjectBaseCacheService projectBaseCacheService)
         {
             _projectBaseRepository = projectBaseRepository;
+            _projectBaseCacheService = projectBaseCacheService;
         }
 
         public async Task<ProjectBaseDto> GetProjectBase(string id)
@@ -31,11 +38,30 @@ namespace EasyIotSharp.Core.Services.Project.Impl
 
         public async Task<PagedResultDto<ProjectBaseDto>> QueryProjectBase(QueryProjectBaseInput input)
         {
-            var query = await _projectBaseRepository.Query(ContextUser.TenantNumId, input.Keyword, input.State, input.CreateStartTime, input.CreateEndTime, input.PageIndex, input.PageSize);
-            int totalCount = query.totalCount;
-            var list = query.items.MapTo<List<ProjectBaseDto>>();
+            if (string.IsNullOrEmpty(input.Keyword)
+                && input.State.Equals(-1)
+                && input.CreateEndTime.IsNull()
+                && input.CreateStartTime.IsNull()
+                && input.IsPage.Equals(true)
+                && input.PageIndex <= 5 && input.PageSize == 10)
+            {
+                return await _projectBaseCacheService.QueryProjectBase(input, async () =>
+                {
+                    var query = await _projectBaseRepository.Query(ContextUser.TenantNumId, input.Keyword, input.State, input.CreateStartTime, input.CreateEndTime, input.PageIndex, input.PageSize);
+                    int totalCount = query.totalCount;
+                    var list = query.items.MapTo<List<ProjectBaseDto>>();
 
-            return new PagedResultDto<ProjectBaseDto>() { TotalCount = totalCount, Items = list };
+                    return new PagedResultDto<ProjectBaseDto>() { TotalCount = totalCount, Items = list };
+                });
+            }
+            else
+            {
+                var query = await _projectBaseRepository.Query(ContextUser.TenantNumId, input.Keyword, input.State, input.CreateStartTime, input.CreateEndTime, input.PageIndex, input.PageSize);
+                int totalCount = query.totalCount;
+                var list = query.items.MapTo<List<ProjectBaseDto>>();
+
+                return new PagedResultDto<ProjectBaseDto>() { TotalCount = totalCount, Items = list };
+            }
         }
 
         public async Task InsertProjectBase(InsertProjectBaseInput input)
@@ -66,6 +92,9 @@ namespace EasyIotSharp.Core.Services.Project.Impl
             rabbitProject.RabbitServerInfoId = input.RabbitServerInfoId;
             rabbitProject.ProjectId = model.Id;
             await _projectBaseRepository.AddRabbitProject(rabbitProject);
+
+            //清除缓存
+            await EventBus.TriggerAsync(new ProjectBaseEventData() { });
         }
 
         public async Task UpdateProjectBase(UpdateProjectBaseInput input)
@@ -102,6 +131,9 @@ namespace EasyIotSharp.Core.Services.Project.Impl
                 addRabbitProject.ProjectId = info.Id;
                 await _projectBaseRepository.AddRabbitProject(addRabbitProject);
             }
+
+            //清除缓存
+            await EventBus.TriggerAsync(new ProjectBaseEventData() { });
         }
 
         public async Task UpdateStateProjectBase(UpdateStateProjectBaseInput input)
@@ -115,6 +147,9 @@ namespace EasyIotSharp.Core.Services.Project.Impl
                 info.OperatorName = ContextUser.UserName;
                 await _projectBaseRepository.UpdateAsync(info);
             }
+
+            //清除缓存
+            await EventBus.TriggerAsync(new ProjectBaseEventData() { });
         }
 
         public async Task DeleteProjectBase(DeleteProjectBaseInput input)
@@ -137,8 +172,10 @@ namespace EasyIotSharp.Core.Services.Project.Impl
                 rabbitProject.OperatorId = ContextUser.UserId;
                 rabbitProject.OperatorName = ContextUser.UserName;
                 await _projectBaseRepository.UpdateRabbitProject(rabbitProject);
-            }
-            ;
+            };
+
+            //清除缓存
+            await EventBus.TriggerAsync(new ProjectBaseEventData() { });
         }
     }
 }
