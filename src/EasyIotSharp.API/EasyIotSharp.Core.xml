@@ -6187,7 +6187,7 @@
             <param name="userNotifies"></param>
             <returns></returns>
         </member>
-        <member name="M:EasyIotSharp.Core.Repositories.Rule.Impl.RuleChainRepository.Query(System.String,System.Int32,System.Int32)">
+        <member name="M:EasyIotSharp.Core.Repositories.Rule.Impl.RuleChainRepository.Query(System.String,System.String,System.Int32,System.Int32)">
             <summary>
             场景联动列表
             </summary>
@@ -6237,7 +6237,7 @@
             <param name="userNotifies"></param>
             <returns></returns>
         </member>
-        <member name="M:EasyIotSharp.Core.Repositories.Rule.IRuleChainRepository.Query(System.String,System.Int32,System.Int32)">
+        <member name="M:EasyIotSharp.Core.Repositories.Rule.IRuleChainRepository.Query(System.String,System.String,System.Int32,System.Int32)">
             <summary>
             查询规则链列表
             </summary>
