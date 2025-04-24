@@ -127,12 +127,12 @@ namespace EasyIotSharp.Core.Services.Rule.Impl
                 throw new BizException(BizError.BIND_EXCEPTION_ERROR, "规则链名称重复");
             }
 
-            input.Name = info.Name;
-            input.AlarmsJSON = info.AlarmsJSON;
-            input.ProjectId = info.ProjectId;
-            input.Remark = info.Remark;
-            input.RuleContentJson = info.RuleContentJson;
-            input.State = info.State;
+            info.Name = input.Name;
+            info.AlarmsJSON = input.AlarmsJSON;
+            info.ProjectId = input.ProjectId;
+            info.Remark = input.Remark;
+            info.RuleContentJson = input.RuleContentJson;
+            info.State = input.State;
             info.UpdatedAt = DateTime.Now;
             info.OperatorId = ContextUser.UserId;
             info.OperatorName = ContextUser.UserName;
