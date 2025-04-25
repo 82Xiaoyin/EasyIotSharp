@@ -88,7 +88,7 @@ namespace EasyIotSharp.Core.Repositories.Hardware.Impl
         /// <returns></returns>
         public List<SensorQuota> GetSensorQuotaList()
         {
-            return Client.Queryable<SensorQuota>().OrderBy(t => t.Sort, OrderByType.Desc).ToList();
+            return Client.Queryable<SensorQuota>().OrderBy(t => t.SensorId, OrderByType.Asc).OrderBy(t => t.Sort, OrderByType.Asc).ToList();
         }
     }
 }

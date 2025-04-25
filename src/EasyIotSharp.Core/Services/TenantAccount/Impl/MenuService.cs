@@ -7,6 +7,7 @@ using EasyIotSharp.Core.Events.TenantAccount;
 using EasyIotSharp.Core.Repositories.TenantAccount;
 using System;
 using System.Collections.Generic;
+using System.Drawing.Printing;
 using System.Linq;
 using System.Security.Policy;
 using System.Threading.Tasks;
@@ -61,11 +62,11 @@ namespace EasyIotSharp.Core.Services.TenantAccount.Impl
                     }
                     // 查询菜单数据
                     var query = await _menuRepository.Query(soldier.IsSuperAdmin == true ? -1 : 0, input.Keyword, input.IsEnable, input.PageIndex, input.PageSize, false);
-                    int totalCount = query.totalCount;
                     var list = query.items.MapTo<List<MenuDto>>();
-
                     // 构建树形结构
-                    var tree = _menuRepository.BuildMenuTree(list);
+                    var tree = _menuRepository.BuildMenuTree(list).Skip((input.PageIndex - 1) * input.PageSize)
+                                      .Take(input.PageSize).ToList();
+                    int totalCount = tree.Count;
                     return new PagedResultDto<MenuTreeDto>() { TotalCount = totalCount, Items = tree };
                 });
             }
@@ -78,11 +79,12 @@ namespace EasyIotSharp.Core.Services.TenantAccount.Impl
                 }
                 // 查询菜单数据
                 var query = await _menuRepository.Query(soldier.IsSuperAdmin == true ? -1 : 0, input.Keyword, input.IsEnable, input.PageIndex, input.PageSize, false);
-                int totalCount = query.totalCount;
                 var list = query.items.MapTo<List<MenuDto>>();
 
                 // 构建树形结构
-                var tree = _menuRepository.BuildMenuTree(list);
+                var tree = _menuRepository.BuildMenuTree(list).Skip((input.PageIndex - 1) * input.PageSize)
+                                  .Take(input.PageSize).ToList();
+                int totalCount = tree.Count;
                 return new PagedResultDto<MenuTreeDto>() { TotalCount = totalCount, Items = tree };
             }
         }

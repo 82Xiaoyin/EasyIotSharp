@@ -249,7 +249,7 @@ namespace EasyIotSharp.DataProcessor.Processing.Implementation
                             // 添加所有指标值
                             foreach (var metric in point.Values)
                             {
-                                dynamicData[metric.Name.ToLower()] = metric.Value;
+                                dynamicData[metric.Name] = metric.Value;
                             }
                             
                             dataPoints.Add(dynamicData);
