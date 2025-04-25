@@ -45,7 +45,16 @@ namespace EasyIotSharp.DataProcessor.Processing
         /// </summary>
         private async void OnMessageReceived(object sender, MessageReceivedEventArgs e)
         {
-            await _messageProcessor.ProcessMessageAsync(e.ProjectId, e.RawMessage);
+            LogHelper.Info($"收到项目 {e.ProjectId} 的消息，长度: {e.RawMessage?.Length ?? 0}");
+            try
+            {
+                await _messageProcessor.ProcessMessageAsync(e.ProjectId, e.RawMessage);
+                LogHelper.Debug($"已将项目 {e.ProjectId} 的消息传递给处理器");
+            }
+            catch (Exception ex)
+            {
+                LogHelper.Error($"处理项目 {e.ProjectId} 的消息时发生错误: {ex.Message}");
+            }
         }
         
         /// <summary>
@@ -58,7 +67,7 @@ namespace EasyIotSharp.DataProcessor.Processing
                 AppContext.SetSwitch("System.Diagnostics.EventLog.EnableLogToConsole", false);
                 
                 // 初始化消息接收器
-                _messageReceiver.Initialize();
+               await  _messageReceiver.InitializeAsync();
                 
                 // 启动性能监控
                 _performanceMonitor.Start();

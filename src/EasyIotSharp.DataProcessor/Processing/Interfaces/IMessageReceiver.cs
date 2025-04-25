@@ -11,13 +11,13 @@ namespace EasyIotSharp.DataProcessor.Processing.Interfaces
         /// <summary>
         /// 初始化消息接收器
         /// </summary>
-        void Initialize();
-        
+        Task InitializeAsync();
+
         /// <summary>
         /// 关闭消息接收器
         /// </summary>
-        void Shutdown();
-        
+        Task Shutdown();
+
         /// <summary>
         /// 消息接收事件
         /// </summary>

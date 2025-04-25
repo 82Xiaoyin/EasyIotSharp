@@ -101,11 +101,19 @@ namespace EasyIotSharp.DataProcessor.Processing.Implementation
         /// </summary>
         public async Task ProcessMessageAsync(string projectId, string message)
         {
-            await _processingChannel.Writer.WriteAsync(new ProcessingItem
+            try
             {
-                ProjectId = projectId,
-                RawMessage = message
-            });
+                await _processingChannel.Writer.WriteAsync(new ProcessingItem
+                {
+                    ProjectId = projectId,
+                    RawMessage = message
+                });
+                LogHelper.Debug($"成功将消息写入Channel，项目ID: {projectId}");
+            }
+            catch (Exception ex)
+            {
+                LogHelper.Error($"将消息写入Channel时发生错误: {ex.Message}");
+            }
         }
         
         /// <summary>
@@ -119,26 +127,46 @@ namespace EasyIotSharp.DataProcessor.Processing.Implementation
                 
                 // 使用批处理提高性能
                 var batch = new List<ProcessingItem>(100);
+                var batchTimer = new System.Diagnostics.Stopwatch();
+                batchTimer.Start();
+                
                 await foreach (var item in _processingChannel.Reader.ReadAllAsync(stoppingToken))
                 {
                     try
                     {
-                        // 处理消息
-                        ProcessMessage(item.ProjectId, item.RawMessage);
+                        // 添加到批处理
+                        batch.Add(item);
                         
-                        // 更新计数器
-                        var count = Interlocked.Increment(ref _processedCount);
-                        
-                        // 每处理1000条消息更新一次性能监控
-                        if (count % 1000 == 0)
+                        // 当批处理达到一定大小或经过一定时间时处理批次
+                        if (batch.Count >= 100 || batchTimer.ElapsedMilliseconds > 1000)
                         {
+                            // 处理批次
+                            await ProcessBatchAsync(batch);
+                            
+                            // 更新计数器
+                            var count = Interlocked.Add(ref _processedCount, batch.Count);
                             _performanceMonitor.UpdateProcessedCount(count);
+                            
+                            LogHelper.Info($"已批量处理 {batch.Count} 条消息，总计: {count}");
+                            
+                            // 清空批次并重置计时器
+                            batch.Clear();
+                            batchTimer.Restart();
                         }
                     }
                     catch (Exception ex)
                     {
-                        LogHelper.Error($"处理项目 {item.ProjectId} 的消息时发生错误: {ex.Message}");
+                        LogHelper.Error($"添加消息到批处理时发生错误: {ex.Message}");
                     }
+                }
+                
+                // 处理剩余的批次
+                if (batch.Count > 0)
+                {
+                    await ProcessBatchAsync(batch);
+                    var count = Interlocked.Add(ref _processedCount, batch.Count);
+                    _performanceMonitor.UpdateProcessedCount(count);
+                    LogHelper.Info($"已处理剩余 {batch.Count} 条消息，总计: {count}");
                 }
             }
             catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
@@ -151,17 +179,37 @@ namespace EasyIotSharp.DataProcessor.Processing.Implementation
             }
         }
         
+        // 批量处理消息
+        private async Task ProcessBatchAsync(List<ProcessingItem> batch)
+        {
+            foreach (var item in batch)
+            {
+                try
+                {
+                    await ProcessMessage(item.ProjectId, item.RawMessage);
+                }
+                catch (Exception ex)
+                {
+                    LogHelper.Error($"批处理中处理项目 {item.ProjectId} 的消息时发生错误: {ex.Message}");
+                }
+            }
+        }
+        
         /// <summary>
         /// 处理消息
         /// </summary>
-        private async void ProcessMessage(string projectId, string message)
+        private async Task ProcessMessage(string projectId, string message)
         {
             try
             {
+                // 记录原始消息内容，便于调试
+                LogHelper.Debug($"开始处理消息，项目ID: {projectId}, 消息内容: {message.Substring(0, Math.Min(100, message.Length))}...");
+                
                 try
                 {
                     // 简单判断是否为高频数据
                     bool isHighFrequency = IsHighFrequencyData(message);
+                    LogHelper.Debug($"消息类型判断结果: {(isHighFrequency ? "高频数据" : "低频数据")}");
                     
                     if (isHighFrequency)
                     {
@@ -172,8 +220,9 @@ namespace EasyIotSharp.DataProcessor.Processing.Implementation
                     else
                     {
                         // 处理低频数据
+                        LogHelper.Debug($"尝试解析低频数据，项目ID: {projectId}");
                         var data = LowFrequencyData.FromEncryptedString<LowFrequencyData>(message);
-                        LogHelper.Debug($"成功解析低频数据，项目ID: {projectId}");
+                        LogHelper.Debug($"成功解析低频数据，项目ID: {projectId}, 测点类型: {data.PointType}, 测点数量: {data.Points?.Count ?? 0}");
                         
                         // 创建测量名称
                         var measurementName = $"raw_{data.PointType}";
@@ -207,13 +256,15 @@ namespace EasyIotSharp.DataProcessor.Processing.Implementation
                         }
                         
                         // 批量保存所有数据点
+                        LogHelper.Debug($"准备保存 {dataPoints.Count} 个数据点到 InfluxDB");
                         await repository.BulkInsertAsync(dataPoints);
+                        LogHelper.Debug($"成功保存 {dataPoints.Count} 个数据点到 InfluxDB");
                     }
                 }
                 catch (Exception parseEx)
                 {
                     // 解析失败，记录详细错误信息
-                    LogHelper.Error($"项目 {projectId} 的消息解析失败: {parseEx.Message}");
+                    LogHelper.Error($"项目 {projectId} 的消息解析失败: {parseEx.Message}, 异常类型: {parseEx.GetType().Name}, 堆栈: {parseEx.StackTrace}");
                     
                     // 保存解析失败的消息
                     SaveFailedMessage(projectId, message);
@@ -221,7 +272,7 @@ namespace EasyIotSharp.DataProcessor.Processing.Implementation
             }
             catch (Exception ex)
             {
-                LogHelper.Error($"处理消息时发生错误: {ex.Message}");
+                LogHelper.Error($"处理消息时发生错误: {ex.Message}, 异常类型: {ex.GetType().Name}, 堆栈: {ex.StackTrace}");
             }
         }
         

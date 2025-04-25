@@ -5825,6 +5825,11 @@
             将实体转换为Point
             </summary>
         </member>
+        <member name="M:EasyIotSharp.Core.Repositories.Influxdb.InfluxdbRepositoryBase`1.ConvertToInfluxValue(System.Object,System.Type)">
+            <summary>
+            将值转换为InfluxDB支持的类型
+            </summary>
+        </member>
         <member name="M:EasyIotSharp.Core.Repositories.Influxdb.InfluxdbRepositoryBase`1.ShouldStoreAsTag(System.Reflection.PropertyInfo)">
             <summary>
             判断属性是否应存储为Tag

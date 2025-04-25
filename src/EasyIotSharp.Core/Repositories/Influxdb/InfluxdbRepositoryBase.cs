@@ -11,6 +11,7 @@ using UPrime.Domain.Entities;
 using InfluxData.Net.InfluxDb.Models.Responses;
 using UPrime.Domain.Entities.Auditing;
 using UPrime.Domain.Repositories;
+using System.Collections;
 
 namespace EasyIotSharp.Core.Repositories.Influxdb
 {
@@ -147,36 +148,177 @@ namespace EasyIotSharp.Core.Repositories.Influxdb
                 Fields = new Dictionary<string, object>()
             };
 
-            var properties = typeof(TEntity).GetProperties(BindingFlags.Public | BindingFlags.Instance);
-
-            foreach (var prop in properties)
+            // 如果实体是字典类型，直接处理字典的值
+            if (entity is IDictionary<string, object> dictionary)
             {
-                var value = prop.GetValue(entity);
-                if (value == null) continue;
-
-                // ID作为Tag
-                if (prop.Name.Equals("Id", StringComparison.OrdinalIgnoreCase))
+                foreach (var kvp in dictionary)
                 {
-                    point.Tags["id"] = value.ToString();
-                    continue;
+                    var key = kvp.Key.ToLower();
+                    var value = kvp.Value;
+
+                    // 跳过空值
+                    if (value == null) continue;
+
+                    // 处理特殊字段
+                    if (key == "time" && value is DateTime dateTime)
+                    {
+                        point.Timestamp = dateTime;
+                        continue;
+                    }
+
+                    // 处理标签字段
+                    if (key == "projectid" || key == "pointtype" || key == "pointid")
+                    {
+                        point.Tags[key] = value.ToString();
+                        continue;
+                    }
+
+                    // 处理普通字段，保持原始类型
+                    switch (value)
+                    {
+                        case int intValue:
+                            point.Fields[key] = intValue;
+                            break;
+                        case double doubleValue:
+                            point.Fields[key] = doubleValue;
+                            break;
+                        case float floatValue:
+                            point.Fields[key] = floatValue;
+                            break;
+                        case bool boolValue:
+                            point.Fields[key] = boolValue;
+                            break;
+                        default:
+                            point.Fields[key] = value.ToString();
+                            break;
+                    }
                 }
-
-                // 审计字段处理
-                if (prop.Name.Equals("CreationTime", StringComparison.OrdinalIgnoreCase))
-                    continue;
-
-                // 根据类型决定存储方式
-                if (ShouldStoreAsTag(prop))
+            }
+            else
+            {
+                // 如果不是字典类型，则按属性处理
+                var properties = typeof(TEntity).GetProperties(BindingFlags.Public | BindingFlags.Instance);
+                foreach (var prop in properties)
                 {
-                    point.Tags[prop.Name] = value.ToString();
-                }
-                else
-                {
-                    point.Fields[prop.Name] = value;
+                    try
+                    {
+                        if (prop.GetIndexParameters().Length > 0) continue;
+
+                        var value = prop.GetValue(entity);
+                        if (value == null) continue;
+
+                        var propertyName = prop.Name.ToLower();
+
+                        if (propertyName == "time" && value is DateTime dateTime)
+                        {
+                            point.Timestamp = dateTime;
+                            continue;
+                        }
+
+                        if (propertyName == "projectid" || propertyName == "pointtype" || propertyName == "pointid")
+                        {
+                            point.Tags[propertyName] = value.ToString();
+                            continue;
+                        }
+
+                        // 处理普通字段值
+                        switch (value)
+                        {
+                            case int intValue:
+                                point.Fields[propertyName] = intValue;
+                                break;
+                            case double doubleValue:
+                                point.Fields[propertyName] = doubleValue;
+                                break;
+                            case float floatValue:
+                                point.Fields[propertyName] = floatValue;
+                                break;
+                            case bool boolValue:
+                                point.Fields[propertyName] = boolValue;
+                                break;
+                            default:
+                                point.Fields[propertyName] = value.ToString();
+                                break;
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"处理属性 {prop.Name} 时出错: {ex.Message}");
+                    }
                 }
             }
 
             return point;
+        }
+
+        /// <summary>
+        /// 将值转换为InfluxDB支持的类型
+        /// </summary>
+        protected virtual object ConvertToInfluxValue(object value, Type propertyType)
+        {
+            if (value == null) return null;
+
+            // 处理基本类型
+            if (propertyType.IsPrimitive || propertyType == typeof(decimal))
+                return value;
+
+            // 处理日期时间
+            if (propertyType == typeof(DateTime))
+                return ((DateTime)value).ToString("yyyy-MM-dd HH:mm:ss.fff");
+
+            // 处理字符串
+            if (propertyType == typeof(string))
+                return value;
+
+            // 处理枚举
+            if (propertyType.IsEnum)
+                return value.ToString();
+
+            // 处理布尔值
+            if (propertyType == typeof(bool))
+                return value;
+
+            // 处理字典类型
+            if (propertyType.IsGenericType && propertyType.GetGenericTypeDefinition() == typeof(Dictionary<,>))
+            {
+                var dictionary = value as IDictionary;
+                if (dictionary != null)
+                {
+                    // 将字典转换为简单的键值对字符串
+                    var pairs = new List<string>();
+                    foreach (DictionaryEntry entry in dictionary)
+                    {
+                        pairs.Add($"{entry.Key}:{entry.Value}");
+                    }
+                    return string.Join(",", pairs);
+                }
+            }
+
+            // 处理集合类型
+            if (propertyType.IsGenericType && typeof(IEnumerable).IsAssignableFrom(propertyType))
+            {
+                var collection = value as IEnumerable;
+                if (collection != null)
+                {
+                    var items = new List<string>();
+                    foreach (var item in collection)
+                    {
+                        items.Add(item?.ToString() ?? "null");
+                    }
+                    return string.Join(",", items);
+                }
+            }
+
+            // 对于其他复杂类型，尝试序列化为JSON
+            try
+            {
+                return System.Text.Json.JsonSerializer.Serialize(value);
+            }
+            catch
+            {
+                // 如果序列化失败，返回简单的字符串表示
+                return value.ToString();
+            }
         }
 
         /// <summary>
