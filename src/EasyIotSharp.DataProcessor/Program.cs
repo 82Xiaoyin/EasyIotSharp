@@ -99,6 +99,9 @@ namespace EasyIotSharp.DataProcessor
                     services.AddSingleton<IMessageProcessor, MessageProcessor>();
                     services.AddSingleton<IPerformanceMonitor, PerformanceMonitor>();
                     services.AddHostedService<DataProcessingService>();
+                    services.AddSingleton<IDataRepository, InfluxDataRepository>();
+                    services.AddSingleton<IMqttService, MqttService>();
+                    services.AddSingleton<ISceneLinkageService, SceneLinkageService>();
                 })
                 .ConfigureLogging((context, logging) =>
                 {

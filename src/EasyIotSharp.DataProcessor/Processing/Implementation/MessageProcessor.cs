@@ -9,6 +9,7 @@ using EasyIotSharp.DataProcessor.Model.AnalysisDTO;
 using EasyIotSharp.DataProcessor.Processing.Interfaces;
 using EasyIotSharp.DataProcessor.Util;
 using EasyIotSharp.Core.Repositories.Influxdb;
+using System.Linq;
 
 namespace EasyIotSharp.DataProcessor.Processing.Implementation
 {
@@ -27,14 +28,23 @@ namespace EasyIotSharp.DataProcessor.Processing.Implementation
         private CancellationTokenSource _cts;
         // 性能监控器
         private readonly IPerformanceMonitor _performanceMonitor;
+        private readonly IDataRepository _dataRepository;
+        private readonly IMqttService _mqttService;
+        private readonly ISceneLinkageService _sceneLinkageService;
         
-
         /// <summary>
         /// 构造函数
         /// </summary>
-        public MessageProcessor(IPerformanceMonitor performanceMonitor)
+        public MessageProcessor(
+            IPerformanceMonitor performanceMonitor, 
+            IDataRepository dataRepository,
+            IMqttService mqttService,
+            ISceneLinkageService sceneLinkageService)
         {
             _performanceMonitor = performanceMonitor;
+            _dataRepository = dataRepository;
+            _mqttService = mqttService;
+            _sceneLinkageService = sceneLinkageService;
             
             // 创建处理管道，设置更大的容量提高吞吐量
             var options = new BoundedChannelOptions(200000)
@@ -226,17 +236,8 @@ namespace EasyIotSharp.DataProcessor.Processing.Implementation
                         
                         // 创建测量名称
                         var measurementName = $"raw_{data.PointType}";
-                        
-                        // 创建仓储实例（只创建一次）
-                        var repository = InfluxdbRepositoryFactory.Create<Dictionary<string, object>>(
-                            measurementName: measurementName,
-                            tenantDatabase: data.TenantAbbreviation
-                        );
-                        
-                        // 批量处理所有测点数据
-                        var dataPoints = new List<Dictionary<string, object>>();
-                        
-                        foreach (var point in data.Points)
+
+                        var dataPoints = data.Points.Select(point =>
                         {
                             var dynamicData = new Dictionary<string, object>
                             {
@@ -245,20 +246,33 @@ namespace EasyIotSharp.DataProcessor.Processing.Implementation
                                 ["pointId"] = point.PointId,
                                 ["time"] = data.Time
                             };
-                            
+
                             // 添加所有指标值
                             foreach (var metric in point.Values)
                             {
                                 dynamicData[metric.Name] = metric.Value;
                             }
-                            
-                            dataPoints.Add(dynamicData);
-                        }
+
+                            return dynamicData;
+                        }).ToList(); // 转换为List以避免多次枚举
                         
-                        // 批量保存所有数据点
-                        LogHelper.Debug($"准备保存 {dataPoints.Count} 个数据点到 InfluxDB");
-                        await repository.BulkInsertAsync(dataPoints);
-                        LogHelper.Debug($"成功保存 {dataPoints.Count} 个数据点到 InfluxDB");
+                        // 并行执行三个操作：入库、MQTT推送、场景联动
+                        var tasks = new List<Task>
+                        {
+                            // 1. 入库到InfluxDB
+                            _dataRepository.SaveDataPointsAsync(measurementName, data.TenantAbbreviation, dataPoints),
+                            
+                            // 2. 推送到MQTT
+                            _mqttService.PublishBatchDataAsync(projectId, dataPoints),
+                            
+                            // 3. 处理场景联动
+                            _sceneLinkageService.ProcessSceneLinkageAsync(projectId, dataPoints)
+                        };
+                        
+                        // 等待所有任务完成
+                        await Task.WhenAll(tasks);
+                        
+                        LogHelper.Debug($"成功完成数据处理：入库、MQTT推送和场景联动，共 {dataPoints.Count} 个数据点");
                     }
                 }
                 catch (Exception parseEx)
