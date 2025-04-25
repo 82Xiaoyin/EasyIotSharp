@@ -37,7 +37,7 @@ namespace EasyIotSharp.Core.Repositories.Hardware.Impl
             {
                 predicate = predicate.And(t => t.Name.Contains(keyword) || t.Identifier.Contains(keyword));
             }
-            if (dataType!= DataTypeMenu.None)
+            if (dataType != DataTypeMenu.None)
             {
                 predicate = predicate.And(t => t.DataType.Equals(dataType));
             }
@@ -53,7 +53,7 @@ namespace EasyIotSharp.Core.Repositories.Hardware.Impl
             if (isPage == true)
             {
                 var query = Client.Queryable<SensorQuota>().Where(predicate)
-                                  .OrderBy(t => t.Sort,OrderByType.Desc)
+                                  .OrderBy(t => t.Sort, OrderByType.Desc)
                                   .OrderBy(m => m.CreationTime, OrderByType.Desc)
                                   .Skip((pageIndex - 1) * pageSize)
                                   .Take(pageSize);
@@ -80,6 +80,15 @@ namespace EasyIotSharp.Core.Repositories.Hardware.Impl
         {
             return Client.Queryable<SensorQuota>().Where(w => w.SensorId.Equals(id))
                                  .OrderBy(t => t.Sort, OrderByType.Desc).ToList();
+        }
+
+        /// <summary>
+        /// 传感器指标列表
+        /// </summary>
+        /// <returns></returns>
+        public List<SensorQuota> GetSensorQuotaList()
+        {
+            return Client.Queryable<SensorQuota>().OrderBy(t => t.Sort, OrderByType.Desc).ToList();
         }
     }
 }

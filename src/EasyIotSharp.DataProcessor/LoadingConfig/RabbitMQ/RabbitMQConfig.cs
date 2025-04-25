@@ -48,7 +48,7 @@ namespace EasyIotSharp.DataProcessor.LoadingConfig.RabbitMQ
         /// </summary>
         public static async Task InitMQ(IServiceProvider serviceProvider = null)
         {
-            var rabbitServerInfoService = UPrimeEngine.Instance.Resolve<IRabbitServerInfoRepository>();
+            var rabbitServerInfoService = UPrimeEngine.Instance.Resolve<IRabbitServerInfoService>();
 
             // 防止重复初始化
             if (_isInitialized)

@@ -1,4 +1,5 @@
-﻿using EasyIotSharp.Core.Dto.Project;
+﻿using EasyIotSharp.Core.Domain.Proejct;
+using EasyIotSharp.Core.Dto.Project;
 using EasyIotSharp.Core.Dto.Project.Params;
 using System;
 using System.Collections.Generic;
@@ -50,5 +51,11 @@ namespace EasyIotSharp.Core.Services.Project
         /// </summary>
         /// <returns></returns>
         Task<SensorPointChart> QuerySensorPointChart(ChartInput input);
+
+        /// <summary>
+        /// 测点列表
+        /// </summary>
+        /// <returns></returns>
+        List<SensorPoint> GetBySensorPointList();
     }
 }

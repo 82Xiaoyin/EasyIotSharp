@@ -6,6 +6,8 @@ using EasyIotSharp.Core.Dto.Hardware;
 using System.Threading.Tasks;
 using UPrime.Runtime.Caching;
 using UPrime.Services.Dto;
+using EasyIotSharp.Core.Dto.Queue;
+using EasyIotSharp.Core.Domain.Hardware;
 
 namespace EasyIotSharp.Core.Caching.Hardware.Impl
 {
@@ -13,6 +15,7 @@ namespace EasyIotSharp.Core.Caching.Hardware.Impl
     {
         public ICache Cache => CacheManager.GetCache($"{CachingConsts.Keys.HardwareCache}SensorCacheService");
         public const string KEY_HARDWARE_SENSOR_QUERY = "Hardware:Sensor-{0}-{1}";
+        public const string KEY_HARDWARE_SENSORBASE_QUERY = "Hardware:SensorBase";
         public void Clear()
         {
             Cache.Clear();
@@ -23,5 +26,11 @@ namespace EasyIotSharp.Core.Caching.Hardware.Impl
                                           input.PageSize);
             return await Cache.GetAsyncExt(key, action, TimeSpan.FromHours(CachingConsts.THIRTY_EXPIRES_MINUTES));
         }
+        public List<Sensor> GetSensorList(Func<List<Sensor>> action)
+        {
+            var key = KEY_HARDWARE_SENSORBASE_QUERY.FormatWith();
+            return Cache.GetExt(key, action, 60);
+        }
+
     }
 }

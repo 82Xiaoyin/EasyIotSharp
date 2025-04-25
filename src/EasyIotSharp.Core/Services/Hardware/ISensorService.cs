@@ -1,4 +1,5 @@
-﻿using EasyIotSharp.Core.Dto.Hardware;
+﻿using EasyIotSharp.Core.Domain.Hardware;
+using EasyIotSharp.Core.Dto.Hardware;
 using EasyIotSharp.Core.Dto.Hardware.Params;
 using System;
 using System.Collections.Generic;
@@ -44,5 +45,11 @@ namespace EasyIotSharp.Core.Services.Hardware
         /// <param name="input"></param>
         /// <returns></returns>
         Task DeleteSensor(DeleteSensorInput input);
+
+        /// <summary>
+        /// 传感器列表
+        /// </summary>
+        /// <returns></returns>
+        List<Sensor> GetSensorList();
     }
 }

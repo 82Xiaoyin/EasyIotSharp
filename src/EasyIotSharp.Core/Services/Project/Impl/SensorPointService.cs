@@ -24,13 +24,15 @@ namespace EasyIotSharp.Core.Services.Project.Impl
         private readonly ISensorPointRepository _sensorPointRepository;
         private readonly ISensorRepository _sensorRepository;
         private readonly ISensorPointCacheService _sensorPointCacheService;
+        private readonly ISensorPointBaseCacheService _sensorPointBaseCacheService;
 
         public SensorPointService(ISensorPointRepository sensorPointRepository,
                                   IProjectBaseRepository projectBaseRepository,
                                   IClassificationRepository classificationRepository,
                                   IGatewayRepository gatewayRepository,
                                   ISensorRepository sensorRepository,
-                                  ISensorPointCacheService sensorPointCacheService)
+                                  ISensorPointCacheService sensorPointCacheService,
+                                  ISensorPointBaseCacheService sensorPointBaseCacheService)
         {
             _projectBaseRepository = projectBaseRepository;
             _classificationRepository = classificationRepository;
@@ -38,6 +40,7 @@ namespace EasyIotSharp.Core.Services.Project.Impl
             _sensorRepository = sensorRepository;
             _sensorPointRepository = sensorPointRepository;
             _sensorPointCacheService = sensorPointCacheService;
+            _sensorPointBaseCacheService = sensorPointBaseCacheService;
         }
 
         public async Task<SensorPointDto> GetSensorPoint(string id)
@@ -176,6 +179,7 @@ namespace EasyIotSharp.Core.Services.Project.Impl
 
             //清除缓存
             await EventBus.TriggerAsync(new SensorPointEventData() { });
+            await EventBus.TriggerAsync(new SensorPointBaseEventData() { });
         }
 
         public async Task UpdateSensorPoint(UpdateSensorPointInput input)
@@ -202,6 +206,7 @@ namespace EasyIotSharp.Core.Services.Project.Impl
 
             //清除缓存
             await EventBus.TriggerAsync(new SensorPointEventData() { });
+            await EventBus.TriggerAsync(new SensorPointBaseEventData() { });
         }
 
         public async Task DeleteSensorPoint(DeleteSensorPointInput input)
@@ -218,6 +223,7 @@ namespace EasyIotSharp.Core.Services.Project.Impl
 
             //清除缓存
             await EventBus.TriggerAsync(new SensorPointEventData() { });
+            await EventBus.TriggerAsync(new SensorPointBaseEventData() { });
         }
 
         /// <summary>
@@ -237,6 +243,21 @@ namespace EasyIotSharp.Core.Services.Project.Impl
             reuslt.AlarmsRatio = reuslt.AlarmsCount == 0 ? 0 : reuslt.AlarmsCount / reuslt.Total;
 
             return reuslt;
+        }
+
+
+        /// <summary>
+        /// 列表数据
+        /// </summary>
+        /// <returns></returns>
+        public List<SensorPoint> GetBySensorPointList()
+        {
+            var list = _sensorPointBaseCacheService.GetSensorPointBase(() => { return _sensorPointRepository.GetSensorPointList(); });
+            if (list.Count == 0)
+            {
+                list = _sensorPointRepository.GetSensorPointList();
+            }
+            return list;
         }
     }
 }

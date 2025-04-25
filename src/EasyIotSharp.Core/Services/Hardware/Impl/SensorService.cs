@@ -82,6 +82,7 @@ namespace EasyIotSharp.Core.Services.Hardware.Impl
 
             //清除缓存
             await EventBus.TriggerAsync(new SensorEventData() { });
+            await EventBus.TriggerAsync(new SensorBaseEventData() { });
         }
 
         public async Task UpdateSensor(UpdateSensorInput input)
@@ -108,6 +109,7 @@ namespace EasyIotSharp.Core.Services.Hardware.Impl
 
             //清除缓存
             await EventBus.TriggerAsync(new SensorEventData() { });
+            await EventBus.TriggerAsync(new SensorBaseEventData() { });
         }
 
         public async Task DeleteSensor(DeleteSensorInput input)
@@ -128,6 +130,21 @@ namespace EasyIotSharp.Core.Services.Hardware.Impl
 
             //清除缓存
             await EventBus.TriggerAsync(new SensorEventData() { });
+            await EventBus.TriggerAsync(new SensorBaseEventData() { });
+        }
+
+        /// <summary>
+        /// 列表
+        /// </summary>
+        /// <returns></returns>
+        public List<Sensor> GetSensorList()
+        {
+            var list = _sensorCacheService.GetSensorList(() => { return _sensorRepository.GetSensorList(); });
+            if (list.Count == 0)
+            {
+                list = _sensorRepository.GetSensorList();
+            }
+            return list;
         }
     }
 }

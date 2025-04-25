@@ -13,6 +13,8 @@ using System.Linq;
 using EasyIotSharp.Core.Caching.Hardware;
 using EasyIotSharp.Core.Events.Tenant;
 using EasyIotSharp.Core.Events.Hardware;
+using EasyIotSharp.Core.Caching.Hardware.Impl;
+using EasyIotSharp.Core.Events.Project;
 
 namespace EasyIotSharp.Core.Services.Hardware.Impl
 {
@@ -48,7 +50,7 @@ namespace EasyIotSharp.Core.Services.Hardware.Impl
 
         public async Task<PagedResultDto<SensorQuotaDto>> QuerySensorQuota(QuerySensorQuotaInput input)
         {
-            if (string.IsNullOrEmpty(input.Keyword) 
+            if (string.IsNullOrEmpty(input.Keyword)
                 && string.IsNullOrEmpty(input.SensorId)
                 && input.DataType.Equals(DataTypeMenu.None)
                 && input.IsPage.Equals(true)
@@ -99,7 +101,7 @@ namespace EasyIotSharp.Core.Services.Hardware.Impl
 
         public async Task InsertSensorQuota(InsertSensorQuotaInput input)
         {
-            var isExistName = await _sensorQuotaRepository.FirstOrDefaultAsync(x => x.TenantNumId == ContextUser.TenantNumId && x.Name == input.Name && x.SensorId==input.SensorId && x.IsDelete == false);
+            var isExistName = await _sensorQuotaRepository.FirstOrDefaultAsync(x => x.TenantNumId == ContextUser.TenantNumId && x.Name == input.Name && x.SensorId == input.SensorId && x.IsDelete == false);
             if (isExistName.IsNotNull())
             {
                 throw new BizException(BizError.BIND_EXCEPTION_ERROR, "传感器类型指标名称重复");
@@ -130,6 +132,7 @@ namespace EasyIotSharp.Core.Services.Hardware.Impl
 
             //清除缓存
             await EventBus.TriggerAsync(new SensorQuotaEventData() { });
+            await EventBus.TriggerAsync(new SensorQuotaBaseEventData() { });
         }
 
         public async Task UpdateSensorQuota(UpdateSensorQuotaInput input)
@@ -164,6 +167,7 @@ namespace EasyIotSharp.Core.Services.Hardware.Impl
 
             //清除缓存
             await EventBus.TriggerAsync(new SensorQuotaEventData() { });
+            await EventBus.TriggerAsync(new SensorQuotaBaseEventData() { });
         }
 
         public async Task DeleteSensorQuota(DeleteSensorQuotaInput input)
@@ -184,6 +188,21 @@ namespace EasyIotSharp.Core.Services.Hardware.Impl
 
             //清除缓存
             await EventBus.TriggerAsync(new SensorQuotaEventData() { });
+            await EventBus.TriggerAsync(new SensorQuotaBaseEventData() { });
+        }
+
+        /// <summary>
+        /// 传感器指标列表
+        /// </summary>
+        /// <returns></returns>
+        public List<SensorQuota> GetSensorQuotaList()
+        {
+            var list = _sensorQuotaCacheService.GetSensorQuotaList(() => { return _sensorQuotaRepository.GetSensorQuotaList(); });
+            if (list.Count == 0)
+            {
+                list = _sensorQuotaRepository.GetSensorQuotaList();
+            }
+            return list;
         }
     }
 }

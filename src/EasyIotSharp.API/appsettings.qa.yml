@@ -20,7 +20,7 @@ Storage:
 Caching:
   IsOpen: true
   RedisEnabled:  true
-  RedisConnStr: '106.75.84.97:7369,password=i&@D04oK,SyncTimeout=5000,allowAdmin=true'
+  RedisConnStr: '106.75.84.97:6379,password=i&@D04oK,SyncTimeout=5000,allowAdmin=true'
   RedisTwemProxyEnabled: false
   RedisDatabaseId:  2
 

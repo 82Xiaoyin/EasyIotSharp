@@ -174,7 +174,7 @@ namespace EasyIotSharp.Core.Services.Queue.Impl
         /// <returns></returns>
         public List<RabbitServerInfoDto> GetRabbitProject()
         {
-            var list = _rabbitServerInfoRepository.GetRabbitProject();
+            var list = _rabbitServerInfoCacheService.GetRabbitProject(() => { return _rabbitServerInfoRepository.GetRabbitProject(); });
             if (list.Count == 0)
             {
                 list = _rabbitServerInfoRepository.GetRabbitProject();
