@@ -37,5 +37,11 @@ namespace EasyIotSharp.Core.Repositories.Hardware
         /// <param name="ids">ID集合</param>
         /// <returns></returns>
         Task<List<Sensor>> QueryByIds(List<string> ids);
+
+        /// <summary>
+        /// 传感器列表
+        /// </summary>
+        /// <returns></returns>
+        List<Sensor> GetSensorList();
     }
 }

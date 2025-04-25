@@ -33,5 +33,11 @@ namespace EasyIotSharp.Core.Repositories.Hardware
                                                                   int pageIndex,
                                                                   int pageSize,
                                                                   bool isPage);
+
+        /// <summary>
+        /// 传感器指标列表
+        /// </summary>
+        /// <returns></returns>
+        List<SensorQuota> GetSensorQuotaList();
     }
 }

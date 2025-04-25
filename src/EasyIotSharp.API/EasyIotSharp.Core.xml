@@ -167,11 +167,25 @@
             <param name="action"></param>
             <returns></returns>
         </member>
+        <member name="M:EasyIotSharp.Core.Caching.Hardware.ISensorCacheService.GetSensorList(System.Func{System.Collections.Generic.List{EasyIotSharp.Core.Domain.Hardware.Sensor}})">
+            <summary>
+            列表
+            </summary>
+            <param name="action"></param>
+            <returns></returns>
+        </member>
         <member name="M:EasyIotSharp.Core.Caching.Hardware.ISensorQuotaCacheService.QuerySensorQuota(EasyIotSharp.Core.Dto.Hardware.Params.QuerySensorQuotaInput,System.Func{System.Threading.Tasks.Task{UPrime.Services.Dto.PagedResultDto{EasyIotSharp.Core.Dto.Hardware.SensorQuotaDto}}})">
             <summary>
             传感器列表
             </summary>
             <param name="input"></param>
+            <param name="action"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EasyIotSharp.Core.Caching.Hardware.ISensorQuotaCacheService.GetSensorQuotaList(System.Func{System.Collections.Generic.List{EasyIotSharp.Core.Domain.Hardware.SensorQuota}})">
+            <summary>
+            传感器指标列表
+            </summary>
             <param name="action"></param>
             <returns></returns>
         </member>
@@ -209,6 +223,13 @@
             项目
             </summary>
             <param name="input"></param>
+            <param name="action"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EasyIotSharp.Core.Caching.Project.ISensorPointBaseCacheService.GetSensorPointBase(System.Func{System.Collections.Generic.List{EasyIotSharp.Core.Domain.Proejct.SensorPoint}})">
+            <summary>
+            列表数据
+            </summary>
             <param name="action"></param>
             <returns></returns>
         </member>
@@ -5654,11 +5675,23 @@
             <param name="id"></param>
             <returns></returns>
         </member>
+        <member name="M:EasyIotSharp.Core.Repositories.Hardware.Impl.SensorQuotaRepository.GetSensorQuotaList">
+            <summary>
+            传感器指标列表
+            </summary>
+            <returns></returns>
+        </member>
         <member name="M:EasyIotSharp.Core.Repositories.Hardware.Impl.SensorRepository.GetBySensor(System.String)">
             <summary>
             根据传感器ID获取单条记录
             </summary>
             <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EasyIotSharp.Core.Repositories.Hardware.Impl.SensorRepository.GetSensorList">
+            <summary>
+            传感器列表
+            </summary>
             <returns></returns>
         </member>
         <member name="M:EasyIotSharp.Core.Repositories.Hardware.IProtocolConfigExtRepository.QueryByConfigIds(System.Collections.Generic.List{System.String})">
@@ -5725,6 +5758,12 @@
             <param name="isPage">是否分页</param>
             <returns></returns>
         </member>
+        <member name="M:EasyIotSharp.Core.Repositories.Hardware.ISensorQuotaRepository.GetSensorQuotaList">
+            <summary>
+            传感器指标列表
+            </summary>
+            <returns></returns>
+        </member>
         <member name="M:EasyIotSharp.Core.Repositories.Hardware.ISensorRepository.GetBySensor(System.String)">
             <summary>
             根据ID查询传感器单条记录
@@ -5748,6 +5787,12 @@
             根据ID集合查询传感器列表
             </summary>
             <param name="ids">ID集合</param>
+            <returns></returns>
+        </member>
+        <member name="M:EasyIotSharp.Core.Repositories.Hardware.ISensorRepository.GetSensorList">
+            <summary>
+            传感器列表
+            </summary>
             <returns></returns>
         </member>
         <member name="M:EasyIotSharp.Core.Repositories.Influxdb.IInfluxdbRepositoryBase`1.GetAll">
@@ -6049,6 +6094,13 @@
             <param name="sensorPointId"></param>
             <returns></returns>
         </member>
+        <member name="M:EasyIotSharp.Core.Repositories.Project.Impl.SensorPointRepository.GetSensorPointList">
+            <summary>
+            获取列表
+            </summary>
+            <param name="sensorPointId"></param>
+            <returns></returns>
+        </member>
         <member name="M:EasyIotSharp.Core.Repositories.Project.IProjectBaseRepository.Query(System.Int32,System.String,System.Int32,System.Nullable{System.DateTime},System.Nullable{System.DateTime},System.Int32,System.Int32)">
             <summary>
             通过条件分页查询项目列表
@@ -6121,6 +6173,12 @@
         <member name="M:EasyIotSharp.Core.Repositories.Project.ISensorPointRepository.QueryList(System.String)">
             <summary>
             获取列表数据
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:EasyIotSharp.Core.Repositories.Project.ISensorPointRepository.GetSensorPointList">
+            <summary>
+            获取列表
             </summary>
             <returns></returns>
         </member>
@@ -6610,6 +6668,18 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="M:EasyIotSharp.Core.Services.Hardware.Impl.SensorQuotaService.GetSensorQuotaList">
+            <summary>
+            传感器指标列表
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.Hardware.Impl.SensorService.GetSensorList">
+            <summary>
+            列表
+            </summary>
+            <returns></returns>
+        </member>
         <member name="M:EasyIotSharp.Core.Services.Hardware.IProtocolConfigService.GetProtocolConfig(System.String)">
             <summary>
             通过id获取一条协议配置信息
@@ -6715,6 +6785,12 @@
             <param name="input"></param>
             <returns></returns>
         </member>
+        <member name="M:EasyIotSharp.Core.Services.Hardware.ISensorQuotaService.GetSensorQuotaList">
+            <summary>
+            传感器指标列表
+            </summary>
+            <returns></returns>
+        </member>
         <member name="M:EasyIotSharp.Core.Services.Hardware.ISensorService.GetSensor(System.String)">
             <summary>
             通过id获取一条传感器类型
@@ -6748,6 +6824,12 @@
             通过id删除一条传感器类型
             </summary>
             <param name="input"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.Hardware.ISensorService.GetSensorList">
+            <summary>
+            传感器列表
+            </summary>
             <returns></returns>
         </member>
         <member name="M:EasyIotSharp.Core.Services.IO.IMinIOFileService.BucketExistsAsync(System.String)">
@@ -7149,6 +7231,12 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="M:EasyIotSharp.Core.Services.Project.Impl.SensorPointService.GetBySensorPointList">
+            <summary>
+            列表数据
+            </summary>
+            <returns></returns>
+        </member>
         <member name="M:EasyIotSharp.Core.Services.Project.IProjectBaseService.GetProjectBase(System.String)">
             <summary>
             通过id获取一条项目信息
@@ -7229,6 +7317,12 @@
         <member name="M:EasyIotSharp.Core.Services.Project.ISensorPointService.QuerySensorPointChart(EasyIotSharp.Core.Dto.Project.Params.ChartInput)">
             <summary>
             echat图
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.Project.ISensorPointService.GetBySensorPointList">
+            <summary>
+            测点列表
             </summary>
             <returns></returns>
         </member>

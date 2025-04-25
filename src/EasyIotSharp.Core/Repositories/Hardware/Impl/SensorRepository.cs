@@ -92,5 +92,14 @@ namespace EasyIotSharp.Core.Repositories.Hardware.Impl
             var item = Client.Queryable<Sensor>().Where(w => w.Id.Equals(id)).First();
             return item;
         }
+
+        /// <summary>
+        /// 传感器列表
+        /// </summary>
+        /// <returns></returns>
+        public List<Sensor> GetSensorList()
+        {
+            return Client.Queryable<Sensor>().ToList();
+        }
     }
 }

@@ -9,10 +9,10 @@ using UPrime.Events.Bus.Handlers;
 
 namespace EasyIotSharp.Core.Caching.Consumers.Hardware
 {
-    public class SensorCahingRemoveHandler : IEventHandler<SensorEventData>, ITransientDependency
+    public class SensorCachingRemoveHandler : IEventHandler<SensorEventData>, ITransientDependency
     {
         private readonly ISensorCacheService _sensorCacheService1;
-        public SensorCahingRemoveHandler(ISensorCacheService sensorCacheService)
+        public SensorCachingRemoveHandler(ISensorCacheService sensorCacheService)
         {
             _sensorCacheService1 = sensorCacheService;
         }

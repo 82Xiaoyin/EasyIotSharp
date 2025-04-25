@@ -19,6 +19,8 @@ using EasyIotSharp.Core.Repositories.Project;
 using EasyIotSharp.Core.Repositories.Project.Impl;
 using EasyIotSharp.Core.Repositories.Hardware.Impl;
 using EasyIotSharp.Core.Repositories.Hardware;
+using EasyIotSharp.Core.Services.Project;
+using EasyIotSharp.Core.Services.Hardware;
 
 namespace EasyIotSharp.GateWay.Core.Socket.Service
 {
@@ -44,11 +46,11 @@ namespace EasyIotSharp.GateWay.Core.Socket.Service
                     return;
                 }
                 byte[] bReceived = taskData.Packet.BData;//队列的封包数据
-                
+
                 // 记录接收到的数据
                 string dataType = string.IsNullOrEmpty(modbusConfig) ? "注册包" : "数据包";
                 GatewayConnectionManager.Instance.UpdateGatewayData(taskData.Client.ConnId, bReceived, dataType);
-                
+
                 if (!string.IsNullOrEmpty(modbusConfig))
                 {
                     // 如果是数据包，进行解析
@@ -65,10 +67,10 @@ namespace EasyIotSharp.GateWay.Core.Socket.Service
                         LogHelper.Info("未找到注册包: " + strData);
                         return;
                     }
-                    
+
                     // 注册网关ID与连接的关联
                     ProcessGatewayRegister(taskData.Client.ConnId, strData, bReceived);
-                    
+
                     //3.2 查询ComModbusDevie配置、
                     taskData.Client.ConfigJson = gatewayprotocol.ConfigJson;
                     //3.3更新server的Extra
@@ -88,11 +90,11 @@ namespace EasyIotSharp.GateWay.Core.Socket.Service
         /// <summary>
         /// 解析接收到的数据包
         /// </summary>
-        private  void ParseReceivedData(IntPtr connId, byte[] data, string configJson)
+        private void ParseReceivedData(IntPtr connId, byte[] data, string configJson)
         {
-            var _sensorPointRepository = UPrimeEngine.Instance.Resolve<ISensorPointRepository>();
-            var _sensorRepository = UPrimeEngine.Instance.Resolve<ISensorRepository>();
-            var _sensorQuotaRepository = UPrimeEngine.Instance.Resolve<ISensorQuotaRepository>();
+            var _sensorPointRepository = UPrimeEngine.Instance.Resolve<ISensorPointService>();
+            var _sensorRepository = UPrimeEngine.Instance.Resolve<ISensorService>();
+            var _sensorQuotaRepository = UPrimeEngine.Instance.Resolve<ISensorQuotaService>();
             try
             {
                 if (data == null || data.Length < 7) return;
@@ -108,7 +110,9 @@ namespace EasyIotSharp.GateWay.Core.Socket.Service
                     LogHelper.Error("配置解析失败或为空");
                     return;
                 }
-
+                var sensorPointList = _sensorPointRepository.GetBySensorPointList();
+                var sensorList = _sensorRepository.GetSensorList();
+                var sensorQuotaLists = _sensorQuotaRepository.GetSensorQuotaList();
                 // 查找匹配的配置项
                 foreach (var config in configModels)
                 {
@@ -122,21 +126,23 @@ namespace EasyIotSharp.GateWay.Core.Socket.Service
                             continue;
                         }
 
-                        var sensorPoint = _sensorPointRepository.GetBySensorPointId(config.MeasurementPoint);
+                        //var sensorPoint = _sensorPointRepository.GetBySensorPointId(config.MeasurementPoint);
+                        var sensorPoint = sensorPointList.Where(w => w.Id == config.MeasurementPoint).FirstOrDefault();
                         if (sensorPoint == null)
                         {
                             LogHelper.Error($"未找到测点信息，测点ID: {config.MeasurementPoint}");
                             continue;
                         }
 
-                        var sensor = _sensorRepository.GetBySensor(sensorPoint.SensorId);
+                        //var sensor = _sensorRepository.GetBySensor(sensorPoint.SensorId);
+                        var sensor = sensorList.Where(w => w.Id == sensorPoint.SensorId).FirstOrDefault();
                         if (sensor == null)
                         {
                             LogHelper.Error($"未找到测点类型信息，测点类型id: {sensorPoint.SensorId}");
                             continue;
                         }
-                        var sensorQuotaList = _sensorQuotaRepository.GetSensorQuotaList(sensorPoint.SensorId);
-
+                        //var sensorQuotaList = _sensorQuotaRepository.GetSensorQuotaList(sensorPoint.SensorId);
+                        var sensorQuotaList = sensorQuotaLists.Where(w => w.SensorId == sensorPoint.SensorId).ToList();
                         if (sensorQuotaList == null || !sensorQuotaList.Any())
                         {
                             LogHelper.Warn($"未找到传感器指标信息，传感器ID: {sensorPoint.SensorId}");
@@ -146,7 +152,7 @@ namespace EasyIotSharp.GateWay.Core.Socket.Service
                         var sensorData = SensorDataFactory.CreateSensorData<LowFrequencyData>(
                             config.projectId,
                             DateTime.Now);
-                        
+
                         // 设置测点类型
                         sensorData.PointType = sensor.BriefName;
 
@@ -167,17 +173,17 @@ namespace EasyIotSharp.GateWay.Core.Socket.Service
                                 if (3 + i * 2 + 1 < data.Length)
                                 {
                                     ushort registerValue = (ushort)((data[3 + i * 2] << 8) | data[3 + i * 2 + 1]);
-                                    
+
                                     // 获取对应的指标名称
-                                    string quotaName = i < sensorQuotaList.Count ? sensorQuotaList[i].Identifier : $"指标{i+1}";
+                                    string quotaName = i < sensorQuotaList.Count ? sensorQuotaList[i].Identifier : $"指标{i + 1}";
                                     double quotaValue = registerValue * k;
-                                    string Unit= i < sensorQuotaList.Count ? sensorQuotaList[i].Unit : $"指标{i + 1}";
+                                    string Unit = i < sensorQuotaList.Count ? sensorQuotaList[i].Unit : $"指标{i + 1}";
                                     // 添加带有名称的值
-                                    pointData.Values.Add(new NamedValue 
-                                    { 
-                                        Name = quotaName, 
+                                    pointData.Values.Add(new NamedValue
+                                    {
+                                        Name = quotaName,
                                         Value = quotaValue,
-                                        Unit= Unit
+                                        Unit = Unit
                                     });
                                 }
                             }
@@ -195,7 +201,7 @@ namespace EasyIotSharp.GateWay.Core.Socket.Service
             }
         }
 
-        
+
 
         /// 处理网关注册包
         protected void ProcessGatewayRegister(IntPtr connId, string gatewayId, byte[] data)
@@ -205,7 +211,7 @@ namespace EasyIotSharp.GateWay.Core.Socket.Service
                 // 获取客户端IP和端口
                 string ip = "未知";
                 ushort port = 0;
-                
+
                 // 注册网关ID与连接的关联
                 GatewayConnectionManager.Instance.RegisterGateway(connId, gatewayId);
                 LogHelper.Info($"网关 {gatewayId} 注册成功，连接ID: {connId}, IP: {ip}, 端口: {port}");
@@ -265,9 +271,9 @@ namespace EasyIotSharp.GateWay.Core.Socket.Service
                         byte[] bCRC = ModbusCRC.ModbusCRC16(cmd, 0, 6);
                         cmd[6] = bCRC[0];                       // CRC低字节
                         cmd[7] = bCRC[1];                       // CRC高字节
-                        
+
                         commandList.Add(cmd);
-                        
+
                         // 获取间隔时间
                         int sleepTime = formData.Interval * 1000; // 转换为毫秒
                         intervalMap[BitConverter.ToString(cmd)] = sleepTime;
@@ -299,16 +305,16 @@ namespace EasyIotSharp.GateWay.Core.Socket.Service
                                     // 发送命令
                                     bool isok = taskData.Server.Send(taskData.Client.ConnId, cmd, cmd.Length);
                                     string cmdHex = BitConverter.ToString(cmd).Replace("-", " ");
-                                    
+
                                     if (isok)
                                     {
                                         int cmdSleepTime = intervalMap.TryGetValue(BitConverter.ToString(cmd), out int time) ? time : defaultSleepTime;
                                         LogHelper.Info($"发送命令成功: {cmdHex}, 间隔: {cmdSleepTime}ms");
-                                        
+
                                         // 记录发送的命令到网关连接管理器
                                         GatewayConnectionManager.Instance.UpdateGatewayData(
-                                            taskData.Client.ConnId, 
-                                            cmd, 
+                                            taskData.Client.ConnId,
+                                            cmd,
                                             "发送命令");
                                     }
                                     else
@@ -316,7 +322,7 @@ namespace EasyIotSharp.GateWay.Core.Socket.Service
                                         LogHelper.Error($"发送命令失败: {cmdHex}");
                                         return;
                                     }
-                                    
+
                                     // 命令间隔
                                     Thread.Sleep(200);
                                 }
@@ -325,7 +331,7 @@ namespace EasyIotSharp.GateWay.Core.Socket.Service
                                     LogHelper.Error($"发送命令时发生错误: {ex.Message}");
                                 }
                             }
-                            
+
                             // 全局间隔
                             Thread.Sleep(defaultSleepTime);
                         }

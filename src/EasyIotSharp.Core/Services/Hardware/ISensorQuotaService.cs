@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using UPrime.Services.Dto;
+using EasyIotSharp.Core.Domain.Hardware;
 
 namespace EasyIotSharp.Core.Services.Hardware
 {
@@ -44,5 +45,11 @@ namespace EasyIotSharp.Core.Services.Hardware
         /// <param name="input"></param>
         /// <returns></returns>
         Task DeleteSensorQuota(DeleteSensorQuotaInput input);
+
+        /// <summary>
+        /// 传感器指标列表
+        /// </summary>
+        /// <returns></returns>
+        List<SensorQuota> GetSensorQuotaList();
     }
 }

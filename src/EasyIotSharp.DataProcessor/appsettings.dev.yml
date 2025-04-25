@@ -26,7 +26,7 @@ MinIO:
 Caching:
   IsOpen: true
   RedisEnabled:  true
-  RedisConnStr: '82.156.125.76:7369,password=Redis1234!,SyncTimeout=5000,allowAdmin=true'
+  RedisConnStr: '82.156.125.76:6379,password=Redis1234!,SyncTimeout=5000,allowAdmin=true'
   RedisTwemProxyEnabled: false
   RedisDatabaseId:  0
 

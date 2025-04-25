@@ -32,6 +32,8 @@ using EasyIotSharp.Core.Repositories.Rule;
 using EasyIotSharp.Core.Repositories.Rule.Impl;
 using EasyIotSharp.Core.Services.Rule;
 using EasyIotSharp.Core.Domain.Rule;
+using EasyIotSharp.Core.Services.Queue;
+using EasyIotSharp.Core.Services.Queue.Impl;
 
 namespace EasyIotSharp.Core
 {
@@ -99,7 +101,6 @@ namespace EasyIotSharp.Core
             IocManager.Register<INotifyRepository, NotifyRepository>();
             IocManager.Register<IRuleChainRepository, RuleChainRepository>();
             IocManager.Register<ISceneManagementRepository, SceneManagementRepository>();
-            
         }
 
         /// <summary>

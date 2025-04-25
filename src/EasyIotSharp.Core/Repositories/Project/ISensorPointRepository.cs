@@ -46,5 +46,11 @@ namespace EasyIotSharp.Core.Repositories.Project
         /// </summary>
         /// <returns></returns>
         Task<List<SensorPoint>> QueryList(string projectId);
+
+        /// <summary>
+        /// 获取列表
+        /// </summary>
+        /// <returns></returns>
+        List<SensorPoint> GetSensorPointList();
     }
 }
