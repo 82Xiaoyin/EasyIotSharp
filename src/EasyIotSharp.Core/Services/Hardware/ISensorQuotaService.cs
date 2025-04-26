@@ -51,5 +51,12 @@ namespace EasyIotSharp.Core.Services.Hardware
         /// </summary>
         /// <returns></returns>
         List<SensorQuota> GetSensorQuotaList();
+
+        /// <summary>
+        /// 从实体数据库获取信息
+        /// </summary>
+        /// <param name="dataRespost"></param>
+        /// <returns></returns>
+        Task<Response> GetResponse(DataRespost dataRespost);
     }
 }

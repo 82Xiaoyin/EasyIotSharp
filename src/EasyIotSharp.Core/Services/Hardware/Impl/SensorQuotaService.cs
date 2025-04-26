@@ -1,20 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
-using EasyIotSharp.Core.Dto.Hardware.Params;
-using EasyIotSharp.Core.Dto.Hardware;
-using System.Threading.Tasks;
-using EasyIotSharp.Core.Repositories.Hardware;
-using UPrime.Services.Dto;
-using EasyIotSharp.Core.Repositories.Hardware.Impl;
-using UPrime.AutoMapper;
-using EasyIotSharp.Core.Domain.Hardware;
+using System.Data.SqlTypes;
 using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using EasyIotSharp.Core.Caching.Hardware;
-using EasyIotSharp.Core.Events.Tenant;
+using EasyIotSharp.Core.Domain.Hardware;
+using EasyIotSharp.Core.Dto.Hardware;
+using EasyIotSharp.Core.Dto.Hardware.Params;
 using EasyIotSharp.Core.Events.Hardware;
-using EasyIotSharp.Core.Caching.Hardware.Impl;
-using EasyIotSharp.Core.Events.Project;
+using EasyIotSharp.Core.Repositories.Hardware;
+using EasyIotSharp.Core.Repositories.Influxdb;
+using SqlSugar;
+using UPrime.AutoMapper;
+using UPrime.Services.Dto;
 
 namespace EasyIotSharp.Core.Services.Hardware.Impl
 {
@@ -48,6 +47,11 @@ namespace EasyIotSharp.Core.Services.Hardware.Impl
             return output;
         }
 
+        /// <summary>
+        /// 传感器指标列表
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
         public async Task<PagedResultDto<SensorQuotaDto>> QuerySensorQuota(QuerySensorQuotaInput input)
         {
             if (string.IsNullOrEmpty(input.Keyword)
@@ -99,6 +103,12 @@ namespace EasyIotSharp.Core.Services.Hardware.Impl
             }
         }
 
+        /// <summary>
+        /// 新增传感器指标
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
+        /// <exception cref="BizException"></exception>
         public async Task InsertSensorQuota(InsertSensorQuotaInput input)
         {
             var isExistName = await _sensorQuotaRepository.FirstOrDefaultAsync(x => x.TenantNumId == ContextUser.TenantNumId && x.Name == input.Name && x.SensorId == input.SensorId && x.IsDelete == false);
@@ -123,6 +133,7 @@ namespace EasyIotSharp.Core.Services.Hardware.Impl
             model.Precision = input.Precision;
             model.Remark = input.Remark;
             model.Sort = input.Sort;
+            model.IsShow = true;
             model.IsDelete = false;
             model.CreationTime = DateTime.Now;
             model.UpdatedAt = DateTime.Now;
@@ -135,6 +146,12 @@ namespace EasyIotSharp.Core.Services.Hardware.Impl
             await EventBus.TriggerAsync(new SensorQuotaBaseEventData() { });
         }
 
+        /// <summary>
+        /// 修改传感器指标
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
+        /// <exception cref="BizException"></exception>
         public async Task UpdateSensorQuota(UpdateSensorQuotaInput input)
         {
             var info = await _sensorQuotaRepository.FirstOrDefaultAsync(x => x.TenantNumId == ContextUser.TenantNumId && x.Id == input.Id && x.IsDelete == false);
@@ -160,6 +177,7 @@ namespace EasyIotSharp.Core.Services.Hardware.Impl
             info.Precision = input.Precision;
             info.Remark = input.Remark;
             info.Sort = input.Sort;
+            info.IsShow = input.IsShow;
             info.UpdatedAt = DateTime.Now;
             info.OperatorId = ContextUser.UserId;
             info.OperatorName = ContextUser.UserName;
@@ -170,6 +188,12 @@ namespace EasyIotSharp.Core.Services.Hardware.Impl
             await EventBus.TriggerAsync(new SensorQuotaBaseEventData() { });
         }
 
+        /// <summary>
+        /// 删除传感器指标
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
+        /// <exception cref="BizException"></exception>
         public async Task DeleteSensorQuota(DeleteSensorQuotaInput input)
         {
             var info = await _sensorQuotaRepository.GetByIdAsync(input.Id);
@@ -203,6 +227,100 @@ namespace EasyIotSharp.Core.Services.Hardware.Impl
                 list = _sensorQuotaRepository.GetSensorQuotaList();
             }
             return list;
+        }
+
+        /// <summary>
+        /// 获取列表
+        /// </summary>
+        /// <param name="dataRespost">数据请求参数</param>
+        /// <returns>响应结果</returns>
+        public async Task<Response> GetResponse(DataRespost dataRespost)
+        {
+            var result = new Response();
+
+            // 参数验证
+            if (dataRespost?.SensorId == null || !dataRespost.SensorId.Any())
+            {
+                return result;
+            }
+
+            // 查询传感器信息
+            var sensorList = await _sensorRepository.QueryByIds(dataRespost.SensorId.ToList());
+            if (sensorList == null || !sensorList.Any())
+            {
+                return result;
+            }
+
+            var sensor = sensorList.First();
+            var measurementName = $"raw_{sensor.BriefName}";
+
+            try
+            {
+                // 添加时间指标
+                result.Quotas.Add(new Quotas
+                {
+                    Name = "time",
+                    Unit = null,
+                    IsShow = true
+                });
+
+                // 获取传感器指标列表
+                var sensorQuotaList = await _sensorQuotaRepository.GetSensorQuotaList(sensor.Id);
+                if (sensorQuotaList == null || !sensorQuotaList.Any())
+                {
+                    return result;
+                }
+
+                // 构建SQL查询
+                var sqlBuilder = new StringBuilder("select ");
+
+                // 添加指标信息到结果并构建查询字段
+                foreach (var item in sensorQuotaList)
+                {
+                    result.Quotas.Add(new Quotas
+                    {
+                        Name = item.Identifier,
+                        Unit = item.Unit,
+                        IsShow = true
+                    });
+
+                    sqlBuilder.Append(item.Identifier).Append(',');
+                }
+
+                // 移除最后一个逗号
+                sqlBuilder.Length -= 1;
+
+                // 添加表名和条件
+                sqlBuilder.Append(" from ").Append(measurementName).Append(" where 1=1");
+
+                // 添加时间范围条件（如果有）
+                if (dataRespost.StartTime.HasValue && dataRespost.EndTime.HasValue)
+                {
+                    sqlBuilder.Append($" and time >= '{dataRespost.StartTime.Value:yyyy-MM-ddTHH:mm:ssZ}' and time <= '{dataRespost.EndTime.Value:yyyy-MM-ddTHH:mm:ssZ}'");
+                }
+
+                if (dataRespost.IsPage == true && dataRespost.PageIndex > 0 && dataRespost.PageSize > 0)
+                {
+                    sqlBuilder.Append($" Limit {dataRespost.PageSize}  Offset {dataRespost.PageIndex - 1}");
+                }
+
+                // 创建仓储实例
+                var repository = InfluxdbRepositoryFactory.Create<Dictionary<string, object>>(
+                    measurementName: measurementName,
+                    tenantDatabase: ContextUser.TenantAbbreviation
+                );
+
+                // 查询数据
+                var data = await repository.GetAsync(sqlBuilder.ToString());
+                result.Data = data.Values;
+            }
+            catch (Exception ex)
+            {
+                // 记录异常信息
+                Logger.Error($"获取传感器数据时发生异常: {ex.Message}", ex);
+            }
+
+            return result;
         }
     }
 }

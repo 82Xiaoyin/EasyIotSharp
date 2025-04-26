@@ -58,6 +58,7 @@ namespace EasyIotSharp.API.Filters
                         var userIdClaim = principal.Claims.FirstOrDefault(c => c.Type == "UserId");
                         var userNameClaim = principal.Claims.FirstOrDefault(c => c.Type == "UserName");
                         var tenantIdClaim = principal.Claims.FirstOrDefault(c => c.Type == "TenantId");
+                        var tenantAbbreviationClaim = principal.Claims.FirstOrDefault(c => c.Type == "Abbreviation");
                         var tenantNumIdClaim = principal.Claims.FirstOrDefault(c => c.Type == "TenantNumId");
 
                         // 验证 Claim 是否存在且有效
@@ -73,12 +74,14 @@ namespace EasyIotSharp.API.Filters
                         var userName = userNameClaim.Value;
                         var tenantId = tenantIdClaim.Value;
                         var tenantNumId = tenantNumIdClaim.Value;
+                        var tenantAbbreviation = tenantAbbreviationClaim.Value;
                         // 设置用户身份信息（包含 UserId、UserName 和 TenantId）
                         var userTokenData = new UserTokenData
                         {
                             UserId = userId,
                             UserName = userName,
                             TenantId = tenantId,
+                            TenantAbbreviation = tenantAbbreviation,
                             TenantNumId = tenantNumId.ToInt()
                         };
                         context.HttpContext.User = new UserTokenPrincipal(new UserTokenIdentity(userTokenData));

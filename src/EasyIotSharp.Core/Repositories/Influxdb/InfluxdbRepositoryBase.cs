@@ -76,6 +76,17 @@ namespace EasyIotSharp.Core.Repositories.Influxdb
         /// <summary>
         /// 根据ID异步获取实体
         /// </summary>
+        public async Task<Serie> GetAsync(string sql)
+        {
+            var result = await _databaseProvider.Client.Client.QueryAsync(sql, _tenantDatabase);
+            var entity = result.FirstOrDefault();
+
+            return entity;
+        }
+
+        /// <summary>
+        /// 根据ID异步获取实体
+        /// </summary>
         public async Task<Serie> GetAsync(Serie id)
         {
             var query = $"SELECT * FROM {_measurementName} WHERE id='{id}'";

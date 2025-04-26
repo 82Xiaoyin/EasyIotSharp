@@ -22,6 +22,13 @@ namespace EasyIotSharp.Core.Repositories.Influxdb
         Task<IQueryable<Serie>> GetAll();
 
         /// <summary>
+        /// 通过Sql执行
+        /// </summary>
+        /// <param name="sql"></param>
+        /// <returns></returns>
+        Task<Serie> GetAsync(string sql);
+
+        /// <summary>
         /// 根据ID异步获取实体
         /// </summary>
         Task<Serie> GetAsync(Serie id);
