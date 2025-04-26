@@ -212,6 +212,13 @@
             <param name="input"></param>
             <returns></returns>
         </member>
+        <member name="M:EasyIotSharp.API.Controllers.HardwareController.GetResponse(EasyIotSharp.Core.Dto.Hardware.Params.DataRespost)">
+            <summary>
+            通过id修改一条传感器类型指标
+            </summary>
+            <param name="input"></param>
+            <returns></returns>
+        </member>
         <member name="M:EasyIotSharp.API.Controllers.ProjectController.GetProjectBase(System.String)">
             <summary>
             通过id获取一条项目信息

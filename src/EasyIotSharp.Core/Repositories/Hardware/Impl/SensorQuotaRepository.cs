@@ -76,10 +76,10 @@ namespace EasyIotSharp.Core.Repositories.Hardware.Impl
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public List<SensorQuota> GetSensorQuotaList(string id)
+        public async Task<List<SensorQuota>> GetSensorQuotaList(string id)
         {
-            return Client.Queryable<SensorQuota>().Where(w => w.SensorId.Equals(id))
-                                 .OrderBy(t => t.Sort, OrderByType.Desc).ToList();
+            return await Client.Queryable<SensorQuota>().Where(w => w.SensorId.Equals(id))
+                                 .OrderBy(t => t.Sort, OrderByType.Desc).ToListAsync();
         }
 
         /// <summary>

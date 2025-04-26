@@ -82,6 +82,11 @@ namespace EasyIotSharp.Core.Dto.Hardware
         public int Sort { get; set; }
 
         /// <summary>
+        /// 是否展示
+        /// </summary>
+        public bool IsShow { get; set; }
+
+        /// <summary>
         /// 创建时间
         /// </summary>
         public DateTime CreationTime { get; set; }

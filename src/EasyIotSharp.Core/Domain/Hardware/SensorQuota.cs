@@ -68,5 +68,10 @@ namespace EasyIotSharp.Core.Domain.Hardware
         /// (数字越大越靠前)
         /// </summary>
         public int Sort { get; set; }
+
+        /// <summary>
+        /// 是否展示
+        /// </summary>
+        public bool IsShow { get; set; }
     }
 }

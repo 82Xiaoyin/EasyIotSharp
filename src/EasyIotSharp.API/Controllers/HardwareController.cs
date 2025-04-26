@@ -4,6 +4,7 @@ using EasyIotSharp.Core.Dto.Hardware.Params;
 using EasyIotSharp.Core.Services.Hardware;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Nest;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -311,5 +312,20 @@ namespace EasyIotSharp.API.Controllers
         }
 
         #endregion
+
+        /// <summary>
+        /// 设备数据列表
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
+        [HttpPost("/Hardware/Sensor/Quota/Response")]
+        [Authorize]
+        public async Task<UPrimeResponse<Response>> GetResponse([FromBody] DataRespost dataRespost)
+        {
+            UPrimeResponse<Response> res = new UPrimeResponse<Response>();
+            res.Result = await _sensorQuotaService.GetResponse(dataRespost);
+            return res;
+
+        }
     }
 }

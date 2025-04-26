@@ -14,7 +14,7 @@ namespace EasyIotSharp.Core.Repositories.Hardware
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        List<SensorQuota> GetSensorQuotaList(string id);
+        Task<List<SensorQuota>> GetSensorQuotaList(string id);
         /// <summary>
         /// 通过条件分页查询传感器指标列表
         /// </summary>

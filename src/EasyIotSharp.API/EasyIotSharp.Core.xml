@@ -576,6 +576,11 @@
             当前租户Id
             </summary>
         </member>
+        <member name="P:EasyIotSharp.Core.Configuration.UserTokenData.TenantAbbreviation">
+            <summary>
+            租户简称
+            </summary>
+        </member>
         <member name="P:EasyIotSharp.Core.Configuration.UserTokenData.TenantNumId">
             <summary>
             当前租户NumId
@@ -822,6 +827,11 @@
             <summary>
             排序字段
             (数字越大越靠前)
+            </summary>
+        </member>
+        <member name="P:EasyIotSharp.Core.Domain.Hardware.SensorQuota.IsShow">
+            <summary>
+            是否展示
             </summary>
         </member>
         <member name="T:EasyIotSharp.Core.Domain.Proejct.Classification">
@@ -1598,6 +1608,36 @@
             对象id
             </summary>
         </member>
+        <member name="P:EasyIotSharp.Core.Dto.Hardware.Params.DataRespost.SensorId">
+            <summary>
+            测点Id
+            </summary>
+        </member>
+        <member name="P:EasyIotSharp.Core.Dto.Hardware.Params.DataRespost.StartTime">
+            <summary>
+            开始时间
+            </summary>
+        </member>
+        <member name="P:EasyIotSharp.Core.Dto.Hardware.Params.DataRespost.EndTime">
+            <summary>
+            结束时间
+            </summary>
+        </member>
+        <member name="P:EasyIotSharp.Core.Dto.Hardware.Params.DataRespost.PageIndex">
+            <summary>
+            当前开始页
+            </summary>
+        </member>
+        <member name="P:EasyIotSharp.Core.Dto.Hardware.Params.DataRespost.PageSize">
+            <summary>
+            页大小
+            </summary>
+        </member>
+        <member name="P:EasyIotSharp.Core.Dto.Hardware.Params.DataRespost.IsPage">
+            <summary>
+            是否分页
+            </summary>
+        </member>
         <member name="T:EasyIotSharp.Core.Dto.Hardware.Params.DeleteProtocolConfigInput">
             <summary>
             通过id删除一条协议配置的入参类
@@ -1829,6 +1869,11 @@
             <summary>
             排序字段
             (数字越大越靠前)
+            </summary>
+        </member>
+        <member name="P:EasyIotSharp.Core.Dto.Hardware.Params.InsertSensorQuotaInput.IsShow">
+            <summary>
+            是否展示
             </summary>
         </member>
         <member name="T:EasyIotSharp.Core.Dto.Hardware.Params.QueryProtocolConfigByProtocolIdOutput">
@@ -2193,6 +2238,11 @@
             (数字越大越靠前)
             </summary>
         </member>
+        <member name="P:EasyIotSharp.Core.Dto.Hardware.Params.UpdateSensorQuotaInput.IsShow">
+            <summary>
+            是否展示
+            </summary>
+        </member>
         <member name="T:EasyIotSharp.Core.Dto.Hardware.ProtocolConfigDto">
             <summary>
             代表一条协议配置的"DTO"
@@ -2471,6 +2521,11 @@
             <summary>
             排序字段
             (数字越大越靠前)
+            </summary>
+        </member>
+        <member name="P:EasyIotSharp.Core.Dto.Hardware.SensorQuotaDto.IsShow">
+            <summary>
+            是否展示
             </summary>
         </member>
         <member name="P:EasyIotSharp.Core.Dto.Hardware.SensorQuotaDto.CreationTime">
@@ -5800,6 +5855,13 @@
             获取所有数据
             </summary>
         </member>
+        <member name="M:EasyIotSharp.Core.Repositories.Influxdb.IInfluxdbRepositoryBase`1.GetAsync(System.String)">
+            <summary>
+            通过Sql执行
+            </summary>
+            <param name="sql"></param>
+            <returns></returns>
+        </member>
         <member name="M:EasyIotSharp.Core.Repositories.Influxdb.IInfluxdbRepositoryBase`1.GetAsync(InfluxData.Net.InfluxDb.Models.Responses.Serie)">
             <summary>
             根据ID异步获取实体
@@ -5843,6 +5905,11 @@
         <member name="M:EasyIotSharp.Core.Repositories.Influxdb.InfluxdbRepositoryBase`1.GetAll">
             <summary>
             获取所有数据
+            </summary>
+        </member>
+        <member name="M:EasyIotSharp.Core.Repositories.Influxdb.InfluxdbRepositoryBase`1.GetAsync(System.String)">
+            <summary>
+            根据ID异步获取实体
             </summary>
         </member>
         <member name="M:EasyIotSharp.Core.Repositories.Influxdb.InfluxdbRepositoryBase`1.GetAsync(InfluxData.Net.InfluxDb.Models.Responses.Serie)">
@@ -6668,11 +6735,49 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="M:EasyIotSharp.Core.Services.Hardware.Impl.SensorQuotaService.QuerySensorQuota(EasyIotSharp.Core.Dto.Hardware.Params.QuerySensorQuotaInput)">
+            <summary>
+            传感器指标列表
+            </summary>
+            <param name="input"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.Hardware.Impl.SensorQuotaService.InsertSensorQuota(EasyIotSharp.Core.Dto.Hardware.Params.InsertSensorQuotaInput)">
+            <summary>
+            新增传感器指标
+            </summary>
+            <param name="input"></param>
+            <returns></returns>
+            <exception cref="T:EasyIotSharp.Core.BizException"></exception>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.Hardware.Impl.SensorQuotaService.UpdateSensorQuota(EasyIotSharp.Core.Dto.Hardware.Params.UpdateSensorQuotaInput)">
+            <summary>
+            修改传感器指标
+            </summary>
+            <param name="input"></param>
+            <returns></returns>
+            <exception cref="T:EasyIotSharp.Core.BizException"></exception>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.Hardware.Impl.SensorQuotaService.DeleteSensorQuota(EasyIotSharp.Core.Dto.Hardware.Params.DeleteSensorQuotaInput)">
+            <summary>
+            删除传感器指标
+            </summary>
+            <param name="input"></param>
+            <returns></returns>
+            <exception cref="T:EasyIotSharp.Core.BizException"></exception>
+        </member>
         <member name="M:EasyIotSharp.Core.Services.Hardware.Impl.SensorQuotaService.GetSensorQuotaList">
             <summary>
             传感器指标列表
             </summary>
             <returns></returns>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.Hardware.Impl.SensorQuotaService.GetResponse(EasyIotSharp.Core.Dto.Hardware.Params.DataRespost)">
+            <summary>
+            获取列表
+            </summary>
+            <param name="dataRespost">数据请求参数</param>
+            <returns>响应结果</returns>
         </member>
         <member name="M:EasyIotSharp.Core.Services.Hardware.Impl.SensorService.GetSensorList">
             <summary>
@@ -6789,6 +6894,13 @@
             <summary>
             传感器指标列表
             </summary>
+            <returns></returns>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.Hardware.ISensorQuotaService.GetResponse(EasyIotSharp.Core.Dto.Hardware.Params.DataRespost)">
+            <summary>
+            从实体数据库获取信息
+            </summary>
+            <param name="dataRespost"></param>
             <returns></returns>
         </member>
         <member name="M:EasyIotSharp.Core.Services.Hardware.ISensorService.GetSensor(System.String)">
