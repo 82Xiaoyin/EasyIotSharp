@@ -214,7 +214,7 @@
         </member>
         <member name="M:EasyIotSharp.API.Controllers.HardwareController.GetResponse(EasyIotSharp.Core.Dto.Hardware.Params.DataRespost)">
             <summary>
-            通过id修改一条传感器类型指标
+            设备数据列表
             </summary>
             <param name="input"></param>
             <returns></returns>

@@ -5397,7 +5397,7 @@
             <param name="identity"></param>
             <returns></returns>
         </member>
-        <member name="M:EasyIotSharp.Core.Extensions.TokenExtensions.GenerateToken(System.String,System.String,System.String,System.String,System.Int32)">
+        <member name="M:EasyIotSharp.Core.Extensions.TokenExtensions.GenerateToken(System.String,System.String,System.String,System.String,System.String,System.Int32)">
             <summary>
             生成 JWT Token
             </summary>
