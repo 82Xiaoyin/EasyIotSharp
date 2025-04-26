@@ -23,6 +23,7 @@ namespace EasyIotSharp.Core.Repositories.Rule.Impl
         public async Task<(int totalCount, List<RuleChainDto> items)> Query(
             string keyword,
             string projectId,
+            bool isPage,
             int pageIndex,
             int pageSize)
         {
@@ -44,14 +45,44 @@ namespace EasyIotSharp.Core.Repositories.Rule.Impl
             {
                 return (0, new List<RuleChainDto>());
             }
+            var items = new List<RuleChainDto>();
+            if (isPage == true)
+            {
+                items = await Client.Queryable<RuleChain>()
+                   .Where(predicate)
+                   .OrderByDescending(x => x.CreationTime)
+                   .Select<RuleChainDto>()
+                   .ToPageListAsync(pageIndex, pageSize);
+            }
+            else
+            {
+                items = await Client.Queryable<RuleChain>()
+                   .Where(predicate)
+                   .OrderByDescending(x => x.CreationTime)
+                   .Select<RuleChainDto>()
+                   .ToListAsync();
+            }
+
+            return (totalCount, items);
+        }
+
+        /// <summary>
+        /// 场景联动列表
+        /// </summary>
+        /// <param name="keyword"></param>
+        /// <param name="pageIndex"></param>
+        /// <param name="pageSize"></param>
+        /// <returns></returns>
+        public async Task<List<RuleChainDto>> QueryRuleChain()
+        {
+            var predicate = PredicateBuilder.New<RuleChain>(x => x.IsDelete == false);
 
             var items = await Client.Queryable<RuleChain>()
                 .Where(predicate)
                 .OrderByDescending(x => x.CreationTime)
-                .Select<RuleChainDto>()
-                .ToPageListAsync(pageIndex, pageSize);
+                .Select<RuleChainDto>().ToListAsync();
 
-            return (totalCount, items);
+            return items;
         }
     }
 }

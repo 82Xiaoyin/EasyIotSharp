@@ -17,5 +17,12 @@ namespace EasyIotSharp.Core.Caching.Rule
         /// <param name="action"></param>
         /// <returns></returns>
         Task<PagedResultDto<RuleChainDto>> QueryRuleChain(SceneManagementInput input, Func<Task<PagedResultDto<RuleChainDto>>> action);
+
+        /// <summary>
+        /// 获取所有场景联动列表
+        /// </summary>
+        /// <param name="action"></param>
+        /// <returns></returns>
+        Task<List<RuleChainDto>> QueryRuleChainBase(Func<Task<List<RuleChainDto>>> action);
     }
 }

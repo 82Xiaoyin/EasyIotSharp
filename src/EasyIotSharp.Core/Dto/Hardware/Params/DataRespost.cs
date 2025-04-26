@@ -7,9 +7,19 @@ namespace EasyIotSharp.Core.Dto.Hardware.Params
     public class DataRespost
     {
         /// <summary>
-        /// 测点Id
+        /// 设备Id
         /// </summary>
         public string SensorId { get; set; }
+
+        /// <summary>
+        /// 测点Id
+        /// </summary>
+        public string SensorPointId { get; set; }
+
+        /// <summary>
+        /// 测点Id
+        /// </summary>
+        public string ProjectId { get; set; }
 
         /// <summary>
         /// 开始时间

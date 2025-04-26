@@ -293,6 +293,16 @@ namespace EasyIotSharp.Core.Services.Hardware.Impl
                 // 添加表名和条件
                 sqlBuilder.Append(" from ").Append(measurementName).Append(" where 1=1");
 
+                if (!string.IsNullOrEmpty(dataRespost.SensorPointId))
+                {
+                    sqlBuilder.Append($" and pointId = '{dataRespost.SensorPointId}'");
+                }
+
+                if (!string.IsNullOrEmpty(dataRespost.ProjectId))
+                {
+                    sqlBuilder.Append($" and projectId = '{dataRespost.ProjectId}'");
+                }
+
                 // 添加时间范围条件（如果有）
                 if (dataRespost.StartTime.HasValue && dataRespost.EndTime.HasValue)
                 {

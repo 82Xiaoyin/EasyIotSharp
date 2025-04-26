@@ -13,6 +13,7 @@ namespace EasyIotSharp.Core.Caching.Rule.Impl
     {
         public ICache Cache => CacheManager.GetCache($"{CachingConsts.Keys.Rule}RuleChainCacheService");
         public const string KEY_RULE_RULECHAIN_QUERY = "Rule:RuleChain-{0}-{1}";
+        public const string KEY_RULE_RULECHAINBASE_QUERY = "Rule:RuleChainBase";
         public void Clear()
         {
             Cache.Clear();
@@ -21,6 +22,12 @@ namespace EasyIotSharp.Core.Caching.Rule.Impl
         {
             var key = KEY_RULE_RULECHAIN_QUERY.FormatWith(input.PageIndex,
                                           input.PageSize);
+            return await Cache.GetAsyncExt(key, action, TimeSpan.FromHours(CachingConsts.TENANT_EXPIRES_MINUTES));
+        }
+
+        public async Task<List<RuleChainDto>> QueryRuleChainBase(Func<Task<List<RuleChainDto>>> action)
+        {
+            var key = KEY_RULE_RULECHAINBASE_QUERY.FormatWith();
             return await Cache.GetAsyncExt(key, action, TimeSpan.FromHours(CachingConsts.TENANT_EXPIRES_MINUTES));
         }
     }

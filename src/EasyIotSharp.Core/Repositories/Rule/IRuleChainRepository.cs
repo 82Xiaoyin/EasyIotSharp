@@ -14,7 +14,14 @@ namespace EasyIotSharp.Core.Repositories.Rule
         Task<(int totalCount, List<RuleChainDto> items)> Query(
             string keyword,
             string projectId,
+            bool isPage,
             int pageIndex,
             int pageSize);
+
+        /// <summary>
+        /// 获取所有场景联动数据
+        /// </summary>
+        /// <returns></returns>
+        Task<List<RuleChainDto>> QueryRuleChain();
     }
 }

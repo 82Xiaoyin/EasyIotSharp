@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using EasyIotSharp.Core.Caching.Rule;
 using EasyIotSharp.Core.Caching.Rule.Impl;
@@ -32,6 +33,22 @@ namespace EasyIotSharp.Core.Services.Rule.Impl
         }
 
         /// <summary>
+        ///  获取所有场景联动
+        /// </summary>
+        /// <returns></returns>
+
+        public async Task<List<RuleChainDto>> QueryRuleChain()
+        {
+            var list = await _ruleChainCacheService.QueryRuleChainBase(() => { return _ruleChainRepository.QueryRuleChain(); });
+            if (list.Count == 0)
+            {
+                list = await _ruleChainRepository.QueryRuleChain();
+            }
+            return list;
+
+        }
+
+        /// <summary>
         /// 查询规则链列表
         /// </summary>
         public async Task<PagedResultDto<RuleChainDto>> QueryRuleChain(SceneManagementInput input)
@@ -45,6 +62,7 @@ namespace EasyIotSharp.Core.Services.Rule.Impl
                     var query = await _ruleChainRepository.Query(
                     input.Keyword,
                     input.ProjectId,
+                    input.IsPage,
                     input.PageIndex,
                     input.PageSize);
 
@@ -60,6 +78,7 @@ namespace EasyIotSharp.Core.Services.Rule.Impl
                 var query = await _ruleChainRepository.Query(
                 input.Keyword,
                 input.ProjectId,
+                input.IsPage,
                 input.PageIndex,
                 input.PageSize);
 
