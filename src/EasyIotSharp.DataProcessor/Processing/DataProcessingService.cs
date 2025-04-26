@@ -24,7 +24,6 @@ namespace EasyIotSharp.DataProcessor.Processing
         /// 构造函数
         /// </summary>
         public DataProcessingService(
-            IConfiguration configuration,
             IMessageReceiver messageReceiver,
             IMessageProcessor messageProcessor,
             IPerformanceMonitor performanceMonitor)

@@ -15,6 +15,7 @@ namespace EasyIotSharp.Core.Extensions
         {
             services.AddSingleton(appOptions);
             services.AddSingleton(appOptions.StorageOptions);
+            services.AddSingleton(appOptions.MqttOptions);
             services.AddSingleton(appOptions.CachingOptions);
             return services;
         }
@@ -23,6 +24,7 @@ namespace EasyIotSharp.Core.Extensions
         {
             iocManager.IocContainer.Register(Component.For<AppOptions>().Instance(appOptions));
             iocManager.IocContainer.Register(Component.For<StorageOptions>().Instance(appOptions.StorageOptions));
+            iocManager.IocContainer.Register(Component.For<MqttOptions>().Instance(appOptions.MqttOptions));
             iocManager.IocContainer.Register(Component.For<CachingOptions>().Instance(appOptions.CachingOptions));
             return iocManager;
         }
