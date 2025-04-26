@@ -45,5 +45,10 @@ namespace EasyIotSharp.Core.Dto.Hardware.Params
         /// 是否分页
         /// </summary>
         public bool IsPage { get; set; }
+
+        /// <summary>
+        /// 是否排序
+        /// </summary>
+        public bool IsSort { get; set; }
     }
 }

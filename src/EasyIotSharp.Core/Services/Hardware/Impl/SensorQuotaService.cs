@@ -308,6 +308,11 @@ namespace EasyIotSharp.Core.Services.Hardware.Impl
                 {
                     sqlBuilder.Append($" and time >= '{dataRespost.StartTime.Value:yyyy-MM-ddTHH:mm:ssZ}' and time <= '{dataRespost.EndTime.Value:yyyy-MM-ddTHH:mm:ssZ}'");
                 }
+                if (dataRespost.IsSort)
+                {
+                    // 添加排序
+                    sqlBuilder.Append(" ORDER BY time DESC ");
+                }
 
                 if (dataRespost.IsPage == true && dataRespost.PageIndex > 0 && dataRespost.PageSize > 0)
                 {
@@ -322,7 +327,10 @@ namespace EasyIotSharp.Core.Services.Hardware.Impl
 
                 // 查询数据
                 var data = await repository.GetAsync(sqlBuilder.ToString());
-                result.Data = data.Values;
+                if (data != null && data.Values != null)
+                {
+                    result.Data = data.Values;
+                }
             }
             catch (Exception ex)
             {
