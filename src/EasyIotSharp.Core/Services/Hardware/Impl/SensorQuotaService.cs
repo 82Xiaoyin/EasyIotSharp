@@ -279,7 +279,7 @@ namespace EasyIotSharp.Core.Services.Hardware.Impl
                 {
                     result.Quotas.Add(new Quotas
                     {
-                        Name = item.Identifier,
+                        Name = item.Name,
                         Unit = item.Unit,
                         IsShow = item.IsShow
                     });

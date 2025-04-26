@@ -1695,6 +1695,11 @@
             是否分页
             </summary>
         </member>
+        <member name="P:EasyIotSharp.Core.Dto.Hardware.Params.DataRespost.IsSort">
+            <summary>
+            是否排序
+            </summary>
+        </member>
         <member name="T:EasyIotSharp.Core.Dto.Hardware.Params.DeleteProtocolConfigInput">
             <summary>
             通过id删除一条协议配置的入参类

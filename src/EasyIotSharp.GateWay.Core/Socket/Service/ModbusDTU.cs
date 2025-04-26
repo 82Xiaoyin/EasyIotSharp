@@ -176,7 +176,7 @@ namespace EasyIotSharp.GateWay.Core.Socket.Service
 
                                     // 获取对应的指标名称
                                     string quotaName = i < sensorQuotaList.Count ? sensorQuotaList[i].Identifier : $"指标{i + 1}";
-                                    double quotaValue = registerValue * k;
+                                    double quotaValue =Math.Round(registerValue * k, sensorQuotaList[i].Precision) ;
                                     string Unit = i < sensorQuotaList.Count ? sensorQuotaList[i].Unit : $"指标{i + 1}";
                                     // 添加带有名称的值
                                     pointData.Values.Add(new NamedValue
