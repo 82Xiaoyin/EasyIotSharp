@@ -275,13 +275,13 @@ namespace EasyIotSharp.Core.Services.Hardware.Impl
                 var sqlBuilder = new StringBuilder("select ");
 
                 // 添加指标信息到结果并构建查询字段
-                foreach (var item in sensorQuotaList)
+                foreach (var item in sensorQuotaList.Where(x=>x.IsShow==true))
                 {
                     result.Quotas.Add(new Quotas
                     {
                         Name = item.Identifier,
                         Unit = item.Unit,
-                        IsShow = true
+                        IsShow = item.IsShow
                     });
 
                     sqlBuilder.Append(item.Identifier).Append(',');
@@ -295,12 +295,12 @@ namespace EasyIotSharp.Core.Services.Hardware.Impl
 
                 if (!string.IsNullOrEmpty(dataRespost.SensorPointId))
                 {
-                    sqlBuilder.Append($" and pointId = '{dataRespost.SensorPointId}'");
+                    sqlBuilder.Append($" and pointid = '{dataRespost.SensorPointId}'");
                 }
 
                 if (!string.IsNullOrEmpty(dataRespost.ProjectId))
                 {
-                    sqlBuilder.Append($" and projectId = '{dataRespost.ProjectId}'");
+                    sqlBuilder.Append($" and projectid = '{dataRespost.ProjectId}'");
                 }
 
                 // 添加时间范围条件（如果有）
@@ -322,7 +322,7 @@ namespace EasyIotSharp.Core.Services.Hardware.Impl
 
                 // 查询数据
                 var data = await repository.GetAsync(sqlBuilder.ToString());
-                result.Data = data.Values;
+                result.Data = data?.Values;
             }
             catch (Exception ex)
             {

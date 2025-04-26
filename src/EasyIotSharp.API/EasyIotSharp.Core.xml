@@ -288,6 +288,13 @@
             <param name="action"></param>
             <returns></returns>
         </member>
+        <member name="M:EasyIotSharp.Core.Caching.Rule.IRuleChainCacheService.QueryRuleChainBase(System.Func{System.Threading.Tasks.Task{System.Collections.Generic.List{EasyIotSharp.Core.Dto.Rule.RuleChainDto}}})">
+            <summary>
+            获取所有场景联动列表
+            </summary>
+            <param name="action"></param>
+            <returns></returns>
+        </member>
         <member name="M:EasyIotSharp.Core.Caching.Rule.ISceneManagementCacheService.QuerySceneManagement(EasyIotSharp.Core.Dto.Rule.Params.SceneManagementInput,System.Func{System.Threading.Tasks.Task{UPrime.Services.Dto.PagedResultDto{EasyIotSharp.Core.Dto.Rule.SceneManagementDto}}})">
             <summary>
             场景管理
@@ -1649,6 +1656,16 @@
             </summary>
         </member>
         <member name="P:EasyIotSharp.Core.Dto.Hardware.Params.DataRespost.SensorId">
+            <summary>
+            设备Id
+            </summary>
+        </member>
+        <member name="P:EasyIotSharp.Core.Dto.Hardware.Params.DataRespost.SensorPointId">
+            <summary>
+            测点Id
+            </summary>
+        </member>
+        <member name="P:EasyIotSharp.Core.Dto.Hardware.Params.DataRespost.ProjectId">
             <summary>
             测点Id
             </summary>
@@ -6389,7 +6406,16 @@
             <param name="userNotifies"></param>
             <returns></returns>
         </member>
-        <member name="M:EasyIotSharp.Core.Repositories.Rule.Impl.RuleChainRepository.Query(System.String,System.String,System.Int32,System.Int32)">
+        <member name="M:EasyIotSharp.Core.Repositories.Rule.Impl.RuleChainRepository.Query(System.String,System.String,System.Boolean,System.Int32,System.Int32)">
+            <summary>
+            场景联动列表
+            </summary>
+            <param name="keyword"></param>
+            <param name="pageIndex"></param>
+            <param name="pageSize"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EasyIotSharp.Core.Repositories.Rule.Impl.RuleChainRepository.QueryRuleChain">
             <summary>
             场景联动列表
             </summary>
@@ -6439,10 +6465,16 @@
             <param name="userNotifies"></param>
             <returns></returns>
         </member>
-        <member name="M:EasyIotSharp.Core.Repositories.Rule.IRuleChainRepository.Query(System.String,System.String,System.Int32,System.Int32)">
+        <member name="M:EasyIotSharp.Core.Repositories.Rule.IRuleChainRepository.Query(System.String,System.String,System.Boolean,System.Int32,System.Int32)">
             <summary>
             查询规则链列表
             </summary>
+        </member>
+        <member name="M:EasyIotSharp.Core.Repositories.Rule.IRuleChainRepository.QueryRuleChain">
+            <summary>
+            获取所有场景联动数据
+            </summary>
+            <returns></returns>
         </member>
         <member name="M:EasyIotSharp.Core.Repositories.Rule.ISceneManagementRepository.Query(System.String,System.Int32,System.Int32)">
             <summary>
@@ -7694,6 +7726,12 @@
             <summary>
             构造函数
             </summary>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.Rule.Impl.RuleChainService.QueryRuleChain">
+            <summary>
+             获取所有场景联动
+            </summary>
+            <returns></returns>
         </member>
         <member name="M:EasyIotSharp.Core.Services.Rule.Impl.RuleChainService.QueryRuleChain(EasyIotSharp.Core.Dto.Rule.Params.SceneManagementInput)">
             <summary>
