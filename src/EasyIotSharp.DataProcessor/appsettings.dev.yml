@@ -23,6 +23,16 @@ MinIO:
   SecretKey: 'jsuper[minio]'
   BucketName: 'hhtl-dsmb'
 
+
+# 在现有配置的基础上添加以下内容
+Mqtt:
+  Host: 82.156.125.76
+  Port: 1883
+  ClientId: EasyIotSharp_DataProcessor
+  Username: admin # 如果需要认证，请填写用户名
+  Password: ZTXH2025!@# # 如果需要认证，请填写密码
+  TopicFormat: "{0}/{1}/rawdata" # {0}=项目ID, {1}=传感器ID
+
 Caching:
   IsOpen: true
   RedisEnabled:  true

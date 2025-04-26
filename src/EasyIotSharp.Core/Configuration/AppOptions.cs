@@ -46,6 +46,12 @@ namespace EasyIotSharp.Core.Configuration
         /// </summary>
         public MinIOOptions MinIOOptions { get; set; }
 
+
+        /// <summary>
+        /// MQTT配置
+        /// </summary>
+        public MqttOptions MqttOptions { get; set; }
+
         /// <summary>
         /// es 分页读写相关
         /// </summary>
@@ -75,6 +81,7 @@ namespace EasyIotSharp.Core.Configuration
             options.APIServiceOptions = APIServiceOptions.ReadFromConfiguration(config);
             options.CachingOptions = CachingOptions.ReadFromConfiguration(config);
             options.MinIOOptions = MinIOOptions.ReadFromConfiguration(config);
+            options.MqttOptions = MqttOptions.ReadFromConfiguration(config);
             options.QueueOptions = QueueOptions.ReadFromConfiguration(config);
             options.ESPaggingOptions = ESPaggingOptions.ReadFromConfiguration(config);
             options.QueueOptions = QueueOptions.ReadFromConfiguration(config);

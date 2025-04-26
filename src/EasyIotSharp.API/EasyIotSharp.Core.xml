@@ -381,6 +381,11 @@
             minio配置
             </summary>
         </member>
+        <member name="P:EasyIotSharp.Core.Configuration.AppOptions.MqttOptions">
+            <summary>
+            MQTT配置
+            </summary>
+        </member>
         <member name="P:EasyIotSharp.Core.Configuration.AppOptions.ESPaggingOptions">
             <summary>
             es 分页读写相关
@@ -526,6 +531,41 @@
         <member name="P:EasyIotSharp.Core.Configuration.MinIOOptions.BucketName">
             <summary>
             文件存储的桶名称
+            </summary>
+        </member>
+        <member name="T:EasyIotSharp.Core.Configuration.MqttOptions">
+            <summary>
+            MQTT配置选项
+            </summary>
+        </member>
+        <member name="P:EasyIotSharp.Core.Configuration.MqttOptions.Host">
+            <summary>
+            MQTT服务器地址
+            </summary>
+        </member>
+        <member name="P:EasyIotSharp.Core.Configuration.MqttOptions.Port">
+            <summary>
+            MQTT服务器端口
+            </summary>
+        </member>
+        <member name="P:EasyIotSharp.Core.Configuration.MqttOptions.ClientId">
+            <summary>
+            MQTT客户端ID
+            </summary>
+        </member>
+        <member name="P:EasyIotSharp.Core.Configuration.MqttOptions.Username">
+            <summary>
+            MQTT用户名
+            </summary>
+        </member>
+        <member name="P:EasyIotSharp.Core.Configuration.MqttOptions.Password">
+            <summary>
+            MQTT密码
+            </summary>
+        </member>
+        <member name="P:EasyIotSharp.Core.Configuration.MqttOptions.TopicFormat">
+            <summary>
+            MQTT主题格式
             </summary>
         </member>
         <member name="T:EasyIotSharp.Core.Configuration.QueueOptions">
