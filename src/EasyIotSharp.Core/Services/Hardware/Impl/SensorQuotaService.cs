@@ -234,7 +234,7 @@ namespace EasyIotSharp.Core.Services.Hardware.Impl
         /// </summary>
         /// <param name="dataRespost">数据请求参数</param>
         /// <returns>响应结果</returns>
-        public async Task<Response> GetResponse(DataRespost dataRespost)
+        public async Task<Response> GetSensorData(DataRespost dataRespost)
         {
             var result = new Response();
 

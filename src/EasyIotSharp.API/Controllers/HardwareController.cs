@@ -318,12 +318,12 @@ namespace EasyIotSharp.API.Controllers
         /// </summary>
         /// <param name="input"></param>
         /// <returns></returns>
-        [HttpPost("/Hardware/Sensor/Quota/Response")]
+        [HttpPost("/Hardware/Sensor/Data")]
         [Authorize]
         public async Task<UPrimeResponse<Response>> GetResponse([FromBody] DataRespost dataRespost)
         {
             UPrimeResponse<Response> res = new UPrimeResponse<Response>();
-            res.Result = await _sensorQuotaService.GetResponse(dataRespost);
+            res.Result = await _sensorQuotaService.GetSensorData(dataRespost);
             return res;
 
         }

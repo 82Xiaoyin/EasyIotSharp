@@ -57,6 +57,6 @@ namespace EasyIotSharp.Core.Services.Hardware
         /// </summary>
         /// <param name="dataRespost"></param>
         /// <returns></returns>
-        Task<Response> GetResponse(DataRespost dataRespost);
+        Task<Response> GetSensorData(DataRespost dataRespost);
     }
 }

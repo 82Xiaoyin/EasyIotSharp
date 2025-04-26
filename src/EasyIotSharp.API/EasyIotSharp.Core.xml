@@ -6817,7 +6817,7 @@
             </summary>
             <returns></returns>
         </member>
-        <member name="M:EasyIotSharp.Core.Services.Hardware.Impl.SensorQuotaService.GetResponse(EasyIotSharp.Core.Dto.Hardware.Params.DataRespost)">
+        <member name="M:EasyIotSharp.Core.Services.Hardware.Impl.SensorQuotaService.GetSensorData(EasyIotSharp.Core.Dto.Hardware.Params.DataRespost)">
             <summary>
             获取列表
             </summary>
@@ -6941,7 +6941,7 @@
             </summary>
             <returns></returns>
         </member>
-        <member name="M:EasyIotSharp.Core.Services.Hardware.ISensorQuotaService.GetResponse(EasyIotSharp.Core.Dto.Hardware.Params.DataRespost)">
+        <member name="M:EasyIotSharp.Core.Services.Hardware.ISensorQuotaService.GetSensorData(EasyIotSharp.Core.Dto.Hardware.Params.DataRespost)">
             <summary>
             从实体数据库获取信息
             </summary>
