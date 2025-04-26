@@ -261,6 +261,13 @@
             <param name="input"></param>
             <returns></returns>
         </member>
+        <member name="M:EasyIotSharp.API.Controllers.ProjectController.UploadProjectUnity(Microsoft.AspNetCore.Http.IFormFile)">
+            <summary>
+            上传项目的unity素材，返回index.html地址
+            </summary>
+            <param name="input"></param>
+            <returns></returns>
+        </member>
         <member name="M:EasyIotSharp.API.Controllers.ProjectController.GetClassification(System.String)">
             <summary>
             通过id获取一条项目分类信息

@@ -15,17 +15,29 @@ using EasyIotSharp.Core.Caching.Project;
 using EasyIotSharp.Core.Caching.Project.Impl;
 using EasyIotSharp.Core.Events.Tenant;
 using EasyIotSharp.Core.Events.Project;
+using Microsoft.AspNetCore.Http;
+using System.IO;
+using System.IO.Compression;
+using EasyIotSharp.Core.Services.IO;
 
 namespace EasyIotSharp.Core.Services.Project.Impl
 {
     public class ProjectBaseService : ServiceBase, IProjectBaseService
     {
+        private readonly ITempFolderService _tempFolderService;
+        private readonly IMinIOFileService _minIOFileService;
+
         private readonly IProjectBaseRepository _projectBaseRepository;
         private readonly IProjectBaseCacheService _projectBaseCacheService;
 
         public ProjectBaseService(IProjectBaseRepository projectBaseRepository,
-                                  IProjectBaseCacheService projectBaseCacheService)
+                                  IProjectBaseCacheService projectBaseCacheService,
+                                  ITempFolderService tempFolderService,
+                                  IMinIOFileService minIOFileService)
         {
+            _tempFolderService = tempFolderService;
+            _minIOFileService = minIOFileService;
+
             _projectBaseRepository = projectBaseRepository;
             _projectBaseCacheService = projectBaseCacheService;
         }
@@ -176,6 +188,107 @@ namespace EasyIotSharp.Core.Services.Project.Impl
 
             //清除缓存
             await EventBus.TriggerAsync(new ProjectBaseEventData() { });
+        }
+
+        public async Task<string> UploadProjectUnity(IFormFile formFile)
+        {
+            var fileExtension = Path.GetExtension(formFile.FileName).ToLower();
+            if (fileExtension != ".zip")
+            {
+                throw new BizException(BizError.BIND_EXCEPTION_ERROR, "请上传.zip后缀的文件");
+            }
+            //获取临时压缩包文件夹目录
+            var zipTempPath = _tempFolderService.GetZipFolderPath("");
+
+            // 保存上传的文件
+            var uploadedFilePath = Path.Combine(zipTempPath, formFile.FileName);
+            using (var stream = new FileStream(uploadedFilePath, FileMode.Create))
+            {
+                await formFile.CopyToAsync(stream);
+            }
+            // 解压文件
+            var extractPath = Path.Combine(zipTempPath, formFile.FileName.Split(".")[0]);
+            Directory.CreateDirectory(extractPath);
+            ZipFile.ExtractToDirectory(uploadedFilePath, extractPath);
+
+            // 处理需要上传文件拼接地址
+            var processedFiles = ProcessExtractedFiles(extractPath);
+            Dictionary<string, string> uploadFiles = new Dictionary<string, string>();
+            foreach (var file in processedFiles)
+            {
+                uploadFiles.Add(file.Key, formFile.FileName.Split(".")[0] + "/" + file.Value);
+            }
+            string defaultUrl = "";
+            foreach (var item in uploadFiles)
+            {
+                string url=await _minIOFileService.UploadAsync(item.Value, item.Key);
+
+                if (item.Value.Contains("index.html"))
+                {
+                    defaultUrl = url;
+                }
+            }
+            #region 删除临时文件夹
+
+            _tempFolderService.DeleteFiles(zipTempPath);
+
+            #endregion 删除临时文件夹
+
+            return defaultUrl;
+        }
+
+        public static Dictionary<string, string> ProcessExtractedFiles(string rootPath)
+        {
+            var processedFiles = new Dictionary<string, string>();
+            ProcessDirectory(rootPath, rootPath, processedFiles);
+            return processedFiles;
+        }
+
+        private static void ProcessDirectory(string currentDir, string rootPath, Dictionary<string, string> processedFiles)
+        {
+            try
+            {
+                // 处理当前目录下的所有文件
+                foreach (string filePath in Directory.GetFiles(currentDir))
+                {
+                    // 获取相对于根目录的路径
+                    string relativePath = GetRelativePath(filePath, rootPath);
+
+                    // 获取拼接后的文件名（用下划线代替路径分隔符）
+                    string prefixedFileName = relativePath.Replace(Path.DirectorySeparatorChar, '/');
+
+                    // 添加到结果字典
+                    processedFiles.Add(filePath, prefixedFileName);
+                }
+
+                // 递归处理子目录
+                foreach (string directory in Directory.GetDirectories(currentDir))
+                {
+                    ProcessDirectory(directory, rootPath, processedFiles);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error processing directory {currentDir}: {ex.Message}");
+            }
+        }
+
+        private static string GetRelativePath(string fullPath, string rootPath)
+        {
+            // 确保根路径以目录分隔符结尾
+            if (!rootPath.EndsWith(Path.DirectorySeparatorChar.ToString()))
+            {
+                rootPath += Path.DirectorySeparatorChar;
+            }
+
+            Uri fullUri = new Uri(fullPath);
+            Uri rootUri = new Uri(rootPath);
+
+            // 获取相对路径并移除开头的目录分隔符
+            string relativePath = Uri.UnescapeDataString(rootUri.MakeRelativeUri(fullUri).ToString())
+                .Replace('/', Path.DirectorySeparatorChar);
+
+            return relativePath;
         }
     }
 }

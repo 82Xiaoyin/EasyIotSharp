@@ -43,7 +43,7 @@ namespace EasyIotSharp.Core.Services.IO
         /// </summary>
         /// <param name="fileName">文件名</param>
         /// <param name="filePath">文件路径</param>
-        Task UploadAsync(string fileName, string filePath);
+        Task<string> UploadAsync(string fileName, string filePath);
 
         /// <summary>
         /// 文件上传
