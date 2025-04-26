@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using EasyIotSharp.DataProcessor.Model.RaddbitDTO;
 using EasyIotSharp.DataProcessor.Processing.Interfaces;
 using EasyIotSharp.DataProcessor.Util;
@@ -12,10 +14,10 @@ namespace EasyIotSharp.DataProcessor.Processing.Implementation
     /// <summary>
     /// RabbitMQ消息接收器
     /// </summary>
-    public class RabbitMQMessageReceiver : IMessageReceiver, IDisposable
+    public class RabbitMQMessageReceiver : IMessageReceiver 
     {
         // 存储项目ID和对应的RabbitMQ通道映射关系
-        private readonly Dictionary<string, IModel> _channels = new Dictionary<string, IModel>();
+        private readonly Dictionary<string, IChannel> _channels = new Dictionary<string, IChannel>();
         // 存储项目ID和对应的队列名称映射关系
         private readonly Dictionary<string, string> _queueNames = new Dictionary<string, string>();
         // 存储所有RabbitMQ客户端实例
@@ -29,7 +31,7 @@ namespace EasyIotSharp.DataProcessor.Processing.Implementation
         /// <summary>
         /// 初始化消息接收器
         /// </summary>
-        public void Initialize()
+        public async Task InitializeAsync()
         {
             try
             {
@@ -39,8 +41,10 @@ namespace EasyIotSharp.DataProcessor.Processing.Implementation
                     string projectId = kvp.Key;
                     RabbitMQClient client = kvp.Value;
                     
+                    LogHelper.Info($"正在为项目 {projectId} 初始化 RabbitMQ 客户端");
+                    
                     // 为每个项目订阅队列
-                    if (SubscribeProjectQueue(client, projectId, "queue_"))
+                    if (await SubscribeProjectQueueAsync(client, projectId, "queue_"))
                     {
                         _rabbitClients.Add(client);
                     }
@@ -58,63 +62,86 @@ namespace EasyIotSharp.DataProcessor.Processing.Implementation
         /// <summary>
         /// 订阅项目队列
         /// </summary>
-        private bool SubscribeProjectQueue(RabbitMQClient client, string projectId, string queuePrefix)
+        private async Task<bool> SubscribeProjectQueueAsync(RabbitMQClient client, string projectId, string queuePrefix)
         {
             try
             {
+                // 确保客户端已初始化
+                await client.InitAsync();
+                
                 // 构建队列名称并保存
                 string queueName = $"{queuePrefix}{projectId}";
                 _queueNames[projectId] = queueName;
                 
                 // 获取RabbitMQ通道
                 var channel = client._channel;
+                if (channel == null)
+                {
+                    LogHelper.Error($"项目 {projectId} 的RabbitMQ通道为空");
+                    return false;
+                }
                 
                 // 设置QoS，提高每个消费者可以同时处理的消息数量
-                channel.BasicQos(0, 2000, false);
+                await channel.BasicQosAsync(0, 2000, false);
                 
                 // 声明队列，确保队列存在
-                var queueDeclareOk = channel.QueueDeclare(
+                var queueDeclareResult = await channel.QueueDeclareAsync(
                     queue: queueName,
                     durable: true,
                     exclusive: false,
                     autoDelete: false,
                     arguments: null);
                     
-                // 记录队列中的消息数量
-                LogHelper.Info($"队列 {queueName} 中有 {queueDeclareOk.MessageCount} 条待处理消息");
+                // 记录队列中的消息数量 - 使用新的方法获取消息数量
+                var messageCount = await channel.MessageCountAsync(queueName);
+                LogHelper.Info($"队列 {queueName} 中有 {messageCount} 条待处理消息");
                 
                 // 创建异步消费者
                 var consumer = new AsyncEventingBasicConsumer(channel);
-                consumer.Received += async (model, ea) =>
+                LogHelper.Info($"为项目 {projectId} 创建了异步消费者");
+                
+                 consumer.ReceivedAsync += async (model, ea) =>
                 {
+                    LogHelper.Info($"收到项目 {projectId} 的消息，DeliveryTag: {ea.DeliveryTag}");
                     try
                     {
                         // 获取消息内容
                         var body = ea.Body.ToArray();
                         var message = Encoding.UTF8.GetString(body);
+                        LogHelper.Debug($"项目 {projectId} 收到消息内容: {message.Substring(0, Math.Min(100, message.Length))}...");
                         
                         // 触发消息接收事件
-                        MessageReceived?.Invoke(this, new MessageReceivedEventArgs
+                        if (MessageReceived != null)
                         {
-                            ProjectId = projectId,
-                            RawMessage = message
-                        });
+                            LogHelper.Debug($"触发项目 {projectId} 的消息接收事件");
+                             MessageReceived.Invoke(this, new MessageReceivedEventArgs
+                            {
+                                ProjectId = projectId,
+                                RawMessage = message
+                            });
+                            LogHelper.Debug($"项目 {projectId} 的消息接收事件处理完成");
+                        }
+                        else
+                        {
+                            LogHelper.Warn($"项目 {projectId} 的消息接收事件未注册");
+                        }
                         
                         // 确认消息已处理
-                        channel.BasicAck(ea.DeliveryTag, false);
+                        await channel.BasicAckAsync(ea.DeliveryTag, false);
+                        LogHelper.Debug($"已确认项目 {projectId} 的消息，DeliveryTag: {ea.DeliveryTag}");
                     }
                     catch (Exception ex)
                     {
                         // 处理失败，消息重新入队
-                        LogHelper.Error($"处理项目 {projectId} 的消息时发生错误: {ex.Message}");
-                        channel.BasicNack(ea.DeliveryTag, false, true);
+                        LogHelper.Error($"处理项目 {projectId} 的消息时发生错误: {ex.Message}, 堆栈: {ex.StackTrace}");
+                       await channel.BasicNackAsync(ea.DeliveryTag, false, true);
                     }
                 };
                 
                 // 开始消费队列 - 使用批量确认模式提高性能
-                string consumerTag = channel.BasicConsume(
+                string consumerTag = await channel.BasicConsumeAsync(
                     queue: queueName,
-                    autoAck: false,
+                    autoAck: false,  // 尝试修改为 true 进行测试
                     consumer: consumer);
                 
                 // 保存通道引用
@@ -134,7 +161,7 @@ namespace EasyIotSharp.DataProcessor.Processing.Implementation
         /// <summary>
         /// 关闭消息接收器
         /// </summary>
-        public void Shutdown()
+        public async Task Shutdown()
         {
             try
             {
@@ -143,7 +170,7 @@ namespace EasyIotSharp.DataProcessor.Processing.Implementation
                 {
                     try
                     {
-                        client.Dispose();
+                       await  client.Dispose();
                     }
                     catch (Exception ex)
                     {
@@ -162,9 +189,10 @@ namespace EasyIotSharp.DataProcessor.Processing.Implementation
         /// <summary>
         /// 释放资源
         /// </summary>
-        public void Dispose()
+        public async Task Dispose()
         {
-            Shutdown();
+           await  Shutdown();
         }
     }
 }
+ 

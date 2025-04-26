@@ -8,6 +8,7 @@ using Microsoft.Extensions.DependencyInjection;
 using EasyIotSharp.Core.Repositories.Queue;
 using UPrime;
 using EasyIotSharp.Core.Services.Queue;
+using System.Threading.Tasks;
 
 namespace EasyIotSharp.DataProcessor.LoadingConfig.RabbitMQ
 {
@@ -45,8 +46,7 @@ namespace EasyIotSharp.DataProcessor.LoadingConfig.RabbitMQ
         /// <summary>
         /// 初始化RabbitMQ配置
         /// </summary>
-        // 修改查询和初始化逻辑
-        public static void InitMQ(IServiceProvider serviceProvider = null)
+        public static async Task InitMQ(IServiceProvider serviceProvider = null)
         {
             var rabbitServerInfoService = UPrimeEngine.Instance.Resolve<IRabbitServerInfoService>();
 
@@ -57,8 +57,6 @@ namespace EasyIotSharp.DataProcessor.LoadingConfig.RabbitMQ
                 return;
             }
 
-            lock (_initLock)
-            {
                 if (_isInitialized) return;
 
                 try
@@ -96,7 +94,7 @@ namespace EasyIotSharp.DataProcessor.LoadingConfig.RabbitMQ
                                     m_MQClient.mqid = item.MqId;
 
                                     // 初始化连接
-                                    m_MQClient.Init();
+                                    await  m_MQClient.InitAsync();
                                     lsMQs.Add(m_MQClient);
 
                                     // 添加项目ID到MQ客户端的映射
@@ -134,7 +132,6 @@ namespace EasyIotSharp.DataProcessor.LoadingConfig.RabbitMQ
                 {
                     LogHelper.Error($"RabbitMQ初始化过程中发生异常: {ex.ToString()}");
                 }
-            }
         }
 
         /// <summary>
@@ -169,13 +166,13 @@ namespace EasyIotSharp.DataProcessor.LoadingConfig.RabbitMQ
         /// <summary>
         /// 关闭所有RabbitMQ连接
         /// </summary>
-        public static void CloseAllConnections()
+        public static async Task CloseAllConnections()
         {
             foreach (var mqClient in lsMQs)
             {
                 try
                 {
-                    mqClient.Close();
+                  await  mqClient.CloseConnectionAsync();
                 }
                 catch (Exception ex)
                 {

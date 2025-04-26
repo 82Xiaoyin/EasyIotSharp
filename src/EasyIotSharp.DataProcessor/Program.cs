@@ -14,12 +14,14 @@ using System.IO;
 using UPrime.Configuration;
 using Serilog; // 添加这个命名空间
 using EasyIotSharp.Core.Extensions;
+using System.Threading.Tasks;
+using System.Linq;
 namespace EasyIotSharp.DataProcessor
 {
     class Program
     {
         private static DataProcessingService _dataProcessingService;
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
             try
             {
@@ -50,17 +52,17 @@ namespace EasyIotSharp.DataProcessor
 
                 // 创建主机
                 var host = CreateHostBuilder(args).Build();
+                
                 // 初始化RabbitMQ
-                ConsoleUI.ShowProgress("正在初始化RabbitMQ服务...", () =>
+                ConsoleUI.ShowProgress("正在初始化RabbitMQ服务...", async () =>
                 {
-                   EasyIotSharp.DataProcessor.LoadingConfig.RabbitMQ.RabbitMQConfig.InitMQ();
+                    await  EasyIotSharp.DataProcessor.LoadingConfig.RabbitMQ.RabbitMQConfig.InitMQ();
                     LogHelper.Info("RabbitMQ初始化成功");
                 });
-                // 获取数据处理服务
+                Thread.Sleep(10000);
+                // 获取数据处理服务并启动主机
                 _dataProcessingService = host.Services.GetRequiredService<DataProcessingService>();
-                
-                // 启动主机
-                host.RunAsync();
+                await host.StartAsync();  // 使用异步方式启动
                 
                 ConsoleUI.ShowSuccess("EasyIotSharp数据处理器已启动，按Ctrl+C退出");
                 
@@ -97,6 +99,9 @@ namespace EasyIotSharp.DataProcessor
                     services.AddSingleton<IMessageProcessor, MessageProcessor>();
                     services.AddSingleton<IPerformanceMonitor, PerformanceMonitor>();
                     services.AddHostedService<DataProcessingService>();
+                    services.AddSingleton<IDataRepository, InfluxDataRepository>();
+                    services.AddSingleton<IMqttService, MqttService>();
+                    services.AddSingleton<ISceneLinkageService, SceneLinkageService>();
                 })
                 .ConfigureLogging((context, logging) =>
                 {
