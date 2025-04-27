@@ -191,143 +191,166 @@ namespace EasyIotSharp.Core.Services.Project.Impl
             await EventBus.TriggerAsync(new ProjectBaseEventData() { });
         }
 
+        /// <summary>
+        /// 上传Unity项目压缩包并部署到MinIO
+        /// </summary>
+        /// <param name="formFile">上传的Unity项目压缩文件</param>
+        /// <returns>部署后的访问URL</returns>
         public async Task<string> UploadProjectUnity(IFormFile formFile)
         {
+            // 临时文件和目录路径
+            string uniqueFolderName = Guid.NewGuid().ToString();
+            string zipTempPath = null;
+            string extractPath = null;
+            string uploadedFilePath = null;
+        
             try
             {
+                // 1. 验证文件格式
                 var fileExtension = Path.GetExtension(formFile.FileName).ToLower();
                 if (fileExtension != ".zip")
                 {
                     throw new BizException(BizError.BIND_EXCEPTION_ERROR, "请上传.zip后缀的文件");
                 }
-
-                // 获取临时压缩包文件夹目录 
-                var zipTempPath = _tempFolderService.GetZipFolderPath("");
-
-                // 生成唯一的文件夹名，避免冲突
-                string uniqueFolderName = Guid.NewGuid().ToString();
-                var extractPath = Path.Combine(zipTempPath, uniqueFolderName);
-
-                // 保存上传的文件 - 使用唯一文件名避免冲突
+        
+                // 2. 准备临时目录和文件
+                zipTempPath = _tempFolderService.GetZipFolderPath("");
+                extractPath = Path.Combine(zipTempPath, uniqueFolderName);
                 string uniqueFileName = $"{Path.GetFileNameWithoutExtension(formFile.FileName)}_{Guid.NewGuid()}.zip";
-                var uploadedFilePath = Path.Combine(zipTempPath, uniqueFileName);
-
-                try
+                uploadedFilePath = Path.Combine(zipTempPath, uniqueFileName);
+        
+                // 确保解压目录存在且为空
+                if (Directory.Exists(extractPath))
                 {
-                    using (var stream = new FileStream(uploadedFilePath, FileMode.Create))
+                    Directory.Delete(extractPath, true);
+                }
+                Directory.CreateDirectory(extractPath);
+                Logger.Debug($"已准备解压目录: {extractPath}");
+        
+                // 3. 保存上传的文件
+                using (var stream = new FileStream(uploadedFilePath, FileMode.Create))
+                {
+                    await formFile.CopyToAsync(stream);
+                }
+                Logger.Debug($"已保存上传文件到: {uploadedFilePath}");
+        
+                // 4. 解压文件
+                await Task.Run(() => {
+                    using (ZipArchive archive = ZipFile.OpenRead(uploadedFilePath))
                     {
-                        await formFile.CopyToAsync(stream);
-                    }
-
-                    // 确保目标目录存在且为空
-                    if (Directory.Exists(extractPath))
-                    {
-                        Directory.Delete(extractPath, true);
-                    }
-                    Directory.CreateDirectory(extractPath);
-
-                    // 手动解压文件，提供更好的错误处理
-                    await Task.Run(() => {
-                        using (ZipArchive archive = ZipFile.OpenRead(uploadedFilePath))
+                        foreach (ZipArchiveEntry entry in archive.Entries)
                         {
-                            foreach (ZipArchiveEntry entry in archive.Entries)
+                            string destinationPath = Path.Combine(extractPath, entry.FullName);
+                            string destinationDirectory = Path.GetDirectoryName(destinationPath);
+        
+                            // 创建目标目录（如果不存在）
+                            if (!string.IsNullOrEmpty(destinationDirectory) && !Directory.Exists(destinationDirectory))
                             {
-                                string destinationPath = Path.Combine(extractPath, entry.FullName);
-                                string destinationDirectory = Path.GetDirectoryName(destinationPath);
-
-                                if (!string.IsNullOrEmpty(destinationDirectory) && !Directory.Exists(destinationDirectory))
+                                Directory.CreateDirectory(destinationDirectory);
+                            }
+        
+                            // 跳过目录条目
+                            if (!string.IsNullOrEmpty(entry.Name))
+                            {
+                                // 解压文件，处理文件锁定情况
+                                int retryCount = 0;
+                                int maxRetries = 3;
+                                
+                                while (true)
                                 {
-                                    Directory.CreateDirectory(destinationDirectory);
-                                }
-
-                                // 跳过目录条目
-                                if (!string.IsNullOrEmpty(entry.Name))
-                                {
-                                    // 尝试多次解压文件，处理文件锁定情况
-                                    ExtractFileWithRetry(entry, destinationPath, 3);
+                                    try
+                                    {
+                                        entry.ExtractToFile(destinationPath, true);
+                                        break; // 成功则退出循环
+                                    }
+                                    catch (IOException ex) when (retryCount < maxRetries &&
+                                                                (ex.Message.Contains("because it is being used by another process") ||
+                                                                 ex.Message.Contains("already exists")))
+                                    {
+                                        retryCount++;
+                                        Thread.Sleep(1000);
+                                        Logger.Debug($"解压文件 {entry.FullName} 重试 ({retryCount}/{maxRetries})");
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        Logger.Error($"解压文件 {entry.FullName} 失败: {ex.Message}");
+                                        throw;
+                                    }
                                 }
                             }
                         }
-                    });
-
-                    // 处理需要上传文件拼接地址 
-                    var processedFiles = ProcessExtractedFiles(extractPath);
-                    Dictionary<string, string> uploadFiles = new Dictionary<string, string>();
-                    foreach (var file in processedFiles)
-                    {
-                        uploadFiles.Add(file.Key, uniqueFolderName + "/" + file.Value);
                     }
-
-                    string defaultUrl = "";
-                    foreach (var item in uploadFiles)
-                    {
-                        string url = await _minIOFileService.UploadAsync(item.Value, item.Key);
-
-                        if (item.Value.Contains("index.html"))
-                        {
-                            defaultUrl = url;
-                        }
-                    }
-
-                    return defaultUrl;
-                }
-                finally
+                });
+                Logger.Debug($"已解压文件 {uploadedFilePath} 到 {extractPath}");
+        
+                // 5. 处理解压后的文件并上传到MinIO
+                // 处理需要上传文件拼接地址
+                var processedFiles = new Dictionary<string, string>();
+                ProcessDirectory(extractPath, extractPath, processedFiles);
+        
+                Dictionary<string, string> uploadFiles = new Dictionary<string, string>();
+                foreach (var file in processedFiles)
                 {
-                    // 在finally块中确保清理临时文件，即使发生异常
+                    uploadFiles.Add(file.Key, uniqueFolderName + "/" + file.Value);
+                }
+        
+                // 6. 上传文件到MinIO
+                string defaultUrl = "";
+                int totalFiles = uploadFiles.Count;
+                int processedCount = 0;
+                
+                foreach (var item in uploadFiles)
+                {
+                    string url = await _minIOFileService.UploadAsync(item.Value, item.Key);
+                    processedCount++;
+                    
+                    // 记录上传进度
+                    Logger.Debug($"已上传文件 {processedCount}/{totalFiles}: {item.Value}");
+        
+                    // 如果是index.html文件，保存其URL作为返回值
+                    if (item.Value.Contains("index.html"))
+                    {
+                        defaultUrl = url;
+                        Logger.Debug($"找到主页文件: {item.Value}, URL: {url}");
+                    }
+                }
+        
+                Logger.Info($"Unity项目上传完成，共 {totalFiles} 个文件，主页URL: {defaultUrl}");
+                return defaultUrl;
+            }
+            catch (Exception ex)
+            {
+                // 记录详细错误信息
+                Logger.Error($"上传Unity项目失败: {ex.Message}", ex);
+                return $"上传Unity项目失败: {ex.Message}";
+            }
+            finally
+            {
+                // 7. 清理临时文件
+                if (!string.IsNullOrEmpty(zipTempPath) && Directory.Exists(zipTempPath))
+                {
                     try
                     {
                         // 等待一段时间，确保所有文件操作完成
                         await Task.Delay(500);
                         _tempFolderService.DeleteFiles(zipTempPath);
+                        Logger.Debug($"已清理临时文件: {zipTempPath}");
                     }
                     catch (Exception cleanupEx)
                     {
                         // 记录清理错误但不抛出
-                        Console.WriteLine($"清理临时文件时出错: {cleanupEx.Message}");
+                        Logger.Warn($"清理临时文件时出错: {cleanupEx.Message}");
                     }
                 }
             }
-            catch (Exception ex)
-            {
-                return ex.ToString();
-            }
         }
 
-        // 带重试的文件解压方法
-        private void ExtractFileWithRetry(ZipArchiveEntry entry, string destinationPath, int maxRetries)
-        {
-            int retryCount = 0;
-            while (true)
-            {
-                try
-                {
-                    // 尝试解压文件，覆盖已存在的文件
-                    entry.ExtractToFile(destinationPath, true);
-                    break; // 成功则退出循环
-                }
-                catch (IOException ex) when (retryCount < maxRetries &&
-                                            (ex.Message.Contains("because it is being used by another process") ||
-                                             ex.Message.Contains("already exists")))
-                {
-                    retryCount++;
-                    // 等待一段时间后重试
-                    Thread.Sleep(1000);
-                }
-                catch (Exception)
-                {
-                    // 其他异常直接抛出
-                    throw;
-                }
-            }
-        }
-
-        public static Dictionary<string, string> ProcessExtractedFiles(string rootPath)
-        {
-            var processedFiles = new Dictionary<string, string>();
-            ProcessDirectory(rootPath, rootPath, processedFiles);
-            return processedFiles;
-        }
-
+        /// <summary>
+        /// 递归处理目录中的文件
+        /// </summary>
+        /// <param name="currentDir">当前处理的目录</param>
+        /// <param name="rootPath">解压根目录</param>
+        /// <param name="processedFiles">结果字典</param>
         private static void ProcessDirectory(string currentDir, string rootPath, Dictionary<string, string> processedFiles)
         {
             try
@@ -337,14 +360,14 @@ namespace EasyIotSharp.Core.Services.Project.Impl
                 {
                     // 获取相对于根目录的路径
                     string relativePath = GetRelativePath(filePath, rootPath);
-
+        
                     // 获取拼接后的文件名（用下划线代替路径分隔符）
                     string prefixedFileName = relativePath.Replace(Path.DirectorySeparatorChar, '/');
-
+        
                     // 添加到结果字典
                     processedFiles.Add(filePath, prefixedFileName);
                 }
-
+        
                 // 递归处理子目录
                 foreach (string directory in Directory.GetDirectories(currentDir))
                 {
@@ -353,10 +376,16 @@ namespace EasyIotSharp.Core.Services.Project.Impl
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error processing directory {currentDir}: {ex.Message}");
+                Console.WriteLine($"处理目录 {currentDir} 时出错: {ex.Message}");
             }
         }
 
+        /// <summary>
+        /// 获取文件相对于根目录的路径
+        /// </summary>
+        /// <param name="fullPath">文件完整路径</param>
+        /// <param name="rootPath">根目录路径</param>
+        /// <returns>相对路径</returns>
         private static string GetRelativePath(string fullPath, string rootPath)
         {
             // 确保根路径以目录分隔符结尾
@@ -367,7 +396,7 @@ namespace EasyIotSharp.Core.Services.Project.Impl
 
             Uri fullUri = new Uri(fullPath);
             Uri rootUri = new Uri(rootPath);
-
+        
             // 获取相对路径并移除开头的目录分隔符
             string relativePath = Uri.UnescapeDataString(rootUri.MakeRelativeUri(fullUri).ToString())
                 .Replace('/', Path.DirectorySeparatorChar);
