@@ -1030,6 +1030,11 @@
             项目地址
             </summary>
         </member>
+        <member name="P:EasyIotSharp.Core.Domain.Proejct.ProjectBase.Unity">
+            <summary>
+            unity资源
+            </summary>
+        </member>
         <member name="P:EasyIotSharp.Core.Domain.Proejct.ProjectBase.Remark">
             <summary>
             项目描述
@@ -3109,6 +3114,11 @@
             项目地址
             </summary>
         </member>
+        <member name="P:EasyIotSharp.Core.Dto.Project.Params.InsertProjectBaseInput.Unity">
+            <summary>
+            unity资源
+            </summary>
+        </member>
         <member name="P:EasyIotSharp.Core.Dto.Project.Params.InsertProjectBaseInput.Remark">
             <summary>
             项目描述
@@ -3363,6 +3373,11 @@
             项目地址
             </summary>
         </member>
+        <member name="P:EasyIotSharp.Core.Dto.Project.Params.UpdateProjectBaseInput.Unity">
+            <summary>
+            unity资源
+            </summary>
+        </member>
         <member name="P:EasyIotSharp.Core.Dto.Project.Params.UpdateProjectBaseInput.Remark">
             <summary>
             项目描述
@@ -3468,6 +3483,11 @@
         <member name="P:EasyIotSharp.Core.Dto.Project.ProjectBaseDto.Address">
             <summary>
             项目地址
+            </summary>
+        </member>
+        <member name="P:EasyIotSharp.Core.Dto.Project.ProjectBaseDto.Unity">
+            <summary>
+            unity资源
             </summary>
         </member>
         <member name="P:EasyIotSharp.Core.Dto.Project.ProjectBaseDto.Remark">
