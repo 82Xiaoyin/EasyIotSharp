@@ -7368,16 +7368,35 @@
             临时文件夹应用绝对路径
             </summary>
         </member>
-        <member name="P:EasyIotSharp.Core.Services.IO.Impl.TempFolderService.GeneratePdfPath">
+        <member name="P:EasyIotSharp.Core.Services.IO.Impl.TempFolderService.ExportExcelPath">
             <summary>
-            临时文件夹生成Pdf的应用绝对路径
+            临时文件夹导出的Excel应用绝对路径
+            </summary>
+        </member>
+        <member name="P:EasyIotSharp.Core.Services.IO.Impl.TempFolderService.ZipPath">
+            <summary>
+            临时文件夹导出的Excel应用绝对路径
             </summary>
         </member>
         <member name="M:EasyIotSharp.Core.Services.IO.Impl.TempFolderService.GetFileWithPath(System.String)">
             <summary>
             通过临时文件夹路径获取绝对路径
             </summary>
-            <param name="ext">后缀名（如：.txt等）</param>
+            <param name="ext">后缀名（如：.txt）</param>
+            <returns></returns>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.IO.Impl.TempFolderService.GetFileWithExportExcelPath(System.String)">
+            <summary>
+            通过临时文件夹路径获取导出Excel的绝对路径
+            </summary>
+            <param name="ext">后缀名（如：.xlsx）</param>
+            <returns></returns>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.IO.Impl.TempFolderService.GetZipFolderPath(System.String)">
+            <summary>
+            获取zip文件夹的绝对路径
+            </summary>
+            <param name="extPath"></param>
             <returns></returns>
         </member>
         <member name="M:EasyIotSharp.Core.Services.IO.Impl.TempFolderService.DeleteFile(System.String)">
@@ -7387,14 +7406,20 @@
             <param name="fileName"></param>
             <returns></returns>
         </member>
+        <member name="M:EasyIotSharp.Core.Services.IO.Impl.TempFolderService.DeleteFiles(System.String)">
+            <summary>
+            删除文件夹以及下面的所有文件
+            </summary>
+            <param name="filePath"></param>
+        </member>
         <member name="P:EasyIotSharp.Core.Services.IO.ITempFolderService.Path">
             <summary>
             临时文件夹应用绝对路径
             </summary>
         </member>
-        <member name="P:EasyIotSharp.Core.Services.IO.ITempFolderService.GeneratePdfPath">
+        <member name="P:EasyIotSharp.Core.Services.IO.ITempFolderService.ExportExcelPath">
             <summary>
-             临时文件夹导出的Excel应用绝对路径
+            临时文件夹导出的Excel应用绝对路径
             </summary>
         </member>
         <member name="M:EasyIotSharp.Core.Services.IO.ITempFolderService.GetFileWithPath(System.String)">
@@ -7404,12 +7429,48 @@
             <param name="ext">后缀名（如：.txt）</param>
             <returns></returns>
         </member>
+        <member name="M:EasyIotSharp.Core.Services.IO.ITempFolderService.GetFileWithExportExcelPath(System.String)">
+            <summary>
+            通过临时文件夹路径获取导出Excel的绝对路径
+            </summary>
+            <param name="ext">后缀名（如：.xlsx）</param>
+            <returns></returns>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.IO.ITempFolderService.GetFileWithExportExcelPath(System.String,System.String)">
+            <summary>
+            通过临时文件夹路径获取导出Excel的绝对路径
+            </summary>
+            <param name="ext">后缀名（如：.xlsx）</param>
+            <param name="name">文件名称</param>
+            <returns></returns>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.IO.ITempFolderService.GetFileWithLogPath(System.String,System.String)">
+            <summary>
+            通过临时文件夹路径获取慢查询日志存储的绝对路径
+            </summary>
+            <param name="name">日志名称</param>
+            <param name="ext">后缀名（如：.log）</param>
+            <returns></returns>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.IO.ITempFolderService.GetZipFolderPath(System.String)">
+            <summary>
+            获取zip文件夹的绝对路径
+            </summary>
+            <param name="extPath"></param>
+            <returns></returns>
+        </member>
         <member name="M:EasyIotSharp.Core.Services.IO.ITempFolderService.DeleteFile(System.String)">
             <summary>
             从临时文件夹删除文件
             </summary>
             <param name="fileName"></param>
             <returns></returns>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.IO.ITempFolderService.DeleteFiles(System.String)">
+            <summary>
+            删除文件夹以及下面的所有的文件
+            </summary>
+            <param name="filePath"></param>
         </member>
         <member name="M:EasyIotSharp.Core.Services.Project.IClassificationService.GetClassification(System.String)">
             <summary>
@@ -7568,6 +7629,13 @@
             通过id删除一条项目信息
             </summary>
             <param name="input"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.Project.IProjectBaseService.UploadProjectUnity(Microsoft.AspNetCore.Http.IFormFile)">
+            <summary>
+            上传项目的unity素材，返回index.html地址
+            </summary>
+            <param name="formFile"></param>
             <returns></returns>
         </member>
         <member name="M:EasyIotSharp.Core.Services.Project.ISensorPointService.GetSensorPoint(System.String)">

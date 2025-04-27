@@ -109,9 +109,10 @@ namespace EasyIotSharp.Core.Services.IO.Impl
         /// </summary>
         /// <param name="fileName">文件名</param>
         /// <param name="filePath">文件路径</param>
-        public async Task UploadAsync(string fileName, string filePath)
+        public async Task<string> UploadAsync(string fileName, string filePath)
         {
             await UploadAsync(_bucketName, fileName, filePath);
+            return await GetFileUrlAsync(_bucketName, fileName);
         }
 
         /// <summary>

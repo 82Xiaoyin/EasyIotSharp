@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using EasyIotSharp.Core.Dto.Project;
 using UPrime.Services.Dto;
 using EasyIotSharp.Core.Dto.Project.Params;
+using Microsoft.AspNetCore.Http;
 
 namespace EasyIotSharp.Core.Services.Project
 {
@@ -51,5 +52,12 @@ namespace EasyIotSharp.Core.Services.Project
         /// <param name="input"></param>
         /// <returns></returns>
         Task DeleteProjectBase(DeleteProjectBaseInput input);
+
+        /// <summary>
+        /// 上传项目的unity素材，返回index.html地址
+        /// </summary>
+        /// <param name="formFile"></param>
+        /// <returns></returns>
+        Task<string> UploadProjectUnity(IFormFile formFile);
     }
 }
