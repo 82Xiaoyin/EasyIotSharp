@@ -17,6 +17,7 @@ namespace EasyIotSharp.Core.Caching
             public const string Queue = BASE + "Queue_";
             public const string Rule = BASE + "Rule_";
             public const string TenantAccount = BASE + "TenantAccount_";
+            public const string Gateways = BASE + "Gateways_";
         }
 
         /// <summary>

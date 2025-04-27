@@ -1,5 +1,10 @@
+using EasyIotSharp.Core.Caching.Gateways;
+using EasyIotSharp.Core.Caching.Gateways.Impl;
 using EasyIotSharp.Core.Domain.Proejct;
+using EasyIotSharp.Core.Dto.Gateways;
+using EasyIotSharp.Core.Events.Hardware;
 using EasyIotSharp.Core.Repositories.Project;
+using EasyIotSharp.Core.Services.Rule;
 using EasyIotSharp.GateWay.Core.Util;
 using System;
 using System.Collections.Concurrent;
@@ -8,107 +13,16 @@ using System.Linq;
 using System.Threading;
 using System.Transactions;
 using UPrime;
+using UPrime.Events.Bus;
 
 namespace EasyIotSharp.GateWay.Core.Socket
 {
-    /// <summary>
-    /// 网关连接信息
-    /// </summary>
-    public class GatewayConnectionInfo
-    {
-        /// <summary>
-        /// 连接ID
-        /// </summary>
-        public IntPtr ConnId { get; set; }
-
-        /// <summary>
-        /// 网关ID
-        /// </summary>
-        public string GatewayId { get; set; }
-
-        /// <summary>
-        /// 客户端IP
-        /// </summary>
-        public string IP { get; set; }
-
-        /// <summary>
-        /// 客户端端口
-        /// </summary>
-        public ushort Port { get; set; }
-
-        /// <summary>
-        /// 连接时间
-        /// </summary>
-        public DateTime ConnectTime { get; set; }
-
-        /// <summary>
-        /// 最后活动时间
-        /// </summary>
-        public DateTime LastActiveTime { get; set; }
-
-        /// <summary>
-        /// 接收的数据包数量
-        /// </summary>
-        public int ReceivedPackets { get; set; }
-
-        /// <summary>
-        /// 接收的总字节数
-        /// </summary>
-        public long ReceivedBytes { get; set; }
-
-        /// <summary>
-        /// 最近接收的数据(最多保存20条)
-        /// </summary>
-        public List<GatewayDataRecord> RecentData { get; set; } = new List<GatewayDataRecord>();
-
-        /// <summary>
-        /// 是否已注册(收到注册包)
-        /// </summary>
-        public bool IsRegistered { get; set; }
-
-        /// <summary>
-        /// 注册时间
-        /// </summary>
-        public DateTime? RegisterTime { get; set; }
-    }
-
-    /// <summary>
-    /// 网关数据记录
-    /// </summary>
-    public class GatewayDataRecord
-    {
-        /// <summary>
-        /// 接收时间
-        /// </summary>
-        public DateTime Time { get; set; }
-
-        /// <summary>
-        /// 数据内容(十六进制字符串)
-        /// </summary>
-        public string Data { get; set; }
-
-        /// <summary>
-        /// 数据长度
-        /// </summary>
-        public int Length { get; set; }
-
-        /// <summary>
-        /// 数据类型(如：注册包、心跳包、数据包等)
-        /// </summary>
-        public string DataType { get; set; }
-
-        /// <summary>
-        /// 解析结果
-        /// </summary>
-        public string ParsedResult { get; set; }
-    }
-
     /// <summary>
     /// 网关连接管理器
     /// </summary>
     public class GatewayConnectionManager
     {
-
+        private readonly IRegisteredGatewayCacheService _registeredGatewayCacheService;
         // 修改为懒加载单例模式
         private static volatile GatewayConnectionManager _instance;
         private static readonly object _lock = new object();
@@ -173,6 +87,7 @@ namespace EasyIotSharp.GateWay.Core.Socket
 
         public GatewayConnectionManager()
         {
+            _registeredGatewayCacheService = UPrime.UPrimeEngine.Instance.Resolve<IRegisteredGatewayCacheService>();
             _statusCheckTimer = new Timer(CheckGatewayStatus, null, STATUS_CHECK_INTERVAL, STATUS_CHECK_INTERVAL);
         }
 
@@ -338,6 +253,13 @@ namespace EasyIotSharp.GateWay.Core.Socket
                 if (connectionInfo.RecentData.Count > 20)
                 {
                     connectionInfo.RecentData.RemoveAt(0);
+                    // 修改这里，使用EventBus.Default来触发事件
+                    EventBus.Default.Trigger(new SensorBaseEventData());
+                }
+                var list = _registeredGatewayCacheService.GetAllRegisteredGateways(() => { return _connectionMap.Values.Where(c => c.IsRegistered).ToList(); });
+                if (list.Count == 0)
+                {
+                    list = _connectionMap.Values.Where(c => c.IsRegistered).ToList();
                 }
             }
         }
@@ -399,7 +321,12 @@ namespace EasyIotSharp.GateWay.Core.Socket
         /// </summary>
         public List<GatewayConnectionInfo> GetAllRegisteredGateways()
         {
-            return _connectionMap.Values.Where(c => c.IsRegistered).ToList();
+            var list = _registeredGatewayCacheService.GetAllRegisteredGateways(() => { return _connectionMap.Values.Where(c => c.IsRegistered).ToList(); });
+            if (list.Count == 0)
+            {
+                list = _connectionMap.Values.Where(c => c.IsRegistered).ToList();
+            }
+            return list;
         }
     }
 }

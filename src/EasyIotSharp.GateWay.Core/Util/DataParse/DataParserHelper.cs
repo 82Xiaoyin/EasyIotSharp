@@ -1,3 +1,4 @@
+using EasyIotSharp.Core.Dto.Gateways;
 using EasyIotSharp.Core.Repositories.Project;
 using EasyIotSharp.GateWay.Core.Model.AnalysisDTO;
 using EasyIotSharp.GateWay.Core.Services;
