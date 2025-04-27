@@ -19,6 +19,7 @@ using Microsoft.AspNetCore.Http;
 using System.IO;
 using System.IO.Compression;
 using EasyIotSharp.Core.Services.IO;
+using System.Threading;
 
 namespace EasyIotSharp.Core.Services.Project.Impl
 {
@@ -192,49 +193,132 @@ namespace EasyIotSharp.Core.Services.Project.Impl
 
         public async Task<string> UploadProjectUnity(IFormFile formFile)
         {
-            var fileExtension = Path.GetExtension(formFile.FileName).ToLower();
-            if (fileExtension != ".zip")
+            try
             {
-                throw new BizException(BizError.BIND_EXCEPTION_ERROR, "请上传.zip后缀的文件");
-            }
-            //获取临时压缩包文件夹目录
-            var zipTempPath = _tempFolderService.GetZipFolderPath("");
-
-            // 保存上传的文件
-            var uploadedFilePath = Path.Combine(zipTempPath, formFile.FileName);
-            using (var stream = new FileStream(uploadedFilePath, FileMode.Create))
-            {
-                await formFile.CopyToAsync(stream);
-            }
-            // 解压文件
-            var extractPath = Path.Combine(zipTempPath, formFile.FileName.Split(".")[0]);
-            Directory.CreateDirectory(extractPath);
-            ZipFile.ExtractToDirectory(uploadedFilePath, extractPath);
-
-            // 处理需要上传文件拼接地址
-            var processedFiles = ProcessExtractedFiles(extractPath);
-            Dictionary<string, string> uploadFiles = new Dictionary<string, string>();
-            foreach (var file in processedFiles)
-            {
-                uploadFiles.Add(file.Key, formFile.FileName.Split(".")[0] + "/" + file.Value);
-            }
-            string defaultUrl = "";
-            foreach (var item in uploadFiles)
-            {
-                string url=await _minIOFileService.UploadAsync(item.Value, item.Key);
-
-                if (item.Value.Contains("index.html"))
+                var fileExtension = Path.GetExtension(formFile.FileName).ToLower();
+                if (fileExtension != ".zip")
                 {
-                    defaultUrl = url;
+                    throw new BizException(BizError.BIND_EXCEPTION_ERROR, "请上传.zip后缀的文件");
+                }
+
+                // 获取临时压缩包文件夹目录 
+                var zipTempPath = _tempFolderService.GetZipFolderPath("");
+
+                // 生成唯一的文件夹名，避免冲突
+                string uniqueFolderName = Guid.NewGuid().ToString();
+                var extractPath = Path.Combine(zipTempPath, uniqueFolderName);
+
+                // 保存上传的文件 - 使用唯一文件名避免冲突
+                string uniqueFileName = $"{Path.GetFileNameWithoutExtension(formFile.FileName)}_{Guid.NewGuid()}.zip";
+                var uploadedFilePath = Path.Combine(zipTempPath, uniqueFileName);
+
+                try
+                {
+                    using (var stream = new FileStream(uploadedFilePath, FileMode.Create))
+                    {
+                        await formFile.CopyToAsync(stream);
+                    }
+
+                    // 确保目标目录存在且为空
+                    if (Directory.Exists(extractPath))
+                    {
+                        Directory.Delete(extractPath, true);
+                    }
+                    Directory.CreateDirectory(extractPath);
+
+                    // 手动解压文件，提供更好的错误处理
+                    await Task.Run(() => {
+                        using (ZipArchive archive = ZipFile.OpenRead(uploadedFilePath))
+                        {
+                            foreach (ZipArchiveEntry entry in archive.Entries)
+                            {
+                                string destinationPath = Path.Combine(extractPath, entry.FullName);
+                                string destinationDirectory = Path.GetDirectoryName(destinationPath);
+
+                                if (!string.IsNullOrEmpty(destinationDirectory) && !Directory.Exists(destinationDirectory))
+                                {
+                                    Directory.CreateDirectory(destinationDirectory);
+                                }
+
+                                // 跳过目录条目
+                                if (!string.IsNullOrEmpty(entry.Name))
+                                {
+                                    // 尝试多次解压文件，处理文件锁定情况
+                                    ExtractFileWithRetry(entry, destinationPath, 3);
+                                }
+                            }
+                        }
+                    });
+
+                    // 处理需要上传文件拼接地址 
+                    var processedFiles = ProcessExtractedFiles(extractPath);
+                    Dictionary<string, string> uploadFiles = new Dictionary<string, string>();
+                    foreach (var file in processedFiles)
+                    {
+                        uploadFiles.Add(file.Key, uniqueFolderName + "/" + file.Value);
+                    }
+
+                    string defaultUrl = "";
+                    foreach (var item in uploadFiles)
+                    {
+                        string url = await _minIOFileService.UploadAsync(item.Value, item.Key);
+
+                        if (item.Value.Contains("index.html"))
+                        {
+                            defaultUrl = url;
+                        }
+                    }
+
+                    return defaultUrl;
+                }
+                finally
+                {
+                    // 在finally块中确保清理临时文件，即使发生异常
+                    try
+                    {
+                        // 等待一段时间，确保所有文件操作完成
+                        await Task.Delay(500);
+                        _tempFolderService.DeleteFiles(zipTempPath);
+                    }
+                    catch (Exception cleanupEx)
+                    {
+                        // 记录清理错误但不抛出
+                        Console.WriteLine($"清理临时文件时出错: {cleanupEx.Message}");
+                    }
                 }
             }
-            #region 删除临时文件夹
+            catch (Exception ex)
+            {
+                return ex.ToString();
+            }
+        }
 
-            _tempFolderService.DeleteFiles(zipTempPath);
-
-            #endregion 删除临时文件夹
-
-            return defaultUrl;
+        // 带重试的文件解压方法
+        private void ExtractFileWithRetry(ZipArchiveEntry entry, string destinationPath, int maxRetries)
+        {
+            int retryCount = 0;
+            while (true)
+            {
+                try
+                {
+                    // 尝试解压文件，覆盖已存在的文件
+                    entry.ExtractToFile(destinationPath, true);
+                    break; // 成功则退出循环
+                }
+                catch (IOException ex) when (retryCount < maxRetries &&
+                                            (ex.Message.Contains("because it is being used by another process") ||
+                                             ex.Message.Contains("already exists")))
+                {
+                    retryCount++;
+                    // 等待一段时间后重试
+                    Thread.Sleep(1000);
+                }
+                catch (Exception)
+                {
+                    // 其他异常直接抛出
+                    throw;
+                }
+            }
         }
 
         public static Dictionary<string, string> ProcessExtractedFiles(string rootPath)

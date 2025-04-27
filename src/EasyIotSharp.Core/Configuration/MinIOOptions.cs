@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Configuration;
+using System.Collections.Generic;
 
 namespace EasyIotSharp.Core.Configuration
 {
@@ -23,6 +24,11 @@ namespace EasyIotSharp.Core.Configuration
         /// 文件存储的桶名称
         /// </summary>
         public string BucketName { get; set; }
+
+        public bool UseHttps { get; set; } = false;
+        public int UrlExpiryHours { get; set; } = 24;
+        public bool EnableFileTypeValidation { get; set; } = false;
+        public List<string> AllowedExtensions { get; set; }
 
         public static MinIOOptions ReadFromConfiguration(IConfiguration config)
         {

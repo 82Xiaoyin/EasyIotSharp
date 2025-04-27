@@ -7161,13 +7161,18 @@
             </summary>
             <returns>Bucket 列表</returns>
         </member>
-        <member name="M:EasyIotSharp.Core.Services.IO.Impl.MinIOFileService.UploadAsync(System.String,System.String,System.String)">
+        <member name="M:EasyIotSharp.Core.Services.IO.Impl.MinIOFileService.CoreUploadAsync(System.String,System.String,System.IO.Stream,System.String)">
             <summary>
-            文件上传
+            核心上传方法
             </summary>
-            <param name="bucketName">桶名</param>
-            <param name="fileName">文件名</param>
-            <param name="filePath">文件路径</param>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.IO.Impl.MinIOFileService.UploadAsync(System.String,System.String,System.String)">
+            <summary> 
+            文件上传 
+            </summary> 
+            <param name="bucketName">桶名</param> 
+            <param name="fileName">文件名</param> 
+            <param name="filePath">文件路径</param> 
         </member>
         <member name="M:EasyIotSharp.Core.Services.IO.Impl.MinIOFileService.UploadAsync(System.String,System.String)">
             <summary>
@@ -7207,6 +7212,16 @@
             </summary>
             <param name="file">文件</param>
             <returns>文件 URL 地址</returns>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.IO.Impl.MinIOFileService.UploadLargeFileAsync(System.String,System.IO.Stream,System.Int32)">
+            <summary>
+            大文件分片上传
+            </summary>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.IO.Impl.MinIOFileService.UploadLargeFileAsync(System.String,System.String,System.IO.Stream,System.Int32)">
+            <summary>
+            大文件分片上传
+            </summary>
         </member>
         <member name="M:EasyIotSharp.Core.Services.IO.Impl.MinIOFileService.DeleteFileAsync(System.String,System.String)">
             <summary>
@@ -7265,6 +7280,18 @@
             <param name="bucketName">桶名</param>
             <param name="fileName">文件名称</param>
             <returns>文件属性字典</returns>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.IO.Impl.MinIOFileService.GetContentType(System.String)">
+            <summary>
+            根据文件扩展名获取对应的 Content-Type
+            </summary>
+            <param name="extension">文件扩展名</param>
+            <returns>对应的 Content-Type</returns>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.IO.Impl.MinIOFileService.ValidateFileType(System.String)">
+            <summary>
+            验证文件类型是否允许
+            </summary>
         </member>
         <member name="P:EasyIotSharp.Core.Services.IO.Impl.TempFolderService.Path">
             <summary>
