@@ -143,6 +143,13 @@
         <member name="M:EasyIotSharp.Core.Caching.Extensions.Seconds(System.Int32)">
             <summary>按秒缓存时间</summary>
         </member>
+        <member name="M:EasyIotSharp.Core.Caching.Gateways.IRegisteredGatewayCacheService.GetAllRegisteredGateways(System.Func{System.Collections.Generic.List{EasyIotSharp.Core.Dto.Gateways.GatewayConnectionInfo}})">
+            <summary>
+            获取网关列表
+            </summary>
+            <param name="action"></param>
+            <returns></returns>
+        </member>
         <member name="M:EasyIotSharp.Core.Caching.Hardware.IProtocolCacheService.QueryProtocol(EasyIotSharp.Core.Dto.Hardware.Params.QueryProtocolInput,System.Func{System.Threading.Tasks.Task{UPrime.Services.Dto.PagedResultDto{EasyIotSharp.Core.Dto.Hardware.ProtocolDto}}})">
             <summary>
             获取协议列表
@@ -1653,6 +1660,96 @@
         <member name="P:EasyIotSharp.Core.Dto.DeleteInput.Id">
             <summary>
             对象id
+            </summary>
+        </member>
+        <member name="T:EasyIotSharp.Core.Dto.Gateways.GatewayConnectionInfo">
+            <summary>
+            网关连接信息
+            </summary>
+        </member>
+        <member name="P:EasyIotSharp.Core.Dto.Gateways.GatewayConnectionInfo.ConnId">
+            <summary>
+            连接ID
+            </summary>
+        </member>
+        <member name="P:EasyIotSharp.Core.Dto.Gateways.GatewayConnectionInfo.GatewayId">
+            <summary>
+            网关ID
+            </summary>
+        </member>
+        <member name="P:EasyIotSharp.Core.Dto.Gateways.GatewayConnectionInfo.IP">
+            <summary>
+            客户端IP
+            </summary>
+        </member>
+        <member name="P:EasyIotSharp.Core.Dto.Gateways.GatewayConnectionInfo.Port">
+            <summary>
+            客户端端口
+            </summary>
+        </member>
+        <member name="P:EasyIotSharp.Core.Dto.Gateways.GatewayConnectionInfo.ConnectTime">
+            <summary>
+            连接时间
+            </summary>
+        </member>
+        <member name="P:EasyIotSharp.Core.Dto.Gateways.GatewayConnectionInfo.LastActiveTime">
+            <summary>
+            最后活动时间
+            </summary>
+        </member>
+        <member name="P:EasyIotSharp.Core.Dto.Gateways.GatewayConnectionInfo.ReceivedPackets">
+            <summary>
+            接收的数据包数量
+            </summary>
+        </member>
+        <member name="P:EasyIotSharp.Core.Dto.Gateways.GatewayConnectionInfo.ReceivedBytes">
+            <summary>
+            接收的总字节数
+            </summary>
+        </member>
+        <member name="P:EasyIotSharp.Core.Dto.Gateways.GatewayConnectionInfo.RecentData">
+            <summary>
+            最近接收的数据(最多保存20条)
+            </summary>
+        </member>
+        <member name="P:EasyIotSharp.Core.Dto.Gateways.GatewayConnectionInfo.IsRegistered">
+            <summary>
+            是否已注册(收到注册包)
+            </summary>
+        </member>
+        <member name="P:EasyIotSharp.Core.Dto.Gateways.GatewayConnectionInfo.RegisterTime">
+            <summary>
+            注册时间
+            </summary>
+        </member>
+        <member name="T:EasyIotSharp.Core.Dto.Gateways.GatewayDataRecord">
+            <summary>
+            网关数据记录
+            </summary>
+        </member>
+        <member name="P:EasyIotSharp.Core.Dto.Gateways.GatewayDataRecord.Time">
+            <summary>
+            接收时间
+            </summary>
+        </member>
+        <member name="P:EasyIotSharp.Core.Dto.Gateways.GatewayDataRecord.Data">
+            <summary>
+            数据内容(十六进制字符串)
+            </summary>
+        </member>
+        <member name="P:EasyIotSharp.Core.Dto.Gateways.GatewayDataRecord.Length">
+            <summary>
+            数据长度
+            </summary>
+        </member>
+        <member name="P:EasyIotSharp.Core.Dto.Gateways.GatewayDataRecord.DataType">
+            <summary>
+            数据类型(如：注册包、心跳包、数据包等)
+            </summary>
+        </member>
+        <member name="P:EasyIotSharp.Core.Dto.Gateways.GatewayDataRecord.ParsedResult">
+            <summary>
+            解析结果
             </summary>
         </member>
         <member name="P:EasyIotSharp.Core.Dto.Hardware.Params.DataRespost.SensorId">

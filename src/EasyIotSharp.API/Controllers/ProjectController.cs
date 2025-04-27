@@ -1,4 +1,5 @@
 ﻿using EasyIotSharp.API.Filters;
+using EasyIotSharp.Core.Dto.Gateways;
 using EasyIotSharp.Core.Dto.Project;
 using EasyIotSharp.Core.Dto.Project.Params;
 using EasyIotSharp.Core.Services.Project;
