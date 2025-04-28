@@ -1100,9 +1100,9 @@
             项目地址
             </summary>
         </member>
-        <member name="P:EasyIotSharp.Core.Domain.Proejct.ProjectBase.Unity">
+        <member name="P:EasyIotSharp.Core.Domain.Proejct.ProjectBase.ResourceId">
             <summary>
-            unity资源
+            unity资源Id
             </summary>
         </member>
         <member name="P:EasyIotSharp.Core.Domain.Proejct.ProjectBase.Remark">
@@ -1757,19 +1757,24 @@
             double
             </summary>
         </member>
+        <member name="F:EasyIotSharp.Core.Dto.Enum.ResourceEnums.全部">
+            <summary>
+            string
+            </summary>
+        </member>
         <member name="T:EasyIotSharp.Core.Dto.File.FileDownloadDto">
             <summary>
-            文件下载数据传输对象
+            下载返回
             </summary>
         </member>
         <member name="P:EasyIotSharp.Core.Dto.File.FileDownloadDto.FileName">
             <summary>
-            文件名
+            名称
             </summary>
         </member>
         <member name="P:EasyIotSharp.Core.Dto.File.FileDownloadDto.ContentType">
             <summary>
-            内容类型
+            类型
             </summary>
         </member>
         <member name="P:EasyIotSharp.Core.Dto.File.FileDownloadDto.FileStream">
@@ -1779,7 +1784,7 @@
         </member>
         <member name="P:EasyIotSharp.Core.Dto.File.FileDownloadDto.FileSize">
             <summary>
-            文件大小（字节）
+            字节
             </summary>
         </member>
         <member name="T:EasyIotSharp.Core.Dto.File.Params.DownloadResourceInput">
@@ -3274,7 +3279,7 @@
             项目地址
             </summary>
         </member>
-        <member name="P:EasyIotSharp.Core.Dto.Project.Params.InsertProjectBaseInput.Unity">
+        <member name="P:EasyIotSharp.Core.Dto.Project.Params.InsertProjectBaseInput.ResourceId">
             <summary>
             unity资源
             </summary>
@@ -3533,9 +3538,9 @@
             项目地址
             </summary>
         </member>
-        <member name="P:EasyIotSharp.Core.Dto.Project.Params.UpdateProjectBaseInput.Unity">
+        <member name="P:EasyIotSharp.Core.Dto.Project.Params.UpdateProjectBaseInput.ResourceId">
             <summary>
-            unity资源
+            资源Id
             </summary>
         </member>
         <member name="P:EasyIotSharp.Core.Dto.Project.Params.UpdateProjectBaseInput.Remark">
@@ -3645,7 +3650,12 @@
             项目地址
             </summary>
         </member>
-        <member name="P:EasyIotSharp.Core.Dto.Project.ProjectBaseDto.Unity">
+        <member name="P:EasyIotSharp.Core.Dto.Project.ProjectBaseDto.ResourceId">
+            <summary>
+            资源Id
+            </summary>
+        </member>
+        <member name="P:EasyIotSharp.Core.Dto.Project.ProjectBaseDto.ResourceUrl">
             <summary>
             unity资源
             </summary>
@@ -7177,31 +7187,6 @@
             <param name="formFile"></param>
             <returns></returns>
             <exception cref="T:EasyIotSharp.Core.BizException"></exception>
-        </member>
-        <member name="M:EasyIotSharp.Core.Services.Files.Impl.ResourceService.SaveUploadedFileAsync(Microsoft.AspNetCore.Http.IFormFile,System.String)">
-            <summary>
-            保存上传的文件到临时目录
-            </summary>
-        </member>
-        <member name="M:EasyIotSharp.Core.Services.Files.Impl.ResourceService.ExtractZipFileAsync(System.String,System.String)">
-            <summary>
-            解压ZIP文件到指定目录
-            </summary>
-        </member>
-        <member name="M:EasyIotSharp.Core.Services.Files.Impl.ResourceService.DecodeZipEntryName(System.String)">
-            <summary>
-            尝试解码ZIP文件名
-            </summary>
-        </member>
-        <member name="M:EasyIotSharp.Core.Services.Files.Impl.ResourceService.UploadFilesToMinIOAsync(System.String,System.String)">
-            <summary>
-            处理并上传文件到MinIO
-            </summary>
-        </member>
-        <member name="M:EasyIotSharp.Core.Services.Files.Impl.ResourceService.CleanupTempFilesAsync(System.String)">
-            <summary>
-            清理临时文件
-            </summary>
         </member>
         <member name="M:EasyIotSharp.Core.Services.Files.IResourceService.QueryResources(EasyIotSharp.Core.Dto.File.Params.ResourceInput)">
             <summary>

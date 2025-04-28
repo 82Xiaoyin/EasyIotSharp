@@ -99,10 +99,10 @@ namespace EasyIotSharp.Core.Repositories.Project.Impl
         {
             var sql = Client.Queryable<ProjectBase>()
                  .LeftJoin<RabbitProject>((p, rp) => p.Id == rp.ProjectId && rp.IsDelete == false)
-                 .LeftJoin<RabbitServerInfo>((p, rp, rs, r) => rp.RabbitServerInfoId == rs.Id && rs.IsDelete == false)
-                 .Where((p, rp, rs, r) => p.IsDelete == false);
+                 .LeftJoin<RabbitServerInfo>((p, rp, rs) => rp.RabbitServerInfoId == rs.Id && rs.IsDelete == false)
+                 .Where((p, rp, rs) => p.IsDelete == false);
 
-            var items = await sql.Select((p, rp, rs, r) => new ProjectBaseDto
+            var items = await sql.Select((p, rp, rs) => new ProjectBaseDto
             {
                 Id = p.Id,
                 TenantNumId = p.TenantNumId,
