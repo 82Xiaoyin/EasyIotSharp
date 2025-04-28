@@ -7101,9 +7101,9 @@
         </member>
         <member name="M:EasyIotSharp.Core.Services.Files.Impl.ResourceService.UploadResponseInsert(EasyIotSharp.Core.Dto.File.Params.ResourceInsert)">
             <summary>
-            文件新增
+            资源新增
             </summary>
-            <param name="input">上传资源参数</param>
+            <param name="insert">上传资源参数</param>
             <returns>默认访问URL</returns>
         </member>
         <member name="M:EasyIotSharp.Core.Services.Files.Impl.ResourceService.UpdateResource(EasyIotSharp.Core.Dto.File.Params.UpdateResourceInput)">

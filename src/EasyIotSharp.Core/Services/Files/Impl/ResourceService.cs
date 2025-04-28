@@ -67,15 +67,15 @@ namespace EasyIotSharp.Core.Services.Files.Impl
             var resource = new Domain.Files.Resource
             {
                 Id = Guid.NewGuid().ToString().Replace("-", ""),
-                TenantId = ContextUser?.TenantId,
+                TenantId = ContextUser?.TenantId ?? Guid.NewGuid().ToString("N"),
                 Name = insert.Name,
                 Type = (int)insert.ResourceType,
                 Url = url,
                 State = true,
-                Remark = insert.Remark,
+                Remark = insert.Remark ?? "",
                 CreationTime = DateTime.Now,
-                OperatorId = ContextUser?.UserId,
-                OperatorName = ContextUser?.UserName
+                OperatorId = ContextUser?.UserId ?? "",
+                OperatorName = ContextUser?.UserName ?? ""
             };
 
             // 保存到数据库
@@ -104,7 +104,7 @@ namespace EasyIotSharp.Core.Services.Files.Impl
                     {
                         // 从URL中提取对象名称
                         var uri = new Uri(resource.Url);
-                        var pathSegments = uri.AbsolutePath.Split('/').Skip(1).ToArray(); // 跳过第一个空段
+                        var pathSegments = uri.AbsolutePath.Split('/').Skip(2).ToArray(); // 跳过第一个空段
 
                         if (pathSegments.Length >= 2)
                         {
@@ -162,7 +162,7 @@ namespace EasyIotSharp.Core.Services.Files.Impl
                 {
                     // 从URL中提取对象名称
                     var uri = new Uri(resource.Url);
-                    var pathSegments = uri.AbsolutePath.Split('/').Skip(1).ToArray(); // 跳过第一个空段
+                    var pathSegments = uri.AbsolutePath.Split('/').Skip(2).ToArray(); // 跳过第一个空段
 
                     if (pathSegments.Length >= 2)
                     {
@@ -219,7 +219,7 @@ namespace EasyIotSharp.Core.Services.Files.Impl
             try
             {
                 // 保存上传的文件
-                await SaveUploadedFileAsync(formFile, uploadedFilePath);
+                //await SaveUploadedFileAsync(formFile, uploadedFilePath);
 
                 // 解压文件
                 await ExtractZipFileAsync(uploadedFilePath, extractPath);
