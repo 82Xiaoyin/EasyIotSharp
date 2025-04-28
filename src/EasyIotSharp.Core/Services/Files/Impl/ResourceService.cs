@@ -18,6 +18,8 @@ using EasyIotSharp.Core.Dto;
 using Mysqlx.Crud;
 using SqlSugar;
 using EasyIotSharp.Core.Services.Project;
+using Minio.DataModel;
+using System.Security.AccessControl;
 
 namespace EasyIotSharp.Core.Services.Files.Impl
 {
@@ -326,244 +328,29 @@ namespace EasyIotSharp.Core.Services.Files.Impl
             string uniqueId = Guid.NewGuid().ToString();
             string uniqueFolderName = type.ToString() + "/" + uniqueId;
 
-            // 获取临时压缩包文件夹目录
-            var zipTempPath = _tempFolderService.GetZipFolderPath("");
-            var extractPath = Path.Combine(zipTempPath, uniqueFolderName);
-            var uploadedFilePath = Path.Combine(zipTempPath, $"{Path.GetFileNameWithoutExtension(formFile.FileName)}_{uniqueId}{fileExtension}");
+            string objectName = uniqueFolderName + "/" + formFile.FileName;
 
             try
             {
-                // 保存上传的文件
-                await SaveUploadedFileAsync(formFile, uploadedFilePath);
+                using(var stream = formFile.OpenReadStream())
+                {
+                    await _minIOFileService.UploadAsync(
+                        ContextUser?.TenantAbbreviation.ToLower() ?? "cs0001",
+                        objectName,
+                        stream);
+                }
 
-                // 处理并上传文件到MinIO
-                var url = await UploadFilesToMinIOAsync(extractPath, uniqueFolderName);
-                return url;
+                // 获取文件URL
+                return await _minIOFileService.GetFileUrlAsync(
+                    ContextUser?.TenantAbbreviation.ToLower() ?? "cs0001",
+                    objectName);
             }
             catch (Exception ex)
             {
                 Logger.Error($"上传文件处理失败: {ex.Message}", ex);
                 throw new BizException(BizError.BIND_EXCEPTION_ERROR, $"上传文件处理失败: {ex.Message}");
             }
-            finally
-            {
-                // 清理临时文件
-                await CleanupTempFilesAsync(zipTempPath);
-            }
         }
-
-        /// <summary>
-        /// 保存上传的文件到临时目录
-        /// </summary>
-        private async Task SaveUploadedFileAsync(IFormFile file, string filePath)
-        {
-            // 确保目录存在
-            Directory.CreateDirectory(Path.GetDirectoryName(filePath));
-
-            using (var stream = new FileStream(filePath, FileMode.Create))
-            {
-                await file.CopyToAsync(stream);
-            }
-        }
-
-        /// <summary>
-        /// 解压ZIP文件到指定目录
-        /// </summary>
-        private async Task ExtractZipFileAsync(string zipFilePath, string extractPath)
-        {
-            // 确保目标目录存在且为空
-            if (Directory.Exists(extractPath))
-            {
-                Directory.Delete(extractPath, true);
-            }
-            Directory.CreateDirectory(extractPath);
-
-            // 异步解压文件
-            await Task.Run(() =>
-            {
-                try
-                {
-                    // 读取zip文件的所有字节
-                    byte[] zipBytes = File.ReadAllBytes(zipFilePath);
-                    
-                    using (var memoryStream = new MemoryStream(zipBytes))
-                    using (var archive = new ZipArchive(memoryStream, ZipArchiveMode.Read))
-                    {
-                        foreach (ZipArchiveEntry entry in archive.Entries)
-                        {
-                            // 跳过目录条目
-                            if (string.IsNullOrEmpty(entry.Name))
-                                continue;
-
-                            // 尝试转换文件名编码
-                            string entryName = entry.FullName;
-                            string decodedName = DecodeZipEntryName(entryName);
-                            
-                            string destinationPath = Path.Combine(extractPath, decodedName);
-                            string destinationDirectory = Path.GetDirectoryName(destinationPath);
-
-                            // 创建目标目录（如果不存在）
-                            if (!string.IsNullOrEmpty(destinationDirectory) && !Directory.Exists(destinationDirectory))
-                            {
-                                Directory.CreateDirectory(destinationDirectory);
-                            }
-
-                            // 尝试解压文件，带重试机制
-                            ExtractFileWithRetry(entry, destinationPath, 3);
-                        }
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Logger.Error($"解压ZIP文件时发生错误: {ex.Message}", ex);
-                    throw new BizException(BizError.BIND_EXCEPTION_ERROR, $"解压ZIP文件时发生错误: {ex.Message}");
-                }
-            });
-        }
-
-        /// <summary>
-        /// 尝试解码ZIP文件名
-        /// </summary>
-        private string DecodeZipEntryName(string entryName)
-        {
-            // 尝试不同的编码方式
-            var encodings = new[] 
-            { 
-                Encoding.GetEncoding("GB18030"),  // GB18030 包含了 GB2312 和 GBK
-                Encoding.GetEncoding("GB2312"),
-                Encoding.GetEncoding("GBK"),
-                Encoding.UTF8,
-                Encoding.Default
-            };
-
-            byte[] entryBytes = Encoding.Default.GetBytes(entryName);
-            
-            foreach (var encoding in encodings)
-            {
-                try
-                {
-                    string decoded = encoding.GetString(entryBytes);
-                    // 检查解码后的字符串是否包含乱码字符
-                    if (!decoded.Contains("?") && !decoded.Contains("�"))
-                    {
-                        return decoded;
-                    }
-                }
-                catch
-                {
-                    continue;
-                }
-            }
-
-            // 如果所有编码都失败，返回原始名称
-            return entryName;
-        }
-
-        /// <summary>
-        /// 处理并上传文件到MinIO
-        /// </summary>
-        private async Task<string> UploadFilesToMinIOAsync(string extractPath, string uniqueFolderName)
-        {
-            // 处理提取的文件
-            var processedFiles = ProcessExtractedFiles(extractPath);
-
-            // 准备上传文件映射
-            var uploadFiles = processedFiles.ToDictionary(
-                kvp => kvp.Key,
-                kvp => uniqueFolderName + "/" + kvp.Value
-            );
-
-            string defaultUrl = "";
-            var uploadTasks = new List<Task<(string path, string url)>>();
-
-            // 并行上传文件以提高性能
-            foreach (var item in uploadFiles)
-            {
-                var task = Task.Run(async () =>
-                {
-                    await _minIOFileService.UploadAsync(ContextUser?.TenantAbbreviation.ToLower() ?? "cs0001", item.Value, item.Key);
-                    string url = await _minIOFileService.GetFileUrlAsync(ContextUser?.TenantAbbreviation.ToLower() ?? "cs0001", item.Value);
-
-                    return (item.Value, url);
-                });
-                uploadTasks.Add(task);
-            }
-
-            // 等待所有上传任务完成
-            var results = await Task.WhenAll(uploadTasks);
-
-            // 查找index.html作为默认URL
-            foreach (var result in results)
-            {
-                if (result.path.Contains("index.html"))
-                {
-                    defaultUrl = result.url;
-                    break;
-                }
-            }
-
-            // 如果没有找到index.html，使用第一个文件的URL作为默认URL
-            if (string.IsNullOrEmpty(defaultUrl) && results.Length > 0)
-            {
-                defaultUrl = results[0].url;
-            }
-
-            return defaultUrl;
-        }
-
-        /// <summary>
-        /// 清理临时文件
-        /// </summary>
-        private async Task CleanupTempFilesAsync(string tempPath)
-        {
-            try
-            {
-                // 等待一段时间，确保所有文件操作完成
-                await Task.Delay(500);
-                _tempFolderService.DeleteFiles(tempPath);
-            }
-            catch (Exception ex)
-            {
-                // 记录清理错误但不抛出
-                Logger.Warn($"清理临时文件时出错: {ex.Message}");
-            }
-        }
-
-        // 带重试的文件解压方法
-        private void ExtractFileWithRetry(ZipArchiveEntry entry, string destinationPath, int maxRetries)
-        {
-            int retryCount = 0;
-            while (true)
-            {
-                try
-                {
-                    // 尝试解压文件，覆盖已存在的文件
-                    entry.ExtractToFile(destinationPath, true);
-                    break; // 成功则退出循环
-                }
-                catch (IOException ex) when (retryCount < maxRetries &&
-                                            (ex.Message.Contains("because it is being used by another process") ||
-                                             ex.Message.Contains("already exists")))
-                {
-                    retryCount++;
-                    // 等待一段时间后重试
-                    Thread.Sleep(1000);
-                }
-                catch (Exception)
-                {
-                    // 其他异常直接抛出
-                    throw;
-                }
-            }
-        }
-
-        public static Dictionary<string, string> ProcessExtractedFiles(string rootPath)
-        {
-            var processedFiles = new Dictionary<string, string>();
-            ProcessDirectory(rootPath, rootPath, processedFiles);
-            return processedFiles;
-        }
-
         private static void ProcessDirectory(string currentDir, string rootPath, Dictionary<string, string> processedFiles)
         {
             try
