@@ -681,6 +681,76 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="T:EasyIotSharp.Core.Domain.Export.ExportRecord">
+            <summary>
+            导出记录
+            </summary>
+        </member>
+        <member name="P:EasyIotSharp.Core.Domain.Export.ExportRecord.Name">
+            <summary>
+            名称
+            </summary>
+        </member>
+        <member name="P:EasyIotSharp.Core.Domain.Export.ExportRecord.TenantId">
+            <summary>
+            租户Id
+            </summary>
+        </member>
+        <member name="P:EasyIotSharp.Core.Domain.Export.ExportRecord.ProjectId">
+            <summary>
+            项目Id
+            </summary>
+        </member>
+        <member name="P:EasyIotSharp.Core.Domain.Export.ExportRecord.ConditionJson">
+            <summary>
+            Json条件
+            </summary>
+        </member>
+        <member name="P:EasyIotSharp.Core.Domain.Export.ExportRecord.ExecuteTime">
+            <summary>
+            执行时间
+            </summary>
+        </member>
+        <member name="P:EasyIotSharp.Core.Domain.Export.ExportRecord.State">
+            <summary>
+            状态
+            </summary>
+        </member>
+        <member name="T:EasyIotSharp.Core.Domain.Files.Resource">
+            <summary>
+            资源表
+            </summary>
+        </member>
+        <member name="P:EasyIotSharp.Core.Domain.Files.Resource.TenantId">
+            <summary>
+            租户Id
+            </summary>
+        </member>
+        <member name="P:EasyIotSharp.Core.Domain.Files.Resource.Name">
+            <summary>
+            资源名称
+            </summary>
+        </member>
+        <member name="P:EasyIotSharp.Core.Domain.Files.Resource.Url">
+            <summary>
+            路由
+            </summary>
+        </member>
+        <member name="P:EasyIotSharp.Core.Domain.Files.Resource.State">
+            <summary>
+            状态
+            </summary>
+        </member>
+        <member name="P:EasyIotSharp.Core.Domain.Files.Resource.Type">
+            <summary>
+            类型
+            </summary>
+        </member>
+        <member name="P:EasyIotSharp.Core.Domain.Files.Resource.Remark">
+            <summary>
+            描述
+            </summary>
+        </member>
         <member name="T:EasyIotSharp.Core.Domain.Hardware.Protocol">
             <summary>
             协议表
@@ -1667,6 +1737,56 @@
             对象id
             </summary>
         </member>
+        <member name="T:EasyIotSharp.Core.Dto.Enum.ResourceEnums">
+            <summary>
+            资源枚举
+            </summary>
+        </member>
+        <member name="F:EasyIotSharp.Core.Dto.Enum.ResourceEnums.File">
+            <summary>
+            string
+            </summary>
+        </member>
+        <member name="F:EasyIotSharp.Core.Dto.Enum.ResourceEnums.Image">
+            <summary>
+            int
+            </summary>
+        </member>
+        <member name="F:EasyIotSharp.Core.Dto.Enum.ResourceEnums.Unity">
+            <summary>
+            double
+            </summary>
+        </member>
+        <member name="P:EasyIotSharp.Core.Dto.File.Params.ResourceInput.State">
+            <summary>
+            状态
+            </summary>
+        </member>
+        <member name="P:EasyIotSharp.Core.Dto.File.Params.ResourceInsert.Name">
+            <summary>
+            名称
+            </summary>
+        </member>
+        <member name="P:EasyIotSharp.Core.Dto.File.Params.ResourceInsert.ResourceType">
+            <summary>
+            文件类型
+            </summary>
+        </member>
+        <member name="P:EasyIotSharp.Core.Dto.File.Params.ResourceInsert.Remark">
+            <summary>
+            描述
+            </summary>
+        </member>
+        <member name="P:EasyIotSharp.Core.Dto.File.Params.ResourceInsert.FormFile">
+            <summary>
+            文件流
+            </summary>
+        </member>
+        <member name="P:EasyIotSharp.Core.Dto.File.Params.UpdateResourceInput.FormFile">
+            <summary>
+            文件流
+            </summary>
+        </member>
         <member name="T:EasyIotSharp.Core.Dto.Gateways.GatewayConnectionInfo">
             <summary>
             网关连接信息
@@ -1765,6 +1885,11 @@
         <member name="P:EasyIotSharp.Core.Dto.Hardware.Params.DataRespost.SensorPointId">
             <summary>
             测点Id
+            </summary>
+        </member>
+        <member name="P:EasyIotSharp.Core.Dto.Hardware.Params.DataRespost.SensorQuotaId">
+            <summary>
+            
             </summary>
         </member>
         <member name="P:EasyIotSharp.Core.Dto.Hardware.Params.DataRespost.ProjectId">
@@ -5546,6 +5671,11 @@
             <param name="expireMinutes">过期时间（分钟）默认七天</param>
             <returns>生成的 Token</returns>
         </member>
+        <member name="T:EasyIotSharp.Core.Extensions.ZipHelper">
+            <summary>
+            导出zip文件拓展类
+            </summary>
+        </member>
         <member name="T:EasyIotSharp.Core.GlobalConsts">
             <summary>
             全局的常量
@@ -5901,6 +6031,34 @@
             <summary>
             true or false
             </summary>
+        </member>
+        <member name="M:EasyIotSharp.Core.Repositories.Export.IExportRecordRepository.QueryExportRecord">
+            <summary>
+            获取未执行的导出任务
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:EasyIotSharp.Core.Repositories.Files.Impl.ResourceRepository.Query(System.Nullable{System.Boolean},EasyIotSharp.Core.Dto.Enum.ResourceEnums,System.Int32,System.Int32,System.Boolean)">
+            <summary>
+            资源列表查询
+            </summary>
+            <param name="State"></param>
+            <param name="ResourceEnum"></param>
+            <param name="pageIndex"></param>
+            <param name="pageSize"></param>
+            <param name="isPage"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EasyIotSharp.Core.Repositories.Files.IResourceRepository.Query(System.Nullable{System.Boolean},EasyIotSharp.Core.Dto.Enum.ResourceEnums,System.Int32,System.Int32,System.Boolean)">
+            <summary>
+            资源表查询
+            </summary>
+            <param name="State"></param>
+            <param name="ResourceEnum"></param>
+            <param name="pageIndex"></param>
+            <param name="pageSize"></param>
+            <param name="isPage"></param>
+            <returns></returns>
         </member>
         <member name="M:EasyIotSharp.Core.Repositories.Hardware.Impl.SensorQuotaRepository.GetSensorQuotaList(System.String)">
             <summary>
@@ -6934,6 +7092,92 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="M:EasyIotSharp.Core.Services.Files.Impl.ResourceService.QueryResources(EasyIotSharp.Core.Dto.File.Params.ResourceInput)">
+            <summary>
+            查询资源列表
+            </summary>
+            <param name="input">查询参数</param>
+            <returns>分页结果</returns>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.Files.Impl.ResourceService.UploadResponseInsert(EasyIotSharp.Core.Dto.File.Params.ResourceInsert)">
+            <summary>
+            文件新增
+            </summary>
+            <param name="input">上传资源参数</param>
+            <returns>默认访问URL</returns>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.Files.Impl.ResourceService.UpdateResource(EasyIotSharp.Core.Dto.File.Params.UpdateResourceInput)">
+            <summary>
+            修改资源信息
+            </summary>
+            <param name="input">资源信息</param>
+            <returns>是否成功</returns>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.Files.Impl.ResourceService.DeleteResource(EasyIotSharp.Core.Dto.DeleteInput)">
+            <summary>
+            删除资源
+            </summary>
+            <param name="id">资源ID</param>
+            <returns>是否成功</returns>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.Files.Impl.ResourceService.UploadResponse(System.String,EasyIotSharp.Core.Dto.Enum.ResourceEnums,Microsoft.AspNetCore.Http.IFormFile)">
+            <summary>
+            上传文件
+            </summary>
+            <param name="name"></param>
+            <param name="type"></param>
+            <param name="formFile"></param>
+            <returns></returns>
+            <exception cref="T:EasyIotSharp.Core.BizException"></exception>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.Files.Impl.ResourceService.SaveUploadedFileAsync(Microsoft.AspNetCore.Http.IFormFile,System.String)">
+            <summary>
+            保存上传的文件到临时目录
+            </summary>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.Files.Impl.ResourceService.ExtractZipFileAsync(System.String,System.String)">
+            <summary>
+            解压ZIP文件到指定目录
+            </summary>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.Files.Impl.ResourceService.UploadFilesToMinIOAsync(System.String,System.String)">
+            <summary>
+            处理并上传文件到MinIO
+            </summary>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.Files.Impl.ResourceService.CleanupTempFilesAsync(System.String)">
+            <summary>
+            清理临时文件
+            </summary>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.Files.IResourceService.QueryResources(EasyIotSharp.Core.Dto.File.Params.ResourceInput)">
+            <summary>
+            资源列表查询
+            </summary>
+            <param name="input"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.Files.IResourceService.UploadResponseInsert(EasyIotSharp.Core.Dto.File.Params.ResourceInsert)">
+            <summary>
+            资源文件上传
+            </summary>
+            <param name="input"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.Files.IResourceService.UpdateResource(EasyIotSharp.Core.Dto.File.Params.UpdateResourceInput)">
+            <summary>
+            修改资源
+            </summary>
+            <param name="input"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.Files.IResourceService.DeleteResource(EasyIotSharp.Core.Dto.DeleteInput)">
+            <summary>
+            删除资源
+            </summary>
+            <param name="input"></param>
+            <returns></returns>
+        </member>
         <member name="M:EasyIotSharp.Core.Services.Hardware.Impl.SensorQuotaService.QuerySensorQuota(EasyIotSharp.Core.Dto.Hardware.Params.QuerySensorQuotaInput)">
             <summary>
             传感器指标列表
@@ -7623,6 +7867,29 @@
             </summary>
             <param name="input"></param>
             <returns></returns>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.Project.Impl.ProjectBaseService.UploadProjectUnity(Microsoft.AspNetCore.Http.IFormFile)">
+            <summary>
+            上传Unity项目压缩包并部署到MinIO
+            </summary>
+            <param name="formFile">上传的Unity项目压缩文件</param>
+            <returns>部署后的访问URL</returns>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.Project.Impl.ProjectBaseService.ProcessDirectory(System.String,System.String,System.Collections.Generic.Dictionary{System.String,System.String})">
+            <summary>
+            递归处理目录中的文件
+            </summary>
+            <param name="currentDir">当前处理的目录</param>
+            <param name="rootPath">解压根目录</param>
+            <param name="processedFiles">结果字典</param>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.Project.Impl.ProjectBaseService.GetRelativePath(System.String,System.String)">
+            <summary>
+            获取文件相对于根目录的路径
+            </summary>
+            <param name="fullPath">文件完整路径</param>
+            <param name="rootPath">根目录路径</param>
+            <returns>相对路径</returns>
         </member>
         <member name="M:EasyIotSharp.Core.Services.Project.Impl.SensorPointService.QuerySensorPointChart(EasyIotSharp.Core.Dto.Project.Params.ChartInput)">
             <summary>

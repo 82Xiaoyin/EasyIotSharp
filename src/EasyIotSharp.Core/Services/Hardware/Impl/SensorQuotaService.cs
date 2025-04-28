@@ -11,6 +11,7 @@ using EasyIotSharp.Core.Dto.Hardware.Params;
 using EasyIotSharp.Core.Events.Hardware;
 using EasyIotSharp.Core.Repositories.Hardware;
 using EasyIotSharp.Core.Repositories.Influxdb;
+using Minio.DataModel;
 using SqlSugar;
 using UPrime.AutoMapper;
 using UPrime.Services.Dto;
@@ -275,16 +276,33 @@ namespace EasyIotSharp.Core.Services.Hardware.Impl
                 var sqlBuilder = new StringBuilder("select ");
 
                 // 添加指标信息到结果并构建查询字段
-                foreach (var item in sensorQuotaList.Where(x=>x.IsShow==true))
+                if (!string.IsNullOrEmpty(dataRespost.SensorQuotaId))
                 {
-                    result.Quotas.Add(new Quotas
+                    var sensorQuota = sensorQuotaList.Where(x => x.IsShow == true && x.Id == dataRespost.SensorQuotaId).FirstOrDefault();
+                    if (sensorQuota != null)
                     {
-                        Name = item.Name,
-                        Unit = item.Unit,
-                        IsShow = item.IsShow
-                    });
+                        result.Quotas.Add(new Quotas
+                        {
+                            Name = sensorQuota.Name,
+                            Unit = sensorQuota.Unit,
+                            IsShow = sensorQuota.IsShow
+                        });
+                    }
+                    sqlBuilder.Append(sensorQuota.Identifier).Append(',');
+                }
+                else
+                {
+                    foreach (var item in sensorQuotaList.Where(x => x.IsShow == true))
+                    {
+                        result.Quotas.Add(new Quotas
+                        {
+                            Name = item.Name,
+                            Unit = item.Unit,
+                            IsShow = item.IsShow
+                        });
 
-                    sqlBuilder.Append(item.Identifier).Append(',');
+                        sqlBuilder.Append(item.Identifier).Append(',');
+                    }
                 }
 
                 // 移除最后一个逗号

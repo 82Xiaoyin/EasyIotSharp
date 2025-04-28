@@ -140,7 +140,7 @@ namespace EasyIotSharp.Core.Services.IO.Impl
                             File.Delete(path);
                         else
                         {
-                            path = ZipPath+ "\\" + fileName;
+                            path = ZipPath + "\\" + fileName;
                         }
                     }
                 }

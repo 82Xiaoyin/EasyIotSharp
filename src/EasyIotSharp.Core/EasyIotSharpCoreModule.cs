@@ -34,6 +34,10 @@ using EasyIotSharp.Core.Services.Rule;
 using EasyIotSharp.Core.Domain.Rule;
 using EasyIotSharp.Core.Services.Queue;
 using EasyIotSharp.Core.Services.Queue.Impl;
+using EasyIotSharp.Core.Repositories.Export;
+using EasyIotSharp.Core.Repositories.Files;
+using EasyIotSharp.Core.Repositories.Files.Impl;
+using EasyIotSharp.Core.Repositories.Export.Impl;
 
 namespace EasyIotSharp.Core
 {
@@ -101,6 +105,9 @@ namespace EasyIotSharp.Core
             IocManager.Register<INotifyRepository, NotifyRepository>();
             IocManager.Register<IRuleChainRepository, RuleChainRepository>();
             IocManager.Register<ISceneManagementRepository, SceneManagementRepository>();
+
+            IocManager.Register<IExportRecordRepository, ExportRecordRepository>();
+            IocManager.Register<IResourceRepository, ResourceRepository>();
         }
 
         /// <summary>

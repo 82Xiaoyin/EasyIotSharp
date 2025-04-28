@@ -72,6 +72,34 @@
             <param name="input"></param>
             <returns></returns>
         </member>
+        <member name="M:EasyIotSharp.API.Controllers.FileController.QueryResources(EasyIotSharp.Core.Dto.File.Params.ResourceInput)">
+            <summary>
+            通过id获取一条项目信息
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EasyIotSharp.API.Controllers.FileController.UploadResponseInsert(EasyIotSharp.Core.Dto.File.Params.ResourceInsert)">
+            <summary>
+            文件上传
+            </summary>
+            <param name="input"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EasyIotSharp.API.Controllers.FileController.UpdateResource(EasyIotSharp.Core.Dto.File.Params.UpdateResourceInput)">
+            <summary>
+            文件修改
+            </summary>
+            <param name="input"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EasyIotSharp.API.Controllers.FileController.DeleteResource(EasyIotSharp.Core.Dto.DeleteInput)">
+            <summary>
+            文件上传
+            </summary>
+            <param name="input"></param>
+            <returns></returns>
+        </member>
         <member name="M:EasyIotSharp.API.Controllers.HardwareController.GetProtocol(System.String)">
             <summary>
             通过id获取一条协议信息
