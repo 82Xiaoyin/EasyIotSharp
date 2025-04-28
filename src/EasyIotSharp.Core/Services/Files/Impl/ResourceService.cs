@@ -227,7 +227,7 @@ namespace EasyIotSharp.Core.Services.Files.Impl
                     throw new BizException(BizError.BIND_EXCEPTION_ERROR, "无效的资源URL");
                 }
 
-                string bucketName = ContextUser?.TenantAbbreviation.ToLower() ?? "cs0001";
+                string bucketName = ContextUser?.TenantAbbreviation.ToLower();
                 string objectName = string.Join("/", pathSegments);
 
                 // 获取文件流
