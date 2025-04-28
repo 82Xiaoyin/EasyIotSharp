@@ -55,29 +55,43 @@ namespace EasyIotSharp.API.Controllers
         /// <summary>
         /// 资源修改
         /// </summary>
-        /// <param name="insert"></param>
+        /// <param name="input"></param>
         /// <returns></returns>
         [HttpPost("/File/Resource/Update")]
         [Authorize]
-        public async Task<UPrimeResponse<string>> UpdateResource(UpdateResourceInput insert)
+        public async Task<UPrimeResponse<string>> UpdateResource(UpdateResourceInput input)
         {
             UPrimeResponse<string> res = new UPrimeResponse<string>();
-            res.Result = await _resourceService.UpdateResource(insert);
+            res.Result = await _resourceService.UpdateResource(input);
             return res;
         }
 
         /// <summary>
         /// 资源删除
         /// </summary>
-        /// <param name="insert"></param>
+        /// <param name="input"></param>
         /// <returns></returns>
         [HttpPost("/File/Resource/Delete")]
         [Authorize]
-        public async Task<UPrimeResponse<string>> DeleteResource([FromBody] DeleteInput insert)
+        public async Task<UPrimeResponse<string>> DeleteResource([FromBody] DeleteInput input)
         {
             UPrimeResponse<string> res = new UPrimeResponse<string>();
-            res.Result = await _resourceService.DeleteResource(insert);
+            res.Result = await _resourceService.DeleteResource(input);
             return res;
+        }
+
+
+        /// <summary>
+        /// 资源删除
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
+        [HttpPost("/File/Resource/Download")]
+        //[Authorize]
+        public async Task<IActionResult> DownloadFile([FromQuery] DownloadResourceInput input)
+        {
+            var result = await _resourceService.DownloadResource(input);
+            return File(result.FileStream, result.ContentType, result.FileName);
         }
     }
 }
