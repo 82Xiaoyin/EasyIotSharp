@@ -27,7 +27,7 @@ namespace EasyIotSharp.API.Controllers
         /// <summary>
         /// 资源列表
         /// </summary>
-        /// <param name="id"></param>
+        /// <param name="input"></param>
         /// <returns></returns>
         [HttpPost("/File/Resource/Query")]
         [Authorize]
@@ -41,7 +41,7 @@ namespace EasyIotSharp.API.Controllers
         /// <summary>
         /// 资源上传
         /// </summary>
-        /// <param name="input"></param>
+        /// <param name="insert"></param>
         /// <returns></returns>
         [HttpPost("/File/Resource/Upload")]
         [Authorize]
@@ -55,7 +55,7 @@ namespace EasyIotSharp.API.Controllers
         /// <summary>
         /// 资源修改
         /// </summary>
-        /// <param name="input"></param>
+        /// <param name="insert"></param>
         /// <returns></returns>
         [HttpPost("/File/Resource/Update")]
         [Authorize]
@@ -69,7 +69,7 @@ namespace EasyIotSharp.API.Controllers
         /// <summary>
         /// 资源删除
         /// </summary>
-        /// <param name="input"></param>
+        /// <param name="insert"></param>
         /// <returns></returns>
         [HttpPost("/File/Resource/Delete")]
         [Authorize]
