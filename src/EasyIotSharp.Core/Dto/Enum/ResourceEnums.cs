@@ -14,7 +14,7 @@ namespace EasyIotSharp.Core.Dto.Enum
         /// string
         /// </summary>
         [EnumAlias("File")]
-        File = 1,
+        File = 3,
 
         /// <summary>
         /// int
@@ -26,6 +26,6 @@ namespace EasyIotSharp.Core.Dto.Enum
         /// double
         /// </summary>
         [EnumAlias("Unity")]
-        Unity = 3,
+        Unity = 1,
     }
 }
