@@ -43,7 +43,7 @@ namespace EasyIotSharp.API.Controllers
         /// </summary>
         /// <param name="insert"></param>
         /// <returns></returns>
-        [HttpPost("/File/Resource/Upload")]
+        [HttpPost("/File/Resource/Insert")]
         [Authorize]
         public async Task<UPrimeResponse<string>> UploadResponseInsert(ResourceInsert insert)
         {
@@ -80,14 +80,13 @@ namespace EasyIotSharp.API.Controllers
             return res;
         }
 
-
         /// <summary>
-        /// 资源删除
+        /// 资源下载
         /// </summary>
         /// <param name="input"></param>
         /// <returns></returns>
         [HttpPost("/File/Resource/Download")]
-        //[Authorize]
+        [Authorize]
         public async Task<IActionResult> DownloadFile([FromQuery] DownloadResourceInput input)
         {
             var result = await _resourceService.DownloadResource(input);

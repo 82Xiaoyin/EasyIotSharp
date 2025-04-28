@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using SqlSugar;
 
 namespace EasyIotSharp.Core.Domain.Files
 {
@@ -22,6 +23,7 @@ namespace EasyIotSharp.Core.Domain.Files
         /// <summary>
         /// 路由
         /// </summary>
+        [SugarColumn(ColumnDataType = "TEXT")]
         public string Url { get; set; }
 
         /// <summary>
@@ -37,6 +39,7 @@ namespace EasyIotSharp.Core.Domain.Files
         /// <summary>
         /// 描述
         /// </summary>
+        [SugarColumn(ColumnDataType = "TEXT")]
         public string Remark { get; set; }
     }
 }

@@ -102,7 +102,7 @@
         </member>
         <member name="M:EasyIotSharp.API.Controllers.FileController.DownloadFile(EasyIotSharp.Core.Dto.File.Params.DownloadResourceInput)">
             <summary>
-            资源删除
+            资源下载
             </summary>
             <param name="input"></param>
             <returns></returns>
