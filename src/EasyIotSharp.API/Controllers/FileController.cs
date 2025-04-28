@@ -25,7 +25,7 @@ namespace EasyIotSharp.API.Controllers
         }
 
         /// <summary>
-        /// 通过id获取一条项目信息
+        /// 资源列表
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
@@ -39,11 +39,11 @@ namespace EasyIotSharp.API.Controllers
         }
 
         /// <summary>
-        /// 文件上传
+        /// 资源上传
         /// </summary>
         /// <param name="input"></param>
         /// <returns></returns>
-        [HttpPost("/File/Resource/Upload")]
+        [HttpPost("/File/Resource/Insert")]
         //[Authorize]
         public async Task<UPrimeResponse<string>> UploadResponseInsert(ResourceInsert insert)
         {
@@ -53,7 +53,7 @@ namespace EasyIotSharp.API.Controllers
         }
 
         /// <summary>
-        /// 文件修改
+        /// 资源修改
         /// </summary>
         /// <param name="input"></param>
         /// <returns></returns>
@@ -67,7 +67,7 @@ namespace EasyIotSharp.API.Controllers
         }
 
         /// <summary>
-        /// 文件上传
+        /// 资源删除
         /// </summary>
         /// <param name="input"></param>
         /// <returns></returns>
