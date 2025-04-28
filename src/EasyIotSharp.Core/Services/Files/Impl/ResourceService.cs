@@ -16,6 +16,7 @@ using System.Linq;
 using EasyIotSharp.Core.Dto.Enum;
 using EasyIotSharp.Core.Dto;
 using Mysqlx.Crud;
+using SqlSugar;
 
 namespace EasyIotSharp.Core.Services.Files.Impl
 {
@@ -186,6 +187,105 @@ namespace EasyIotSharp.Core.Services.Files.Impl
             }
         }
 
+        /// <summary>
+        /// 下载
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
+        /// <exception cref="BizException"></exception>
+        public async Task<FileDownloadDto> DownloadResource(DownloadResourceInput input)
+        {
+            if (string.IsNullOrEmpty(input.Id))
+            {
+                throw new BizException(BizError.BIND_EXCEPTION_ERROR, "资源ID不能为空");
+            }
+
+            // 获取资源信息
+            var resource = await _resourceRepository.GetByIdAsync(input.Id);
+            if (resource == null)
+            {
+                throw new BizException(BizError.BIND_EXCEPTION_ERROR, "资源不存在");
+            }
+
+            try
+            {
+                if (string.IsNullOrEmpty(resource.Url))
+                {
+                    throw new BizException(BizError.BIND_EXCEPTION_ERROR, "资源URL不存在");
+                }
+
+                // 从URL中提取对象名称
+                var uri = new Uri(resource.Url);
+                var pathSegments = uri.AbsolutePath.Split('/').Skip(2).ToArray(); // 跳过前两个段
+
+                if (pathSegments.Length < 1)
+                {
+                    throw new BizException(BizError.BIND_EXCEPTION_ERROR, "无效的资源URL");
+                }
+
+                string bucketName = ContextUser?.TenantAbbreviation.ToLower() ?? "cs0001";
+                string objectName = string.Join("/", pathSegments);
+
+                // 获取文件流
+                var fileStream = await _minIOFileService.DownloadAsync(bucketName, objectName);
+
+                // 获取文件信息
+                var objectInfo = await _minIOFileService.GetFileStatAsync(bucketName, objectName);
+
+                // 获取文件名
+                string fileName = Path.GetFileName(objectName);
+                if (string.IsNullOrEmpty(fileName))
+                {
+                    fileName = $"{resource.Name}.zip";
+                }
+
+                return new FileDownloadDto
+                {
+                    FileName = fileName,
+                    ContentType = GetContentTypeFromFileName(fileName),
+                    FileStream = fileStream,
+                    FileSize = long.Parse(objectInfo["length"].ToSqlValue()),
+                };
+            }
+            catch (Exception ex)
+            {
+                Logger.Error($"下载资源失败: {ex.Message}", ex);
+                throw new BizException(BizError.BIND_EXCEPTION_ERROR, $"下载资源失败: {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// 根据文件名获取Content-Type
+        /// </summary>
+        private string GetContentTypeFromFileName(string fileName)
+        {
+            var extension = Path.GetExtension(fileName).ToLowerInvariant();
+
+            return extension switch
+            {
+                ".zip" => "application/zip",
+                ".html" => "text/html",
+                ".htm" => "text/html",
+                ".css" => "text/css",
+                ".js" => "application/javascript",
+                ".json" => "application/json",
+                ".jpg" => "image/jpeg",
+                ".jpeg" => "image/jpeg",
+                ".png" => "image/png",
+                ".gif" => "image/gif",
+                ".svg" => "image/svg+xml",
+                ".pdf" => "application/pdf",
+                ".doc" => "application/msword",
+                ".docx" => "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                ".xls" => "application/vnd.ms-excel",
+                ".xlsx" => "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                ".ppt" => "application/vnd.ms-powerpoint",
+                ".pptx" => "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+                ".txt" => "text/plain",
+                ".xml" => "application/xml",
+                _ => "application/octet-stream"
+            };
+        }
 
         /// <summary>
         /// 上传文件
@@ -219,7 +319,7 @@ namespace EasyIotSharp.Core.Services.Files.Impl
             try
             {
                 // 保存上传的文件
-                //await SaveUploadedFileAsync(formFile, uploadedFilePath);
+                await SaveUploadedFileAsync(formFile, uploadedFilePath);
 
                 // 解压文件
                 await ExtractZipFileAsync(uploadedFilePath, extractPath);
@@ -271,9 +371,11 @@ namespace EasyIotSharp.Core.Services.Files.Impl
             {
                 try
                 {
-                    // 使用 FileStream 打开文件，这样可以更好地控制文件访问
-                    using (FileStream zipStream = new FileStream(zipFilePath, FileMode.Open, FileAccess.Read))
-                    using (ZipArchive archive = new ZipArchive(zipStream, ZipArchiveMode.Read))
+                    // 读取zip文件的所有字节
+                    byte[] zipBytes = File.ReadAllBytes(zipFilePath);
+                    
+                    using (var memoryStream = new MemoryStream(zipBytes))
+                    using (var archive = new ZipArchive(memoryStream, ZipArchiveMode.Read))
                     {
                         foreach (ZipArchiveEntry entry in archive.Entries)
                         {
@@ -281,7 +383,11 @@ namespace EasyIotSharp.Core.Services.Files.Impl
                             if (string.IsNullOrEmpty(entry.Name))
                                 continue;
 
-                            string destinationPath = Path.Combine(extractPath, entry.FullName);
+                            // 尝试转换文件名编码
+                            string entryName = entry.FullName;
+                            string decodedName = DecodeZipEntryName(entryName);
+                            
+                            string destinationPath = Path.Combine(extractPath, decodedName);
                             string destinationDirectory = Path.GetDirectoryName(destinationPath);
 
                             // 创建目标目录（如果不存在）
@@ -295,25 +401,50 @@ namespace EasyIotSharp.Core.Services.Files.Impl
                         }
                     }
                 }
-                catch (InvalidDataException ex)
-                {
-                    // 处理无效的ZIP文件格式
-                    Logger.Error($"无效的ZIP文件格式: {ex.Message}", ex);
-                    throw new BizException(BizError.BIND_EXCEPTION_ERROR, "无效的ZIP文件格式，请确保上传的是有效的ZIP压缩文件");
-                }
-                catch (IOException ex)
-                {
-                    // 处理IO异常
-                    Logger.Error($"读取ZIP文件时发生IO错误: {ex.Message}", ex);
-                    throw new BizException(BizError.BIND_EXCEPTION_ERROR, "读取ZIP文件时发生错误，请检查文件是否可访问");
-                }
                 catch (Exception ex)
                 {
-                    // 处理其他异常
                     Logger.Error($"解压ZIP文件时发生错误: {ex.Message}", ex);
                     throw new BizException(BizError.BIND_EXCEPTION_ERROR, $"解压ZIP文件时发生错误: {ex.Message}");
                 }
             });
+        }
+
+        /// <summary>
+        /// 尝试解码ZIP文件名
+        /// </summary>
+        private string DecodeZipEntryName(string entryName)
+        {
+            // 尝试不同的编码方式
+            var encodings = new[] 
+            { 
+                Encoding.GetEncoding("GB18030"),  // GB18030 包含了 GB2312 和 GBK
+                Encoding.GetEncoding("GB2312"),
+                Encoding.GetEncoding("GBK"),
+                Encoding.UTF8,
+                Encoding.Default
+            };
+
+            byte[] entryBytes = Encoding.Default.GetBytes(entryName);
+            
+            foreach (var encoding in encodings)
+            {
+                try
+                {
+                    string decoded = encoding.GetString(entryBytes);
+                    // 检查解码后的字符串是否包含乱码字符
+                    if (!decoded.Contains("?") && !decoded.Contains("�"))
+                    {
+                        return decoded;
+                    }
+                }
+                catch
+                {
+                    continue;
+                }
+            }
+
+            // 如果所有编码都失败，返回原始名称
+            return entryName;
         }
 
         /// <summary>

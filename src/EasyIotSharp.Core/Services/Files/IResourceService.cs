@@ -8,6 +8,7 @@ using UPrime.Services.Dto;
 using Microsoft.AspNetCore.Http;
 using EasyIotSharp.Core.Dto.Enum;
 using EasyIotSharp.Core.Dto;
+using System.IO;
 
 namespace EasyIotSharp.Core.Services.Files
 {
@@ -40,5 +41,12 @@ namespace EasyIotSharp.Core.Services.Files
         /// <param name="input"></param>
         /// <returns></returns>
         Task<string> DeleteResource(DeleteInput input);
+
+        /// <summary>
+        /// 下载
+        /// </summary>
+        /// <param name="input">下载参数</param>
+        /// <returns>文件下载信息</returns>
+        Task<FileDownloadDto> DownloadResource(DownloadResourceInput input);
     }
 }

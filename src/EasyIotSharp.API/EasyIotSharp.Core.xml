@@ -1757,6 +1757,41 @@
             double
             </summary>
         </member>
+        <member name="T:EasyIotSharp.Core.Dto.File.FileDownloadDto">
+            <summary>
+            文件下载数据传输对象
+            </summary>
+        </member>
+        <member name="P:EasyIotSharp.Core.Dto.File.FileDownloadDto.FileName">
+            <summary>
+            文件名
+            </summary>
+        </member>
+        <member name="P:EasyIotSharp.Core.Dto.File.FileDownloadDto.ContentType">
+            <summary>
+            内容类型
+            </summary>
+        </member>
+        <member name="P:EasyIotSharp.Core.Dto.File.FileDownloadDto.FileStream">
+            <summary>
+            文件流
+            </summary>
+        </member>
+        <member name="P:EasyIotSharp.Core.Dto.File.FileDownloadDto.FileSize">
+            <summary>
+            文件大小（字节）
+            </summary>
+        </member>
+        <member name="T:EasyIotSharp.Core.Dto.File.Params.DownloadResourceInput">
+            <summary>
+            下载
+            </summary>
+        </member>
+        <member name="P:EasyIotSharp.Core.Dto.File.Params.DownloadResourceInput.Id">
+            <summary>
+            主键
+            </summary>
+        </member>
         <member name="P:EasyIotSharp.Core.Dto.File.Params.ResourceInput.State">
             <summary>
             状态
@@ -7120,6 +7155,19 @@
             <param name="id">资源ID</param>
             <returns>是否成功</returns>
         </member>
+        <member name="M:EasyIotSharp.Core.Services.Files.Impl.ResourceService.DownloadResource(EasyIotSharp.Core.Dto.File.Params.DownloadResourceInput)">
+            <summary>
+            下载
+            </summary>
+            <param name="input"></param>
+            <returns></returns>
+            <exception cref="T:EasyIotSharp.Core.BizException"></exception>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.Files.Impl.ResourceService.GetContentTypeFromFileName(System.String)">
+            <summary>
+            根据文件名获取Content-Type
+            </summary>
+        </member>
         <member name="M:EasyIotSharp.Core.Services.Files.Impl.ResourceService.UploadResponse(System.String,EasyIotSharp.Core.Dto.Enum.ResourceEnums,Microsoft.AspNetCore.Http.IFormFile)">
             <summary>
             上传文件
@@ -7138,6 +7186,11 @@
         <member name="M:EasyIotSharp.Core.Services.Files.Impl.ResourceService.ExtractZipFileAsync(System.String,System.String)">
             <summary>
             解压ZIP文件到指定目录
+            </summary>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.Files.Impl.ResourceService.DecodeZipEntryName(System.String)">
+            <summary>
+            尝试解码ZIP文件名
             </summary>
         </member>
         <member name="M:EasyIotSharp.Core.Services.Files.Impl.ResourceService.UploadFilesToMinIOAsync(System.String,System.String)">
@@ -7177,6 +7230,13 @@
             </summary>
             <param name="input"></param>
             <returns></returns>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.Files.IResourceService.DownloadResource(EasyIotSharp.Core.Dto.File.Params.DownloadResourceInput)">
+            <summary>
+            下载
+            </summary>
+            <param name="input">下载参数</param>
+            <returns>文件下载信息</returns>
         </member>
         <member name="M:EasyIotSharp.Core.Services.Hardware.Impl.SensorQuotaService.QuerySensorQuota(EasyIotSharp.Core.Dto.Hardware.Params.QuerySensorQuotaInput)">
             <summary>
@@ -7502,6 +7562,14 @@
             </summary>
             <param name="fileName">文件名称</param>
             <returns>文件属性字典</returns>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.IO.IMinIOFileService.GetFileStatAsync(System.String,System.String)">
+            <summary>
+            获取属性
+            </summary>
+            <param name="bucketName"></param>
+            <param name="fileName"></param>
+            <returns></returns>
         </member>
         <member name="M:EasyIotSharp.Core.Services.IO.Impl.MinIOFileService.BucketExistsAsync(System.String)">
             <summary>

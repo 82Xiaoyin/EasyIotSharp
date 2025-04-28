@@ -126,5 +126,13 @@ namespace EasyIotSharp.Core.Services.IO
         /// <param name="fileName">文件名称</param>
         /// <returns>文件属性字典</returns>
         Task<Dictionary<string, object>> GetFileStatAsync(string fileName);
+
+        /// <summary>
+        /// 获取属性
+        /// </summary>
+        /// <param name="bucketName"></param>
+        /// <param name="fileName"></param>
+        /// <returns></returns>
+        Task<Dictionary<string, object>> GetFileStatAsync(string bucketName, string fileName);
     }
 }
