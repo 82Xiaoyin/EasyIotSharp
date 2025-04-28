@@ -127,6 +127,7 @@ namespace EasyIotSharp.Core.Services.Files.Impl
                 resource.Name = input.Name;
                 resource.Remark = input.Remark;
                 resource.State = input.State;
+                resource.Type = input.Type;
                 resource.UpdatedAt = DateTime.Now;
                 resource.OperatorId = ContextUser?.UserId;
                 resource.OperatorName = ContextUser?.UserName;

@@ -203,7 +203,7 @@ namespace EasyIotSharp.Core.Services.Project.Impl
         public async Task<string> UploadProjectUnity(string name, ResourceEnums type, IFormFile formFile)
         {
             // 临时文件和目录路径
-            string uniqueFolderName = type.ToString() + Guid.NewGuid().ToString();
+            string uniqueFolderName = type.ToString() + "/" + Guid.NewGuid().ToString();
             string zipTempPath = null;
             string extractPath = null;
             string uploadedFilePath = null;
