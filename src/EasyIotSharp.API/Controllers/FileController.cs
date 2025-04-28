@@ -27,7 +27,7 @@ namespace EasyIotSharp.API.Controllers
         /// <summary>
         /// 资源列表
         /// </summary>
-        /// <param name="id"></param>
+        /// <param name="input"></param>
         /// <returns></returns>
         [HttpPost("/File/Resource/Query")]
         [Authorize]
@@ -41,10 +41,10 @@ namespace EasyIotSharp.API.Controllers
         /// <summary>
         /// 资源上传
         /// </summary>
-        /// <param name="input"></param>
+        /// <param name="insert"></param>
         /// <returns></returns>
-        [HttpPost("/File/Resource/Insert")]
-        //[Authorize]
+        [HttpPost("/File/Resource/Upload")]
+        [Authorize]
         public async Task<UPrimeResponse<string>> UploadResponseInsert(ResourceInsert insert)
         {
             UPrimeResponse<string> res = new UPrimeResponse<string>();
@@ -55,10 +55,10 @@ namespace EasyIotSharp.API.Controllers
         /// <summary>
         /// 资源修改
         /// </summary>
-        /// <param name="input"></param>
+        /// <param name="insert"></param>
         /// <returns></returns>
         [HttpPost("/File/Resource/Update")]
-        //[Authorize]
+        [Authorize]
         public async Task<UPrimeResponse<string>> UpdateResource(UpdateResourceInput insert)
         {
             UPrimeResponse<string> res = new UPrimeResponse<string>();
@@ -69,10 +69,10 @@ namespace EasyIotSharp.API.Controllers
         /// <summary>
         /// 资源删除
         /// </summary>
-        /// <param name="input"></param>
+        /// <param name="insert"></param>
         /// <returns></returns>
         [HttpPost("/File/Resource/Delete")]
-        //[Authorize]
+        [Authorize]
         public async Task<UPrimeResponse<string>> DeleteResource([FromBody] DeleteInput insert)
         {
             UPrimeResponse<string> res = new UPrimeResponse<string>();
