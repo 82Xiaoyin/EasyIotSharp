@@ -17,6 +17,7 @@ using EasyIotSharp.Core.Dto.Enum;
 using EasyIotSharp.Core.Dto;
 using Mysqlx.Crud;
 using SqlSugar;
+using EasyIotSharp.Core.Services.Project;
 
 namespace EasyIotSharp.Core.Services.Files.Impl
 {
@@ -25,13 +26,16 @@ namespace EasyIotSharp.Core.Services.Files.Impl
         private readonly ITempFolderService _tempFolderService;
         private readonly IMinIOFileService _minIOFileService;
         private readonly IResourceRepository _resourceRepository;
+        private readonly IProjectBaseService _projectBaseService;
         public ResourceService(IResourceRepository resourceRepository,
                                ITempFolderService tempFolderService,
-                               IMinIOFileService minIOFileService)
+                               IMinIOFileService minIOFileService,
+                               IProjectBaseService projectBaseService)
         {
             _resourceRepository = resourceRepository;
             _tempFolderService = tempFolderService;
             _minIOFileService = minIOFileService;
+            _projectBaseService = projectBaseService;
         }
         /// <summary>
         /// 查询资源列表
@@ -297,16 +301,26 @@ namespace EasyIotSharp.Core.Services.Files.Impl
         /// <exception cref="BizException"></exception>
         public async Task<string> UploadResponse(string name, ResourceEnums type, IFormFile formFile)
         {
+            var fileExtension = Path.GetExtension(formFile.FileName).ToLower();
+            if (type == ResourceEnums.Unity)
+            {
+                return await _projectBaseService.UploadProjectUnity(name, type, formFile);
+            }
+            if (type == ResourceEnums.Image)
+            {
+                var imagePattern = @"^\.(jpg|jpeg|png|gif|bmp|webp|svg|ico)$";
+
+                if (!System.Text.RegularExpressions.Regex.IsMatch(fileExtension, imagePattern, System.Text.RegularExpressions.RegexOptions.IgnoreCase))
+                {
+                    throw new BizException(BizError.BIND_EXCEPTION_ERROR, "请上传正确的图片格式文件（支持jpg、jpeg、png、gif、bmp、webp、svg、ico）");
+                }
+
+            }
             if (formFile == null)
             {
                 throw new BizException(BizError.BIND_EXCEPTION_ERROR, "上传文件不能为空");
             }
 
-            var fileExtension = Path.GetExtension(formFile.FileName).ToLower();
-            if (fileExtension != ".zip")
-            {
-                throw new BizException(BizError.BIND_EXCEPTION_ERROR, "请上传.zip后缀的文件");
-            }
             // 生成唯一标识符，用于文件夹和文件名
             string uniqueId = Guid.NewGuid().ToString();
             string uniqueFolderName = type.ToString() + "/" + uniqueId;
@@ -314,15 +328,12 @@ namespace EasyIotSharp.Core.Services.Files.Impl
             // 获取临时压缩包文件夹目录
             var zipTempPath = _tempFolderService.GetZipFolderPath("");
             var extractPath = Path.Combine(zipTempPath, uniqueFolderName);
-            var uploadedFilePath = Path.Combine(zipTempPath, $"{Path.GetFileNameWithoutExtension(formFile.FileName)}_{uniqueId}.zip");
+            var uploadedFilePath = Path.Combine(zipTempPath, $"{Path.GetFileNameWithoutExtension(formFile.FileName)}_{uniqueId}{fileExtension}");
 
             try
             {
                 // 保存上传的文件
                 await SaveUploadedFileAsync(formFile, uploadedFilePath);
-
-                // 解压文件
-                await ExtractZipFileAsync(uploadedFilePath, extractPath);
 
                 // 处理并上传文件到MinIO
                 var url = await UploadFilesToMinIOAsync(extractPath, uniqueFolderName);

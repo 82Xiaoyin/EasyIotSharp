@@ -7936,7 +7936,7 @@
             <param name="input"></param>
             <returns></returns>
         </member>
-        <member name="M:EasyIotSharp.Core.Services.Project.Impl.ProjectBaseService.UploadProjectUnity(Microsoft.AspNetCore.Http.IFormFile)">
+        <member name="M:EasyIotSharp.Core.Services.Project.Impl.ProjectBaseService.UploadProjectUnity(System.String,EasyIotSharp.Core.Dto.Enum.ResourceEnums,Microsoft.AspNetCore.Http.IFormFile)">
             <summary>
             上传Unity项目压缩包并部署到MinIO
             </summary>
@@ -8013,7 +8013,7 @@
             <param name="input"></param>
             <returns></returns>
         </member>
-        <member name="M:EasyIotSharp.Core.Services.Project.IProjectBaseService.UploadProjectUnity(Microsoft.AspNetCore.Http.IFormFile)">
+        <member name="M:EasyIotSharp.Core.Services.Project.IProjectBaseService.UploadProjectUnity(System.String,EasyIotSharp.Core.Dto.Enum.ResourceEnums,Microsoft.AspNetCore.Http.IFormFile)">
             <summary>
             上传项目的unity素材，返回index.html地址
             </summary>

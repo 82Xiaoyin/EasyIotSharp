@@ -6,6 +6,7 @@ using EasyIotSharp.Core.Dto.Project;
 using UPrime.Services.Dto;
 using EasyIotSharp.Core.Dto.Project.Params;
 using Microsoft.AspNetCore.Http;
+using EasyIotSharp.Core.Dto.Enum;
 
 namespace EasyIotSharp.Core.Services.Project
 {
@@ -58,6 +59,6 @@ namespace EasyIotSharp.Core.Services.Project
         /// </summary>
         /// <param name="formFile"></param>
         /// <returns></returns>
-        Task<string> UploadProjectUnity(IFormFile formFile);
+        Task<string> UploadProjectUnity(string name, ResourceEnums type, IFormFile formFile);
     }
 }

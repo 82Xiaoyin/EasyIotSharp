@@ -115,19 +115,19 @@ namespace EasyIotSharp.API.Controllers
             return new UPrimeResponse();
         }
 
-        /// <summary>
-        /// 上传项目的unity素材，返回index.html地址
-        /// </summary>
-        /// <param name="formFile"></param>
-        /// <returns></returns>
-        [HttpPost("/Project/ProjectBase/Unity/Upload")]
-        [DisableRequestSizeLimit]
-        public async Task<UPrimeResponse<string>> UploadProjectUnity(IFormFile formFile)
-        {
-            UPrimeResponse<string> res = new UPrimeResponse<string>();
-            res.Result = await _projectBaseService.UploadProjectUnity(formFile);
-            return res;
-        }
+        ///// <summary>
+        ///// 上传项目的unity素材，返回index.html地址
+        ///// </summary>
+        ///// <param name="formFile"></param>
+        ///// <returns></returns>
+        //[HttpPost("/Project/ProjectBase/Unity/Upload")]
+        //[DisableRequestSizeLimit]
+        //public async Task<UPrimeResponse<string>> UploadProjectUnity(IFormFile formFile)
+        //{
+        //    UPrimeResponse<string> res = new UPrimeResponse<string>();
+        //    res.Result = await _projectBaseService.UploadProjectUnity(formFile);
+        //    return res;
+        //}
 
         #endregion
 
