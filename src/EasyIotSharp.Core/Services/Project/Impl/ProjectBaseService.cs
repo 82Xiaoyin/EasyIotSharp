@@ -93,7 +93,7 @@ namespace EasyIotSharp.Core.Services.Project.Impl
             model.latitude = input.latitude;
             model.State = 0;
             model.Address = input.Address;
-            model.Unity = input.Unity;
+            model.ResourceId = input.ResourceId;
             model.Remark = input.Remark;
             model.IsDelete = false;
             model.CreationTime = DateTime.Now;
@@ -124,7 +124,7 @@ namespace EasyIotSharp.Core.Services.Project.Impl
             info.Longitude = input.Longitude;
             info.latitude = input.latitude;
             info.Address = input.Address;
-            info.Unity = input.Unity;
+            info.ResourceId = input.ResourceId;
             info.Remark = input.Remark;
             info.UpdatedAt = DateTime.Now;
             info.OperatorId = ContextUser.UserId;

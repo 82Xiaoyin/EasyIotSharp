@@ -40,7 +40,7 @@ namespace EasyIotSharp.Core.Dto.Project.Params
         /// <summary>
         /// unity资源
         /// </summary>
-        public string Unity { get; set; }
+        public string ResourceId { get; set; }
 
         /// <summary>
         /// 项目描述

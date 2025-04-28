@@ -33,7 +33,7 @@ namespace EasyIotSharp.Core.Repositories.Files.Impl
         {
             var query = Client.Queryable<Resource>()
                     .WhereIF(State.HasValue, r => r.State == State.Value)
-                    .WhereIF(ResourceEnum != null, r => r.Type == (int)ResourceEnum)
+                    .WhereIF(ResourceEnum != ResourceEnums.全部, r => r.Type == (int)ResourceEnum)
                     .OrderByDescending(r => r.CreationTime)
                     .Select<ResourceDto>();
 

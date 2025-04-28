@@ -43,9 +43,9 @@ namespace EasyIotSharp.Core.Domain.Proejct
         public string Address { get; set; }
 
         /// <summary>
-        /// unity资源
+        /// unity资源Id
         /// </summary>
-        public string Unity { get; set; }
+        public string ResourceId { get; set; }
 
         /// <summary>
         /// 项目描述

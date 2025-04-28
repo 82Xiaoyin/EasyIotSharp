@@ -9,6 +9,7 @@ using SqlSugar;
 using EasyIotSharp.Core.Domain.Queue;
 using OfficeOpenXml.FormulaParsing.Excel.Functions.Text;
 using EasyIotSharp.Core.Dto.Project;
+using EasyIotSharp.Core.Domain.Files;
 
 namespace EasyIotSharp.Core.Repositories.Project.Impl
 {
@@ -29,37 +30,38 @@ namespace EasyIotSharp.Core.Repositories.Project.Impl
             var sql = Client.Queryable<ProjectBase>()
                  .LeftJoin<RabbitProject>((p, rp) => p.Id == rp.ProjectId && rp.IsDelete == false)
                  .LeftJoin<RabbitServerInfo>((p, rp, rs) => rp.RabbitServerInfoId == rs.Id && rs.IsDelete == false)
-                 .Where((p, rp, rs) => p.IsDelete == false);
+                 .LeftJoin<Resource>((p, rp, rs, r) => r.Id == p.ResourceId)
+                 .Where((p, rp, rs, r) => p.IsDelete == false);
 
             // 初始化条件
             if (tenantNumId > 0)
             {
-                sql = sql.Where((p, rp, rs) => p.TenantNumId.Equals(tenantNumId));
+                sql = sql.Where((p, rp, rs, r) => p.TenantNumId.Equals(tenantNumId));
             }
 
             if (!string.IsNullOrWhiteSpace(keyword))
             {
-                sql = sql.Where((p, rp, rs) => p.Name.Contains(keyword) || p.Remark.Contains(keyword));
+                sql = sql.Where((p, rp, rs, r) => p.Name.Contains(keyword) || p.Remark.Contains(keyword));
             }
 
             if (state > -1)
             {
-                sql = sql.Where((p, rp, rs) => p.State.Equals(state));
+                sql = sql.Where((p, rp, rs, r) => p.State.Equals(state));
             }
 
             if (createStartTime.HasValue && createEndTime.HasValue)
             {
-                sql = sql.Where((p, rp, rs) => p.CreationTime >= createStartTime.Value && p.CreationTime <= createEndTime.Value);
+                sql = sql.Where((p, rp, rs, r) => p.CreationTime >= createStartTime.Value && p.CreationTime <= createEndTime.Value);
             }
             else
             {
                 if (createStartTime.HasValue)
                 {
-                    sql = sql.Where((p, rp, rs) => p.CreationTime >= createStartTime.Value);
+                    sql = sql.Where((p, rp, rs, r) => p.CreationTime >= createStartTime.Value);
                 }
                 if (createEndTime.HasValue)
                 {
-                    sql = sql.Where((p, rp, rs) => p.CreationTime <= createEndTime.Value);
+                    sql = sql.Where((p, rp, rs, r) => p.CreationTime <= createEndTime.Value);
                 }
             }
 
@@ -71,7 +73,7 @@ namespace EasyIotSharp.Core.Repositories.Project.Impl
             }
 
             // 分页查询
-            var items = await sql.Select((p, rp, rs) => new ProjectBaseDto
+            var items = await sql.Select((p, rp, rs, r) => new ProjectBaseDto
             {
                 Id = p.Id,
                 TenantNumId = p.TenantNumId,
@@ -83,9 +85,11 @@ namespace EasyIotSharp.Core.Repositories.Project.Impl
                 OperatorId = p.OperatorId,
                 OperatorName = p.OperatorName,
                 Remark = p.Remark,
-                State = p.State==1?true:false,
+                State = p.State == 1 ? true : false,
                 Host = rs.Host,
-                RabbitServerInfoId = rs.Id
+                RabbitServerInfoId = rs.Id,
+                ResourceId = r.Id,
+                ResourceUrl = r.Url,
             }).ToPageListAsync(pageIndex, pageSize);
 
             return (totalCount, items);
@@ -95,10 +99,10 @@ namespace EasyIotSharp.Core.Repositories.Project.Impl
         {
             var sql = Client.Queryable<ProjectBase>()
                  .LeftJoin<RabbitProject>((p, rp) => p.Id == rp.ProjectId && rp.IsDelete == false)
-                 .LeftJoin<RabbitServerInfo>((p, rp, rs) => rp.RabbitServerInfoId == rs.Id && rs.IsDelete == false)
-                 .Where((p, rp, rs) => p.IsDelete == false);
+                 .LeftJoin<RabbitServerInfo>((p, rp, rs, r) => rp.RabbitServerInfoId == rs.Id && rs.IsDelete == false)
+                 .Where((p, rp, rs, r) => p.IsDelete == false);
 
-            var items = await sql.Select((p, rp, rs) => new ProjectBaseDto
+            var items = await sql.Select((p, rp, rs, r) => new ProjectBaseDto
             {
                 Id = p.Id,
                 TenantNumId = p.TenantNumId,

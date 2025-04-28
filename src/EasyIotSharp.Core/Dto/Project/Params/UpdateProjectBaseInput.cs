@@ -37,9 +37,9 @@ namespace EasyIotSharp.Core.Dto.Project.Params
         public string Address { get; set; }
 
         /// <summary>
-        /// unity资源
+        /// 资源Id
         /// </summary>
-        public string Unity { get; set; }
+        public string ResourceId { get; set; }
 
         /// <summary>
         /// 项目描述

@@ -3,27 +3,27 @@ using System.IO;
 namespace EasyIotSharp.Core.Dto.File
 {
     /// <summary>
-    /// æ–‡ä»¶ä¸‹è½½æ•°æ®ä¼ è¾“å¯¹è±¡
+    /// ÏÂÔØ·µ»Ø
     /// </summary>
     public class FileDownloadDto
     {
         /// <summary>
-        /// æ–‡ä»¶å
+        /// Ãû³Æ
         /// </summary>
         public string FileName { get; set; }
 
         /// <summary>
-        /// å†…å®¹ç±»å‹
+        /// ÀàĞÍ
         /// </summary>
         public string ContentType { get; set; }
 
         /// <summary>
-        /// æ–‡ä»¶æµ
+        /// ÎÄ¼şÁ÷
         /// </summary>
         public Stream FileStream { get; set; }
 
         /// <summary>
-        /// æ–‡ä»¶å¤§å°ï¼ˆå­—èŠ‚ï¼‰
+        /// ×Ö½Ú
         /// </summary>
         public long FileSize { get; set; }
     }

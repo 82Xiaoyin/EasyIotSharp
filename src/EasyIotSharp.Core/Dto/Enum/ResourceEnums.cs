@@ -27,5 +27,11 @@ namespace EasyIotSharp.Core.Dto.Enum
         /// </summary>
         [EnumAlias("Unity")]
         Unity = 1,
+
+        /// <summary>
+        /// string
+        /// </summary>
+        [EnumAlias("全部")]
+        全部 = -1,
     }
 }
