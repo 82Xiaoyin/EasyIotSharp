@@ -25,13 +25,15 @@ namespace EasyIotSharp.Core.Repositories.Files.Impl
         /// <param name="pageSize"></param>
         /// <param name="isPage"></param>
         /// <returns></returns>
-        public async Task<(int totalCount, List<ResourceDto> items)> Query(bool? State,
+        public async Task<(int totalCount, List<ResourceDto> items)> Query(string keyWord,
+                                                                      bool? State,
                                                                       ResourceEnums ResourceEnum,
                                                                       int pageIndex,
                                                                       int pageSize,
                                                                       bool isPage)
         {
             var query = Client.Queryable<Resource>()
+                    .WhereIF(!string.IsNullOrEmpty(keyWord), r => r.Name.Contains(keyWord))
                     .WhereIF(State.HasValue, r => r.State == State.Value)
                     .WhereIF(ResourceEnum != ResourceEnums.全部, r => r.Type == (int)ResourceEnum)
                     .OrderByDescending(r => r.CreationTime)

@@ -87,10 +87,12 @@ namespace EasyIotSharp.API.Controllers
         /// <returns></returns>
         [HttpPost("/File/Resource/Download")]
         [Authorize]
-        public async Task<IActionResult> DownloadFile([FromBody] DownloadResourceInput input)
+        public async Task<UPrimeResponse<IActionResult>> DownloadFile([FromBody] DownloadResourceInput input)
         {
+            UPrimeResponse<IActionResult> res = new UPrimeResponse<IActionResult>();
             var result = await _resourceService.DownloadResource(input);
-            return File(result.FileStream, result.ContentType, result.FileName);
+            res.Result = File(result.FileStream, result.ContentType, result.FileName);
+            return res;
         }
     }
 }

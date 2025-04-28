@@ -48,6 +48,7 @@ namespace EasyIotSharp.Core.Services.Files.Impl
         {
             // 调用仓储层的查询方法
             var list = await _resourceRepository.Query(
+                input.KeyWord,
                 input.State,
                 input.ResourceType,
                 input.PageIndex,
@@ -332,7 +333,7 @@ namespace EasyIotSharp.Core.Services.Files.Impl
 
             try
             {
-                using(var stream = formFile.OpenReadStream())
+                using (var stream = formFile.OpenReadStream())
                 {
                     await _minIOFileService.UploadAsync(
                         ContextUser?.TenantAbbreviation.ToLower() ?? "cs0001",

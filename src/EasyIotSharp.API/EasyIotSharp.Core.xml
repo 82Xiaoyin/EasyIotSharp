@@ -1797,9 +1797,19 @@
             主键
             </summary>
         </member>
+        <member name="P:EasyIotSharp.Core.Dto.File.Params.ResourceInput.KeyWord">
+            <summary>
+            
+            </summary>
+        </member>
         <member name="P:EasyIotSharp.Core.Dto.File.Params.ResourceInput.State">
             <summary>
             状态
+            </summary>
+        </member>
+        <member name="P:EasyIotSharp.Core.Dto.File.Params.ResourceInput.ResourceType">
+            <summary>
+            枚举类型
             </summary>
         </member>
         <member name="P:EasyIotSharp.Core.Dto.File.Params.ResourceInsert.Name">
@@ -6083,7 +6093,7 @@
             </summary>
             <returns></returns>
         </member>
-        <member name="M:EasyIotSharp.Core.Repositories.Files.Impl.ResourceRepository.Query(System.Nullable{System.Boolean},EasyIotSharp.Core.Dto.Enum.ResourceEnums,System.Int32,System.Int32,System.Boolean)">
+        <member name="M:EasyIotSharp.Core.Repositories.Files.Impl.ResourceRepository.Query(System.String,System.Nullable{System.Boolean},EasyIotSharp.Core.Dto.Enum.ResourceEnums,System.Int32,System.Int32,System.Boolean)">
             <summary>
             资源列表查询
             </summary>
@@ -6094,7 +6104,7 @@
             <param name="isPage"></param>
             <returns></returns>
         </member>
-        <member name="M:EasyIotSharp.Core.Repositories.Files.IResourceRepository.Query(System.Nullable{System.Boolean},EasyIotSharp.Core.Dto.Enum.ResourceEnums,System.Int32,System.Int32,System.Boolean)">
+        <member name="M:EasyIotSharp.Core.Repositories.Files.IResourceRepository.Query(System.String,System.Nullable{System.Boolean},EasyIotSharp.Core.Dto.Enum.ResourceEnums,System.Int32,System.Int32,System.Boolean)">
             <summary>
             资源表查询
             </summary>

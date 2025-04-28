@@ -22,7 +22,7 @@ namespace EasyIotSharp.Core.Repositories.Files
         /// <param name="pageSize"></param>
         /// <param name="isPage"></param>
         /// <returns></returns>
-        Task<(int totalCount, List<ResourceDto> items)> Query(bool? State,
+        Task<(int totalCount, List<ResourceDto> items)> Query(string keyWord, bool? State,
                                                                       ResourceEnums ResourceEnum,
                                                                       int pageIndex,
                                                                       int pageSize,
