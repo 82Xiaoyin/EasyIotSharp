@@ -29,7 +29,7 @@ namespace EasyIotSharp.API.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [HttpPost("/File/Resource/List")]
+        [HttpPost("/File/Resource/Query")]
         [Authorize]
         public async Task<UPrimeResponse<PagedResultDto<ResourceDto>>> QueryResources([FromBody] ResourceInput input)
         {
