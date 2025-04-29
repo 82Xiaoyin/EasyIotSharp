@@ -44,7 +44,7 @@ namespace EasyIotSharp.API.Controllers
         /// <param name="insert"></param>
         /// <returns></returns>
         [HttpPost("/File/Resource/Insert")]
-        //[Authorize]
+        [Authorize]
         public async Task<UPrimeResponse<string>> UploadResponseInsert(ResourceInsert insert)
         {
             UPrimeResponse<string> res = new UPrimeResponse<string>();
