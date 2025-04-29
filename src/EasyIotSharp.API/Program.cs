@@ -86,6 +86,7 @@ namespace EasyIotSharp.API
                          // https://docs.microsoft.com/zh-cn/dotnet/api/microsoft.aspnetcore.server.kestrel.core.kestrelserveroptions?view=aspnetcore-3.1
                          c.AddServerHeader = false;
                          c.ListenAnyIP(5000); // 添加此行，明确指定监听所有IP
+                         c.Limits.MaxRequestBodySize = 1000 * 1024 * 1024; // 上传文件大小设置为1G
                      })
                      .UseStartup<Startup>();
                  })
