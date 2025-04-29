@@ -283,6 +283,7 @@ namespace EasyIotSharp.Core.Services.Hardware.Impl
                     {
                         result.Quotas.Add(new Quotas
                         {
+                            Identifier=sensorQuota.Identifier,
                             Name = sensorQuota.Name,
                             Unit = sensorQuota.Unit,
                             IsShow = sensorQuota.IsShow
@@ -296,6 +297,7 @@ namespace EasyIotSharp.Core.Services.Hardware.Impl
                     {
                         result.Quotas.Add(new Quotas
                         {
+                            Identifier = item.Identifier,
                             Name = item.Name,
                             Unit = item.Unit,
                             IsShow = item.IsShow
