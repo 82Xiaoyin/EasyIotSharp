@@ -39,7 +39,7 @@ namespace EasyIotSharp.Core.Domain.Files
         /// <summary>
         /// 描述
         /// </summary>
-        [SugarColumn(ColumnDataType = "TEXT")]
+        [SugarColumn(ColumnDataType = "TEXT", IsNullable = true)]
         public string Remark { get; set; }
     }
 }
