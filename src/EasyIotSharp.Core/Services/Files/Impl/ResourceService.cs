@@ -20,6 +20,7 @@ using SqlSugar;
 using EasyIotSharp.Core.Services.Project;
 using Minio.DataModel;
 using System.Security.AccessControl;
+using Kdbndp.KingbaseTypes;
 
 namespace EasyIotSharp.Core.Services.Files.Impl
 {
@@ -123,14 +124,14 @@ namespace EasyIotSharp.Core.Services.Files.Impl
                             await _minIOFileService.DeleteFileAsync(bucketName, objectName);
                         }
                     }
-                    resource.Url = await UploadResponse(input.Name, (ResourceEnums)input.Type, input.FormFile);
+                    resource.Url = await UploadResponse(input.Name, (ResourceEnums)input.ResourceType, input.FormFile);
                 }
 
                 // 更新资源信息
                 resource.Name = input.Name;
                 resource.Remark = input.Remark;
                 resource.State = input.State;
-                resource.Type = input.Type;
+                resource.Type = (int)input.ResourceType;
                 resource.UpdatedAt = DateTime.Now;
                 resource.OperatorId = ContextUser?.UserId;
                 resource.OperatorName = ContextUser?.UserName;

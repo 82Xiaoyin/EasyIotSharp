@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using EasyIotSharp.Core.Domain.Files;
+using EasyIotSharp.Core.Dto.Enum;
 using Microsoft.AspNetCore.Http;
 using SqlSugar;
 
@@ -35,7 +36,7 @@ namespace EasyIotSharp.Core.Dto.File.Params
         /// <summary>
         /// 类型
         /// </summary>
-        public int Type { get; set; }
+        public ResourceEnums ResourceType { get; set; }
 
         /// <summary>
         /// 描述
