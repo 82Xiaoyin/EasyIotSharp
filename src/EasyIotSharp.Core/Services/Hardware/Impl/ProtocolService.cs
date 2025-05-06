@@ -32,7 +32,12 @@ namespace EasyIotSharp.Core.Services.Hardware.Impl
             var info = await _protocolRepository.FirstOrDefaultAsync(x => x.Id == id && x.IsDelete == false);
             return info.MapTo<ProtocolDto>();
         }
-
+        
+        /// <summary>
+        /// 根据条件分页查询协议列表
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
         public async Task<PagedResultDto<ProtocolDto>> QueryProtocol(QueryProtocolInput input)
         {
             if(string.IsNullOrEmpty(input.Keyword) && input.IsEnable.Equals(-1)
@@ -58,6 +63,11 @@ namespace EasyIotSharp.Core.Services.Hardware.Impl
             }
         }
 
+        /// <summary>
+        /// 添加一条协议信息
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
         public async Task InsertProtocol(InsertProtocolInput input)
         {
             var isExistName = await _protocolRepository.FirstOrDefaultAsync(x => x.Name == input.Name && x.IsDelete == false);
@@ -81,6 +91,11 @@ namespace EasyIotSharp.Core.Services.Hardware.Impl
             await EventBus.TriggerAsync(new ProtocolEventData() { });
         }
 
+        /// <summary>
+        /// 通过id修改一条协议信息
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
         public async Task UpdateProtocol(UpdateProtocolInput input)
         {
             var info = await _protocolRepository.FirstOrDefaultAsync(x => x.Id == input.Id && x.IsDelete == false);
@@ -105,6 +120,11 @@ namespace EasyIotSharp.Core.Services.Hardware.Impl
             await EventBus.TriggerAsync(new ProtocolEventData() { });
         }
 
+        /// <summary>
+        /// 通过id删除一条协议信息
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
         public async Task DeleteProtocol(DeleteProtocolInput input)
         {
             var info = await _protocolRepository.GetByIdAsync(input.Id);

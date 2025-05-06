@@ -18,12 +18,21 @@ using UPrime.Services.Dto;
 
 namespace EasyIotSharp.Core.Services.Hardware.Impl
 {
+    /// <summary>
+    /// 传感器指标服务实现类
+    /// </summary>
     public class SensorQuotaService : ServiceBase, ISensorQuotaService
     {
         private readonly ISensorQuotaRepository _sensorQuotaRepository;
         private readonly ISensorRepository _sensorRepository;
         private readonly ISensorQuotaCacheService _sensorQuotaCacheService;
 
+        /// <summary>
+        /// 构造函数
+        /// </summary>
+        /// <param name="sensorQuotaRepository">传感器指标仓储</param>
+        /// <param name="sensorRepository">传感器仓储</param>
+        /// <param name="sensorQuotaCacheService">传感器指标缓存服务</param>
         public SensorQuotaService(ISensorQuotaRepository sensorQuotaRepository,
                                   ISensorRepository sensorRepository,
                                   ISensorQuotaCacheService sensorQuotaCacheService)
@@ -33,6 +42,11 @@ namespace EasyIotSharp.Core.Services.Hardware.Impl
             _sensorQuotaCacheService = sensorQuotaCacheService;
         }
 
+        /// <summary>
+        /// 获取单个传感器指标信息
+        /// </summary>
+        /// <param name="id">指标ID</param>
+        /// <returns>传感器指标信息</returns>
         public async Task<SensorQuotaDto> GetSensorQuota(string id)
         {
             var info = await _sensorQuotaRepository.FirstOrDefaultAsync(x => x.Id == id && x.IsDelete == false);

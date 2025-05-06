@@ -13,16 +13,28 @@ using static FluentValidation.Validators.PredicateValidator;
 
 namespace EasyIotSharp.Core.Repositories.Project.Impl
 {
+    /// <summary>
+    /// 网关仓储实现类
+    /// </summary>
     public class GatewayRepository : MySqlRepositoryBase<Gateway, string>, IGatewayRepository
     {
+        /// <summary>
+        /// 构造函数
+        /// </summary>
+        /// <param name="databaseProvider">数据库提供者</param>
         public GatewayRepository(ISqlSugarDatabaseProvider databaseProvider) : base(databaseProvider)
         {
         }
+
         /// <summary>
-        /// 根据网关id获取单条信息
+        /// 获取单个网关信息
         /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
+        /// <param name="id">网关ID</param>
+        /// <returns>网关基础信息</returns>
+        /// <remarks>
+        /// 关联查询：
+        /// - 租户信息（获取租户简称）
+        /// </remarks>
         public GatewayBaseDto GetGateway(string id)
         {
             return Client.Queryable<Gateway>()
@@ -41,10 +53,15 @@ namespace EasyIotSharp.Core.Repositories.Project.Impl
         }
 
         /// <summary>
-        /// 根据网关ids获取集合
+        /// 根据ID列表批量获取网关信息
         /// </summary>
-        /// <param name="ids"></param>
-        /// <returns></returns>
+        /// <param name="ids">网关ID列表</param>
+        /// <returns>网关列表</returns>
+        /// <remarks>
+        /// 查询条件：
+        /// 1. ID在指定列表中
+        /// 2. 未删除的记录
+        /// </remarks>
         public List<Gateway> GetByIds(List<string> ids)
         {
             if (ids == null || ids.Count == 0)
@@ -61,6 +78,30 @@ namespace EasyIotSharp.Core.Repositories.Project.Impl
             var items = Client.Queryable<Gateway>().Where(predicate);
             return items.ToList();
         }
+
+        /// <summary>
+        /// 分页查询网关列表
+        /// </summary>
+        /// <param name="tenantNumId">租户编号</param>
+        /// <param name="Keyword">关键字（网关名称）</param>
+        /// <param name="state">状态</param>
+        /// <param name="protocolId">协议ID</param>
+        /// <param name="projectId">项目ID</param>
+        /// <param name="pageIndex">页码</param>
+        /// <param name="pageSize">每页大小</param>
+        /// <returns>总数和网关列表</returns>
+        /// <remarks>
+        /// 查询条件：
+        /// 1. 未删除的记录
+        /// 2. 指定租户的记录（如果提供）
+        /// 3. 名称包含关键字（如果提供）
+        /// 4. 指定状态的记录（如果提供）
+        /// 5. 指定协议的记录（如果提供）
+        /// 6. 指定项目的记录（如果提供）
+        /// 
+        /// 排序方式：
+        /// - 按创建时间降序
+        /// </remarks>
         public async Task<(int totalCount, List<Gateway> items)> Query(int tenantNumId,
                                                                       string Keyword,
                                                                       int state,
@@ -111,6 +152,19 @@ namespace EasyIotSharp.Core.Repositories.Project.Impl
             var items = await query.ToListAsync();
             return (totalCount, items);
         }
+
+        /// <summary>
+        /// 根据ID列表批量查询网关
+        /// </summary>
+        /// <param name="ids">网关ID列表</param>
+        /// <returns>网关列表</returns>
+        /// <remarks>
+        /// 使用 LinqKit 的 PredicateBuilder 构建动态查询条件
+        /// 注意：
+        /// 1. 排除已删除的网关
+        /// 2. 使用临时变量避免闭包问题
+        /// 3. 使用 OR 条件组合多个ID查询
+        /// </remarks>
         public async Task<List<Gateway>> QueryByIds(List<string> ids)
         {
             if (ids == null || ids.Count == 0)
