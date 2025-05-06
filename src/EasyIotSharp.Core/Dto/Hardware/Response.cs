@@ -12,6 +12,7 @@ namespace EasyIotSharp.Core.Dto.Hardware
 
     public class Quotas
     {
+        public string Identifier { get; set; }
         public string Name { get; set; }
         public string Unit { get; set; }
         public bool IsShow { get; set; }
