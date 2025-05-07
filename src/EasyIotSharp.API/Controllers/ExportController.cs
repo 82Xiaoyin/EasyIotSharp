@@ -26,7 +26,7 @@ namespace EasyIotSharp.API.Controllers
         /// <param name="input">查询参数</param>
         /// <returns>分页结果</returns>
         [HttpPost("/Export/ExportRecord/Query")]
-        //[Authorize]
+        [Authorize]
         public async Task<PagedResultDto<ExportDataRecordDto>> QueryExportRecord([FromBody] ExportRecordInput input)
         {
             return await _exportRecordService.QueryExportRecord(input);
@@ -39,7 +39,7 @@ namespace EasyIotSharp.API.Controllers
         /// <param name="input">创建参数</param>
         /// <returns></returns>
         [HttpPost("/Export/ExportRecord/Insert")]
-        //[Authorize]
+        [Authorize]
         public async Task<UPrimeResponse<string>> CreateExportRecord([FromBody] ExportRecordInsert input)
         {
             UPrimeResponse<string> res = new UPrimeResponse<string>();
@@ -53,7 +53,7 @@ namespace EasyIotSharp.API.Controllers
         /// <param name="input">创建参数</param>
         /// <returns></returns>
         [HttpPost("/Export/ExportRecord/Update")]
-        //[Authorize]
+        [Authorize]
         public async Task<UPrimeResponse> UpdateExportRecord([FromBody] ExportRecordInsert input)
         {
             await _exportRecordService.UpdateExportRecord(input); ;
@@ -65,7 +65,7 @@ namespace EasyIotSharp.API.Controllers
         /// </summary>
         /// <param name="id">记录ID</param>
         [HttpPost("/Export/ExportRecord/Delete")]
-        //[Authorize]
+        [Authorize]
         public async Task<UPrimeResponse> DeleteExportRecord([FromBody] DeleteInput input)
         {
             await _exportRecordService.DeleteExportRecord(input.Id);
