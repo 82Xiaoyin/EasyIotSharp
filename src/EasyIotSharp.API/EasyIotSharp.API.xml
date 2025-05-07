@@ -72,6 +72,33 @@
             <param name="input">入参</param>
             <returns></returns>
         </member>
+        <member name="M:EasyIotSharp.API.Controllers.ExportController.QueryExportRecord(EasyIotSharp.Core.Dto.Export.Params.ExportRecordInput)">
+            <summary>
+            资源列表
+            </summary>
+            <param name="input">查询参数</param>
+            <returns>分页结果</returns>
+        </member>
+        <member name="M:EasyIotSharp.API.Controllers.ExportController.CreateExportRecord(EasyIotSharp.Core.Dto.Export.Params.ExportRecordInsert)">
+            <summary>
+            创建导出记录
+            </summary>
+            <param name="input">创建参数</param>
+            <returns></returns>
+        </member>
+        <member name="M:EasyIotSharp.API.Controllers.ExportController.UpdateExportRecord(EasyIotSharp.Core.Dto.Export.Params.ExportRecordInsert)">
+            <summary>
+            更新导出记录
+            </summary>
+            <param name="input">创建参数</param>
+            <returns></returns>
+        </member>
+        <member name="M:EasyIotSharp.API.Controllers.ExportController.DeleteExportRecord(EasyIotSharp.Core.Dto.DeleteInput)">
+            <summary>
+            删除导出记录
+            </summary>
+            <param name="id">记录ID</param>
+        </member>
         <member name="M:EasyIotSharp.API.Controllers.FileController.QueryResources(EasyIotSharp.Core.Dto.File.Params.ResourceInput)">
             <summary>
             资源列表

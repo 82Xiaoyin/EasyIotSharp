@@ -716,6 +716,11 @@
             状态
             </summary>
         </member>
+        <member name="P:EasyIotSharp.Core.Domain.Export.ExportRecord.ResourceId">
+            <summary>
+            资源Id
+            </summary>
+        </member>
         <member name="T:EasyIotSharp.Core.Domain.Files.Resource">
             <summary>
             资源表
@@ -1760,6 +1765,76 @@
         <member name="F:EasyIotSharp.Core.Dto.Enum.ResourceEnums.全部">
             <summary>
             string
+            </summary>
+        </member>
+        <member name="P:EasyIotSharp.Core.Dto.Export.ExportDataRecordDto.Id">
+            <summary>
+            主键
+            </summary>
+        </member>
+        <member name="P:EasyIotSharp.Core.Dto.Export.ExportDataRecordDto.Name">
+            <summary>
+            名称
+            </summary>
+        </member>
+        <member name="P:EasyIotSharp.Core.Dto.Export.ExportDataRecordDto.TenantId">
+            <summary>
+            租户Id
+            </summary>
+        </member>
+        <member name="P:EasyIotSharp.Core.Dto.Export.ExportDataRecordDto.ProjectId">
+            <summary>
+            项目Id
+            </summary>
+        </member>
+        <member name="P:EasyIotSharp.Core.Dto.Export.ExportDataRecordDto.ExecuteTime">
+            <summary>
+            执行时间
+            </summary>
+        </member>
+        <member name="P:EasyIotSharp.Core.Dto.Export.ExportDataRecordDto.State">
+            <summary>
+            状态
+            </summary>
+        </member>
+        <member name="P:EasyIotSharp.Core.Dto.Export.ExportDataRecordDto.ResourceId">
+            <summary>
+            资源Id
+            </summary>
+        </member>
+        <member name="P:EasyIotSharp.Core.Dto.Export.Params.ExportDataInput.SensorId">
+            <summary>
+            设备Id
+            </summary>
+        </member>
+        <member name="P:EasyIotSharp.Core.Dto.Export.Params.ExportDataInput.SensorPointId">
+            <summary>
+            测点Id
+            </summary>
+        </member>
+        <member name="P:EasyIotSharp.Core.Dto.Export.Params.ExportDataInput.SensorQuotaId">
+            <summary>
+            测点记录类型Id
+            </summary>
+        </member>
+        <member name="P:EasyIotSharp.Core.Dto.Export.Params.ExportDataInput.ProjectId">
+            <summary>
+            测点Id
+            </summary>
+        </member>
+        <member name="P:EasyIotSharp.Core.Dto.Export.Params.ExportDataInput.StartTime">
+            <summary>
+            开始时间
+            </summary>
+        </member>
+        <member name="P:EasyIotSharp.Core.Dto.Export.Params.ExportDataInput.EndTime">
+            <summary>
+            结束时间
+            </summary>
+        </member>
+        <member name="P:EasyIotSharp.Core.Dto.Export.Params.ExportRecordInput.ProjectId">
+            <summary>
+            项目ID
             </summary>
         </member>
         <member name="T:EasyIotSharp.Core.Dto.File.FileDownloadDto">
@@ -5766,6 +5841,23 @@
             导出zip文件拓展类
             </summary>
         </member>
+        <member name="M:EasyIotSharp.Core.Extensions.ZipHelper.ZipFile(System.String,System.String,System.Int32,System.Int32)">
+            <summary>
+            单文件压缩
+            </summary>
+            <param name="sourceFile">源文件</param>
+            <param name="zipedFile">zip压缩文件</param>
+            <param name="blockSize">缓冲区大小</param>
+            <param name="compressionLevel">压缩级别</param>
+        </member>
+        <member name="M:EasyIotSharp.Core.Extensions.ZipHelper.ZipFiles(System.String,System.String[],System.String)">
+            <summary>
+            多文件压缩
+            </summary>
+            <param name="zipfile">zip压缩文件</param>
+            <param name="filenames">源文件集合</param>
+            <param name="password">压缩加密</param>
+        </member>
         <member name="T:EasyIotSharp.Core.GlobalConsts">
             <summary>
             全局的常量
@@ -6127,6 +6219,26 @@
             获取未执行的导出任务
             </summary>
             <returns></returns>
+        </member>
+        <member name="M:EasyIotSharp.Core.Repositories.Export.IExportRecordRepository.QueryExportRecordPage(System.String,System.String,System.Int32,System.Int32,System.Boolean)">
+            <summary>
+            分页查询导出记录
+            </summary>
+            <param name="input">查询参数</param>
+            <returns>总数和导出记录列表</returns>
+        </member>
+        <member name="M:EasyIotSharp.Core.Repositories.Export.Impl.ExportRecordRepository.QueryExportRecord">
+            <summary>
+            查询出未执行的任务
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:EasyIotSharp.Core.Repositories.Export.Impl.ExportRecordRepository.QueryExportRecordPage(System.String,System.String,System.Int32,System.Int32,System.Boolean)">
+            <summary>
+            分页查询导出记录
+            </summary>
+            <param name="input">查询参数</param>
+            <returns>总数和导出记录列表</returns>
         </member>
         <member name="M:EasyIotSharp.Core.Repositories.Files.Impl.ResourceRepository.Query(System.String,System.Nullable{System.Boolean},EasyIotSharp.Core.Dto.Enum.ResourceEnums,System.Int32,System.Int32,System.Boolean)">
             <summary>
@@ -7412,6 +7524,68 @@
             获取所有省份列表（静态的）
             </summary>
             <returns></returns>
+        </member>
+        <member name="T:EasyIotSharp.Core.Services.Export.IExportRecordService">
+            <summary>
+            导出记录服务接口
+            </summary>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.Export.IExportRecordService.CreateExportRecord(EasyIotSharp.Core.Dto.Export.Params.ExportRecordInsert)">
+            <summary>
+            创建导出记录
+            </summary>
+            <param name="input">创建参数</param>
+            <returns>新创建的记录ID</returns>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.Export.IExportRecordService.UpdateExportRecord(EasyIotSharp.Core.Dto.Export.Params.ExportRecordInsert)">
+            <summary>
+            更新导出记录
+            </summary>
+            <param name="input">更新参数</param>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.Export.IExportRecordService.DeleteExportRecord(System.String)">
+            <summary>
+            删除导出记录
+            </summary>
+            <param name="id">记录ID</param>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.Export.IExportRecordService.QueryExportRecord(EasyIotSharp.Core.Dto.Export.Params.ExportRecordInput)">
+            <summary>
+            分页查询导出记录
+            </summary>
+            <param name="input">查询参数</param>
+            <returns>分页结果</returns>
+        </member>
+        <member name="T:EasyIotSharp.Core.Services.Export.Impl.ExportRecordService">
+            <summary>
+            导出记录服务实现类
+            </summary>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.Export.Impl.ExportRecordService.QueryExportRecord(EasyIotSharp.Core.Dto.Export.Params.ExportRecordInput)">
+            <summary>
+            分页查询导出记录
+            </summary>
+            <param name="input">查询参数</param>
+            <returns>分页结果</returns>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.Export.Impl.ExportRecordService.CreateExportRecord(EasyIotSharp.Core.Dto.Export.Params.ExportRecordInsert)">
+            <summary>
+            创建导出记录
+            </summary>
+            <param name="input">创建参数</param>
+            <returns>新创建的记录ID</returns>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.Export.Impl.ExportRecordService.UpdateExportRecord(EasyIotSharp.Core.Dto.Export.Params.ExportRecordInsert)">
+            <summary>
+            更新导出记录
+            </summary>
+            <param name="input">更新参数</param>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.Export.Impl.ExportRecordService.DeleteExportRecord(System.String)">
+            <summary>
+            删除导出记录
+            </summary>
+            <param name="id">记录ID</param>
         </member>
         <member name="M:EasyIotSharp.Core.Services.Files.Impl.ResourceService.QueryResources(EasyIotSharp.Core.Dto.File.Params.ResourceInput)">
             <summary>

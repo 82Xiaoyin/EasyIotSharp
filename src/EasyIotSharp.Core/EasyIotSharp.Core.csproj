@@ -41,7 +41,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Dto\Export\Params\" />
     <Folder Include="Repositories\Queue\Impl\" />
+    <Folder Include="Quartz\" />
   </ItemGroup>
 </Project>
