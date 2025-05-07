@@ -22,7 +22,7 @@ namespace EasyIotSharp.Core.Dto.Export.Params
         public string SensorQuotaId { get; set; }
 
         /// <summary>
-        /// 测点Id
+        /// 项目Id
         /// </summary>
         public string ProjectId { get; set; }
 
