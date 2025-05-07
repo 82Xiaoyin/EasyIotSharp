@@ -1,23 +1,16 @@
-﻿using System;
-using Quartz.Impl;
-using Quartz;
-using System.Threading.Tasks;
-using EasylotSharp.Quartz.Service;
-using Microsoft.Extensions.DependencyInjection;
-using EasyIotSharp.Core.Repositories.Mysql;
-using EasylotSharp.Quartz.JobFactory;
-using EasyIotSharp.Repositories.Mysql;
-using EasyIotSharp.Core.Configuration;
+﻿using EasyIotSharp.Core.Configuration;
+using Microsoft.Extensions.Configuration;
+using UPrime.Configuration;
+using Serilog;
+using System;
+using System.IO;
+using System.Threading;
 using UPrime;
 using EasyIotSharp.Core.Extensions;
-using Microsoft.Extensions.Configuration;
-using System.IO;
-using UPrime.Configuration;
-using Castle.Core.Logging;
-using Microsoft.Graph;
-using Microsoft.Graph.Models;
-using Serilog;
-
+using System.Threading.Tasks;
+using Quartz;
+using Quartz.Impl;
+using EasylotSharp.Quartz.Service;
 namespace EasylotSharp.Quartz
 {
     internal class Program
@@ -55,6 +48,7 @@ namespace EasylotSharp.Quartz
                     .AddYamlFile($"appsettings.{environment}.yml", optional: true, reloadOnChange: true)
                     .AddCommandLine(args)
                     .Build();
+
             var appOptions = AppOptions.ReadFromConfiguration(config);
             UPrimeStarter.Create<QuartzModule>(
                (options) =>

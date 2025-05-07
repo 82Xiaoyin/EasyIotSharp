@@ -13,6 +13,12 @@
 
   <ItemGroup>
     <ProjectReference Include="..\EasyIotSharp.Core\EasyIotSharp.Core.csproj" />
-  </ItemGroup>
+    <None Update="appsettings.yml">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="appsettings.dev.yml">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+</ItemGroup>
 
 </Project>

@@ -55,10 +55,14 @@ namespace EasyIotSharp.Core.Services.Export.Impl
         /// <returns>新创建的记录ID</returns>
         public async Task<string> CreateExportRecord(ExportRecordInsert input)
         {
+            var data = Newtonsoft.Json.JsonConvert.DeserializeObject<List<ExportDataInput>>(input.ConditionJson);
+            if (data == null || data.Count == 0)
+            {
+                throw new BizException(BizError.NO_HANDLER_FOUND, "条件错误");
+            }
             if (!string.IsNullOrEmpty(input.ConditionJson))
             {
-                var data = Newtonsoft.Json.JsonConvert.DeserializeObject<ExportDataInput>(input.ConditionJson);
-                if (data.StartTime.Value.Date.AddDays(60) > data.EndTime.Value.Date)
+                if (data[0].StartTime.Value.Date.AddDays(60) > data[0].EndTime.Value.Date)
                 {
                     throw new BizException(BizError.NO_HANDLER_FOUND, "一次性导出最多60天的数据");
                 }
@@ -72,7 +76,7 @@ namespace EasyIotSharp.Core.Services.Export.Impl
             {
                 Id = Guid.NewGuid().ToString().Replace("-", ""),
                 TenantId = ContextUser.TenantId,
-                ProjectId = input.ProjectId,
+                ProjectId = data[0].ProjectId,
                 Name = input.Name + "-" + DateTime.Now.ToString("yyyyMMddHHmmss"),
                 ConditionJson = input.ConditionJson,
                 State = 0, // 初始状态：未执行
