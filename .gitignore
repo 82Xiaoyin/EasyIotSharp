@@ -20,6 +20,8 @@
 /src/EasyIotSharp.GateWay.Core/obj
 /src/EasyIotSharp.DataProcessor/bin
 /src/EasyIotSharp.DataProcessor/obj
+/src/EasylotSharp.Quartz/bin
+/src/EasylotSharp.Quartz/obj
 .vs/*
 /.vs
 /.vs/slnx.sqlite
