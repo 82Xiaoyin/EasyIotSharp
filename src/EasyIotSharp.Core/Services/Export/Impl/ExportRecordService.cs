@@ -62,7 +62,7 @@ namespace EasyIotSharp.Core.Services.Export.Impl
             }
             if (!string.IsNullOrEmpty(input.ConditionJson))
             {
-                if (data[0].StartTime.Value.Date.AddDays(60) > data[0].EndTime.Value.Date)
+                if (data[0].StartTime.Value.Date.AddDays(60) < data[0].EndTime.Value.Date)
                 {
                     throw new BizException(BizError.NO_HANDLER_FOUND, "一次性导出最多60天的数据");
                 }
