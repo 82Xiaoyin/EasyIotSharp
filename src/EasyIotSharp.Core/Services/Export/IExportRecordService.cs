@@ -1,5 +1,6 @@
 ﻿using EasyIotSharp.Core.Dto.Export;
 using EasyIotSharp.Core.Dto.Export.Params;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using UPrime.Services.Dto;
 
@@ -10,6 +11,12 @@ namespace EasyIotSharp.Core.Services.Export
     /// </summary>
     public interface IExportRecordService
     {
+        /// <summary>
+        /// 获取列表
+        /// </summary>
+        /// <returns></returns>
+        Task<List<ExportRecordDto>> QueryExportRecord();
+
         /// <summary>
         /// 创建导出记录
         /// </summary>

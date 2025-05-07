@@ -42,6 +42,5 @@
 
   <ItemGroup>
     <Folder Include="Repositories\Queue\Impl\" />
-    <Folder Include="Quartz\" />
   </ItemGroup>
 </Project>

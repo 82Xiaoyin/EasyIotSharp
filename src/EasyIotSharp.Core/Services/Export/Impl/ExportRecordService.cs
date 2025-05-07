@@ -8,6 +8,7 @@ using System;
 using System.Threading.Tasks;
 using UPrime.AutoMapper;
 using UPrime.Services.Dto;
+using System.Collections.Generic;
 
 namespace EasyIotSharp.Core.Services.Export.Impl
 {
@@ -21,6 +22,15 @@ namespace EasyIotSharp.Core.Services.Export.Impl
         public ExportRecordService(IExportRecordRepository exportRecordRepository)
         {
             _exportRecordRepository = exportRecordRepository;
+        }
+
+        /// <summary>
+        /// 获取列表
+        /// </summary>
+        /// <returns></returns>
+        public async Task<List<ExportRecordDto>> QueryExportRecord()
+        {
+            return await _exportRecordRepository.QueryExportRecord();
         }
 
         /// <summary>

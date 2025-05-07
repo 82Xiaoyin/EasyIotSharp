@@ -7530,6 +7530,12 @@
             导出记录服务接口
             </summary>
         </member>
+        <member name="M:EasyIotSharp.Core.Services.Export.IExportRecordService.QueryExportRecord">
+            <summary>
+            获取列表
+            </summary>
+            <returns></returns>
+        </member>
         <member name="M:EasyIotSharp.Core.Services.Export.IExportRecordService.CreateExportRecord(EasyIotSharp.Core.Dto.Export.Params.ExportRecordInsert)">
             <summary>
             创建导出记录
@@ -7560,6 +7566,12 @@
             <summary>
             导出记录服务实现类
             </summary>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.Export.Impl.ExportRecordService.QueryExportRecord">
+            <summary>
+            获取列表
+            </summary>
+            <returns></returns>
         </member>
         <member name="M:EasyIotSharp.Core.Services.Export.Impl.ExportRecordService.QueryExportRecord(EasyIotSharp.Core.Dto.Export.Params.ExportRecordInput)">
             <summary>
