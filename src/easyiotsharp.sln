@@ -12,6 +12,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EasyIotSharp.GateWay.Core",
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EasyIotSharp.DataProcessor", "EasyIotSharp.DataProcessor\EasyIotSharp.DataProcessor.csproj", "{C77C3C92-E892-415E-920B-9C6DDCDB463E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EasylotSharp.Quartz", "EasylotSharp.Quartz\EasylotSharp.Quartz.csproj", "{F33E7EEF-4695-462B-94B3-BC6E0FFD617A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -38,6 +40,10 @@ Global
 		{C77C3C92-E892-415E-920B-9C6DDCDB463E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C77C3C92-E892-415E-920B-9C6DDCDB463E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C77C3C92-E892-415E-920B-9C6DDCDB463E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F33E7EEF-4695-462B-94B3-BC6E0FFD617A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F33E7EEF-4695-462B-94B3-BC6E0FFD617A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F33E7EEF-4695-462B-94B3-BC6E0FFD617A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F33E7EEF-4695-462B-94B3-BC6E0FFD617A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
