@@ -15,11 +15,19 @@ using UPrime.Services.Dto;
 
 namespace EasyIotSharp.Core.Services.Hardware.Impl
 {
+    /// <summary>
+    /// 传感器服务实现类
+    /// </summary>
     public class SensorService : ServiceBase, ISensorService
     {
         private readonly ISensorRepository _sensorRepository;
         private readonly ISensorCacheService _sensorCacheService;
 
+        /// <summary>
+        /// 构造函数
+        /// </summary>
+        /// <param name="sensorRepository">传感器仓储</param>
+        /// <param name="sensorCacheService">传感器缓存服务</param>
         public SensorService(ISensorRepository sensorRepository,
             ISensorCacheService sensorCacheService)
         {
@@ -27,12 +35,28 @@ namespace EasyIotSharp.Core.Services.Hardware.Impl
             _sensorCacheService = sensorCacheService;
         }
 
+        /// <summary>
+        /// 获取单个传感器信息
+        /// </summary>
+        /// <param name="id">传感器ID</param>
+        /// <returns>传感器信息</returns>
         public async Task<SensorDto> GetSensor(string id)
         {
             var info = await _sensorRepository.FirstOrDefaultAsync(x => x.Id == id && x.IsDelete == false);
             return info.MapTo<SensorDto>();
         }
 
+        /// <summary>
+        /// 查询传感器列表
+        /// </summary>
+        /// <param name="input">查询参数</param>
+        /// <returns>分页后的传感器列表</returns>
+        /// <remarks>
+        /// 当满足以下条件时使用缓存：
+        /// 1. 无关键字搜索
+        /// 2. 使用分页且在前5页
+        /// 3. 每页大小为10
+        /// </remarks>
         public async Task<PagedResultDto<SensorDto>> QuerySensor(QuerySensorInput input)
         {
             if (string.IsNullOrEmpty(input.Keyword)
@@ -58,6 +82,18 @@ namespace EasyIotSharp.Core.Services.Hardware.Impl
             }
         }
 
+        /// <summary>
+        /// 新增传感器
+        /// </summary>
+        /// <param name="input">新增参数</param>
+        /// <returns>无</returns>
+        /// <exception cref="BizException">当传感器简称重复时抛出异常</exception>
+        /// <remarks>
+        /// 执行操作：
+        /// 1. 检查简称是否重复
+        /// 2. 创建新传感器记录
+        /// 3. 清除相关缓存
+        /// </remarks>
         public async Task InsertSensor(InsertSensorInput input)
         {
             var isExistBriefName = await _sensorRepository.FirstOrDefaultAsync(x => x.TenantNumId == ContextUser.TenantNumId && x.BriefName == input.BriefName && x.IsDelete == false);
@@ -85,6 +121,22 @@ namespace EasyIotSharp.Core.Services.Hardware.Impl
             await EventBus.TriggerAsync(new SensorBaseEventData() { });
         }
 
+        /// <summary>
+        /// 修改传感器信息
+        /// </summary>
+        /// <param name="input">修改参数</param>
+        /// <returns>无</returns>
+        /// <exception cref="BizException">
+        /// 抛出异常的情况：
+        /// 1. 传感器不存在
+        /// 2. 传感器简称重复
+        /// </exception>
+        /// <remarks>
+        /// 更新内容包括：
+        /// 1. 基本信息（名称、简称、供应商等）
+        /// 2. 更新时间和操作者信息
+        /// 3. 清除相关缓存
+        /// </remarks>
         public async Task UpdateSensor(UpdateSensorInput input)
         {
             var info = await _sensorRepository.FirstOrDefaultAsync(x => x.TenantNumId == ContextUser.TenantNumId && x.Id == input.Id && x.IsDelete == false);
@@ -112,6 +164,18 @@ namespace EasyIotSharp.Core.Services.Hardware.Impl
             await EventBus.TriggerAsync(new SensorBaseEventData() { });
         }
 
+        /// <summary>
+        /// 删除传感器
+        /// </summary>
+        /// <param name="input">删除参数</param>
+        /// <returns>无</returns>
+        /// <exception cref="BizException">当传感器不存在时抛出异常</exception>
+        /// <remarks>
+        /// 执行软删除：
+        /// 1. 更新IsDelete状态
+        /// 2. 记录操作者信息
+        /// 3. 清除相关缓存
+        /// </remarks>
         public async Task DeleteSensor(DeleteSensorInput input)
         {
             var info = await _sensorRepository.GetByIdAsync(input.Id);
@@ -134,9 +198,14 @@ namespace EasyIotSharp.Core.Services.Hardware.Impl
         }
 
         /// <summary>
-        /// 列表
+        /// 获取传感器列表
         /// </summary>
-        /// <returns></returns>
+        /// <returns>传感器列表</returns>
+        /// <remarks>
+        /// 优先从缓存获取数据：
+        /// 1. 如果缓存中有数据，直接返回
+        /// 2. 如果缓存为空，从数据库获取
+        /// </remarks>
         public List<Sensor> GetSensorList()
         {
             var list = _sensorCacheService.GetSensorList(() => { return _sensorRepository.GetSensorList(); });

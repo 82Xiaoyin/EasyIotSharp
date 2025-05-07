@@ -2,13 +2,15 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace EasyIotSharp.Core.Domain.Export
+namespace EasyIotSharp.Core.Dto.Export
 {
-    /// <summary>
-    /// 导出记录
-    /// </summary>
-    public class ExportRecord : BaseEntity<string>
+    public class ExportDataRecordDto
     {
+        /// <summary>
+        /// 主键
+        /// </summary>
+        public string Id { get; set; }
+
         /// <summary>
         /// 名称
         /// </summary>
@@ -19,16 +21,10 @@ namespace EasyIotSharp.Core.Domain.Export
         /// </summary>
         public string TenantId { get; set; }
 
-
         /// <summary>
         /// 项目Id
         /// </summary>
         public string ProjectId { get; set; }
-
-        /// <summary>
-        /// Json条件
-        /// </summary>
-        public string ConditionJson { get; set; }
 
         /// <summary>
         /// 执行时间

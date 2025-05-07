@@ -14,13 +14,21 @@ using EasyIotSharp.Core.Events.Tenant;
 
 namespace EasyIotSharp.Core.Services.Tenant.Impl
 {
-    public class TenantService:ServiceBase, ITenantService
+    /// <summary>
+    /// 租户服务实现类
+    /// </summary>
+    public class TenantService : ServiceBase, ITenantService
     {
         private readonly ITenantRepository _tenantRepository;
-
         private readonly ISoldierService _soldierService;
         private readonly ITenantCacheService _tenantCacheService;
 
+        /// <summary>
+        /// 构造函数
+        /// </summary>
+        /// <param name="tenantRepository">租户仓储</param>
+        /// <param name="soldierService">用户服务</param>
+        /// <param name="tenantCacheService">租户缓存服务</param>
         public TenantService(ITenantRepository tenantRepository,
                              ISoldierService soldierService,
                              ITenantCacheService tenantCacheService)
@@ -30,12 +38,30 @@ namespace EasyIotSharp.Core.Services.Tenant.Impl
             _tenantCacheService = tenantCacheService;
         }
 
+        /// <summary>
+        /// 获取单个租户信息
+        /// </summary>
+        /// <param name="id">租户ID</param>
+        /// <returns>租户信息</returns>
         public async Task<TenantDto> GetTenant(string id)
         {
             var info = await _tenantRepository.FirstOrDefaultAsync(x => x.Id == id && x.IsDelete == false);
             return info.MapTo<TenantDto>();
         }
 
+        /// <summary>
+        /// 查询租户列表
+        /// </summary>
+        /// <param name="input">查询参数</param>
+        /// <returns>分页后的租户列表</returns>
+        /// <remarks>
+        /// 当满足以下条件时使用缓存：
+        /// 1. 无关键字搜索
+        /// 2. 过期类型为-1
+        /// 3. 无合同开始和结束时间筛选
+        /// 4. 使用分页且在前5页
+        /// 5. 每页大小为10
+        /// </remarks>
         public async Task<PagedResultDto<TenantDto>> QueryTenant(QueryTenantInput input)
         {
             if (string.IsNullOrEmpty(input.Keyword) && input.ExpiredType.Equals(-1) 
@@ -61,6 +87,20 @@ namespace EasyIotSharp.Core.Services.Tenant.Impl
 
         }
 
+        /// <summary>
+        /// 新增租户
+        /// </summary>
+        /// <param name="input">新增参数</param>
+        /// <returns>无</returns>
+        /// <exception cref="BizException">当租户名称重复时抛出异常</exception>
+        /// <remarks>
+        /// 执行操作：
+        /// 1. 检查租户名称是否重复
+        /// 2. 生成租户编号
+        /// 3. 创建租户管理员账号
+        /// 4. 创建租户记录
+        /// 5. 清除相关缓存
+        /// </remarks>
         public async Task InsertTenant(InsertTenantInput input)
         {
             var info = await _tenantRepository.FirstOrDefaultAsync(x => x.Name == input.Name && x.IsDelete == false);
@@ -110,6 +150,23 @@ namespace EasyIotSharp.Core.Services.Tenant.Impl
             await EventBus.TriggerAsync(new TenantEventData(){});
         }
 
+        /// <summary>
+        /// 修改租户信息
+        /// </summary>
+        /// <param name="input">修改参数</param>
+        /// <returns>无</returns>
+        /// <exception cref="BizException">
+        /// 抛出异常的情况：
+        /// 1. 租户不存在
+        /// 2. 租户名称重复
+        /// </exception>
+        /// <remarks>
+        /// 更新内容包括：
+        /// 1. 基本信息（名称、合同信息等）
+        /// 2. 联系信息（手机、邮箱等）
+        /// 3. 状态信息（版本、冻结状态等）
+        /// 4. 清除相关缓存
+        /// </remarks>
         public async Task UpdateTenant(UpdateTenantInput input)
         {
             var info = await _tenantRepository.GetByIdAsync(input.Id);
@@ -144,6 +201,18 @@ namespace EasyIotSharp.Core.Services.Tenant.Impl
             await EventBus.TriggerAsync(new TenantEventData() { });
         }
 
+        /// <summary>
+        /// 更新租户冻结状态
+        /// </summary>
+        /// <param name="input">冻结状态更新参数</param>
+        /// <returns>无</returns>
+        /// <exception cref="BizException">当租户不存在时抛出异常</exception>
+        /// <remarks>
+        /// 仅当冻结状态发生变化时才更新：
+        /// 1. 更新冻结状态和描述
+        /// 2. 记录操作者信息
+        /// 3. 清除相关缓存
+        /// </remarks>
         public async Task UpdateIsFreezeTenant(UpdateIsFreezeTenantTenantInput input)
         {
             var info = await _tenantRepository.GetByIdAsync(input.Id);
@@ -164,6 +233,18 @@ namespace EasyIotSharp.Core.Services.Tenant.Impl
             await EventBus.TriggerAsync(new TenantEventData() { });
         }
 
+        /// <summary>
+        /// 删除租户
+        /// </summary>
+        /// <param name="input">删除参数</param>
+        /// <returns>无</returns>
+        /// <exception cref="BizException">当租户不存在时抛出异常</exception>
+        /// <remarks>
+        /// 执行软删除：
+        /// 1. 更新IsDelete状态
+        /// 2. 记录操作者信息
+        /// 3. 清除相关缓存
+        /// </remarks>
         public async Task DeleteTenant(DeleteTenantInput input)
         {
             var info = await _tenantRepository.GetByIdAsync(input.Id);

@@ -16,14 +16,23 @@ using UPrime.Services.Dto;
 
 namespace EasyIotSharp.Core.Services.Hardware.Impl
 {
+    /// <summary>
+    /// 协议配置服务实现类
+    /// </summary>
     public class ProtocolConfigService : ServiceBase, IProtocolConfigService
     {
         private readonly IProtocolRepository _protocolRepository;
         private readonly IProtocolConfigRepository _protocolConfigRepository;
         private readonly IProtocolConfigExtRepository _protocolConfigExtRepository;
-
         private readonly IProtocolConfigCacheService _protocolConfigCacheService;
 
+        /// <summary>
+        /// 构造函数
+        /// </summary>
+        /// <param name="protocolRepository">协议仓储</param>
+        /// <param name="protocolConfigRepository">协议配置仓储</param>
+        /// <param name="protocolConfigExtRepository">协议配置扩展仓储</param>
+        /// <param name="protocolConfigCacheService">协议配置缓存服务</param>
         public ProtocolConfigService(IProtocolRepository protocolRepository,
                                      IProtocolConfigRepository protocolConfigRepository,
                                      IProtocolConfigExtRepository protocolConfigExtRepository,
@@ -35,6 +44,11 @@ namespace EasyIotSharp.Core.Services.Hardware.Impl
             _protocolConfigCacheService = protocolConfigCacheService;
         }
 
+        /// <summary>
+        /// 通过id获取一条协议配置信息
+        /// </summary>
+        /// <param name="id">协议配置ID</param>
+        /// <returns>协议配置信息</returns>
         public async Task<ProtocolConfigDto> GetProtocolConfig(string id)
         {
             var info = await _protocolConfigRepository.FirstOrDefaultAsync(x => x.Id == id && x.IsDelete == false);
@@ -50,6 +64,19 @@ namespace EasyIotSharp.Core.Services.Hardware.Impl
             return output;
         }
 
+        /// <summary>
+        /// 查询协议配置列表
+        /// </summary>
+        /// <param name="input">查询参数</param>
+        /// <returns>分页后的协议配置列表</returns>
+        /// <remarks>
+        /// 当满足以下条件时使用缓存：
+        /// 1. 无关键字搜索
+        /// 2. 标签类型为None
+        /// 3. 无协议ID筛选
+        /// 4. 使用分页且在前5页
+        /// 5. 每页大小为10
+        /// </remarks>
         public async Task<PagedResultDto<QueryProtocolConfigByProtocolIdOutput>> QueryProtocolConfig(QueryProtocolConfigInput input)
         {
             if (string.IsNullOrEmpty(input.Keyword)
@@ -114,6 +141,18 @@ namespace EasyIotSharp.Core.Services.Hardware.Impl
 
         }
 
+        /// <summary>
+        /// 新增协议配置
+        /// </summary>
+        /// <param name="input">新增参数</param>
+        /// <returns>无</returns>
+        /// <exception cref="BizException">当标识符重复时抛出异常</exception>
+        /// <remarks>
+        /// 同时会处理：
+        /// 1. 基本配置信息
+        /// 2. 扩展配置信息（Options）
+        /// 3. 清除相关缓存
+        /// </remarks>
         public async Task InsertProtocolConfig(InsertProtocolConfigInput input)
         {
             var isExistName = await _protocolConfigRepository.FirstOrDefaultAsync(x => x.Identifier == input.Identifier && x.IsDelete == false);
@@ -164,6 +203,22 @@ namespace EasyIotSharp.Core.Services.Hardware.Impl
             await EventBus.TriggerAsync(new ProtocolConfigEventData() { });
         }
 
+        /// <summary>
+        /// 修改协议配置
+        /// </summary>
+        /// <param name="input">修改参数</param>
+        /// <returns>无</returns>
+        /// <exception cref="BizException">
+        /// 抛出异常的情况：
+        /// 1. 协议配置不存在
+        /// 2. 标识符重复
+        /// </exception>
+        /// <remarks>
+        /// 更新内容包括：
+        /// 1. 基本配置信息
+        /// 2. 可选更新扩展配置（由IsUpdateExt控制）
+        /// 3. 清除相关缓存
+        /// </remarks>
         public async Task UpdateProtocolConfig(UpdateProtocolConfigInput input)
         {
             var info = await _protocolConfigRepository.FirstOrDefaultAsync(x => x.Id == input.Id && x.IsDelete == false);
@@ -220,6 +275,18 @@ namespace EasyIotSharp.Core.Services.Hardware.Impl
             await EventBus.TriggerAsync(new ProtocolConfigEventData() { });
         }
 
+        /// <summary>
+        /// 删除协议配置
+        /// </summary>
+        /// <param name="input">删除参数</param>
+        /// <returns>无</returns>
+        /// <exception cref="BizException">当协议配置不存在时抛出异常</exception>
+        /// <remarks>
+        /// 执行软删除：
+        /// 1. 更新IsDelete状态
+        /// 2. 记录操作者信息
+        /// 3. 清除相关缓存
+        /// </remarks>
         public async Task DeleteProtocolConfig(DeleteProtocolConfigInput input)
         {
             var info = await _protocolConfigRepository.GetByIdAsync(input.Id);

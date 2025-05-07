@@ -28,7 +28,7 @@ namespace EasyIotSharp.API.Controllers
         /// <summary>
         /// 通过条件分页查询场景管理
         /// </summary>
-        /// <param name="input"></param>
+        /// <param name="input">入参</param>
         /// <returns></returns>
         [HttpPost("/Automation/SceneManagement/Query")]
         [Authorize]
@@ -42,7 +42,7 @@ namespace EasyIotSharp.API.Controllers
         /// <summary>
         /// 新增场景管理
         /// </summary>
-        /// <param name="input"></param>
+        /// <param name="input">入参</param>
         /// <returns></returns>
         [HttpPost("/Automation/SceneManagement/Insert")]
         [Authorize]
@@ -55,7 +55,7 @@ namespace EasyIotSharp.API.Controllers
         /// <summary>
         /// 修改场景管理
         /// </summary>
-        /// <param name="input"></param>
+        /// <param name="input">入参</param>
         /// <returns></returns>
         [HttpPost("/Automation/SceneManagement/Update")]
         [Authorize]
@@ -68,7 +68,7 @@ namespace EasyIotSharp.API.Controllers
         /// <summary>
         /// 删除场景管理
         /// </summary>
-        /// <param name="input"></param>
+        /// <param name="input">入参</param>
         /// <returns></returns>
         [HttpPost("/Automation/SceneManagement/Delete")]
         [Authorize]
@@ -86,7 +86,7 @@ namespace EasyIotSharp.API.Controllers
         /// <summary>
         /// 通过条件分页查询场景联动
         /// </summary>
-        /// <param name="input"></param>
+        /// <param name="input">入参</param>
         /// <returns></returns>
         [HttpPost("/Automation/RuleChain/Query")]
         [Authorize]
@@ -100,7 +100,7 @@ namespace EasyIotSharp.API.Controllers
         /// <summary>
         /// 新增场景联动
         /// </summary>
-        /// <param name="input"></param>
+        /// <param name="input">入参</param>
         /// <returns></returns>
         [HttpPost("/Automation/RuleChain/Insert")]
         [Authorize]
@@ -113,7 +113,7 @@ namespace EasyIotSharp.API.Controllers
         /// <summary>
         /// 修改场景联动
         /// </summary>
-        /// <param name="input"></param>
+        /// <param name="input">入参</param>
         /// <returns></returns>
         [HttpPost("/Automation/RuleChain/Update")]
         [Authorize]
@@ -126,7 +126,7 @@ namespace EasyIotSharp.API.Controllers
         /// <summary>
         /// 删除场景联动
         /// </summary>
-        /// <param name="input"></param>
+        /// <param name="input">入参</param>
         /// <returns></returns>
         [HttpPost("/Automation/RuleChain/Delete")]
         [Authorize]
@@ -139,7 +139,7 @@ namespace EasyIotSharp.API.Controllers
         /// <summary>
         /// 修改场景联动状态
         /// </summary>
-        /// <param name="input"></param>
+        /// <param name="input">入参</param>
         /// <returns></returns>
         [HttpPost("/Automation/RuleChain/UpdateState")]
         [Authorize]

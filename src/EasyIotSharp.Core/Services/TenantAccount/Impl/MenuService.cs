@@ -16,6 +16,9 @@ using UPrime.Services.Dto;
 
 namespace EasyIotSharp.Core.Services.TenantAccount.Impl
 {
+    /// <summary>
+    /// 菜单服务实现类
+    /// </summary>
     public class MenuService : ServiceBase, IMenuService
     {
         private readonly IMenuRepository _menuRepository;
@@ -23,8 +26,17 @@ namespace EasyIotSharp.Core.Services.TenantAccount.Impl
         private readonly IRoleRepository _roleRepository;
         private readonly IRoleMenuRepository _roleMenuRepository;
         private readonly ISoldierRoleRepository _soldierRoleRepository;
-        private readonly IMenuCacheService  _menuCacheService;
+        private readonly IMenuCacheService _menuCacheService;
 
+        /// <summary>
+        /// 构造函数
+        /// </summary>
+        /// <param name="menuRepository">菜单仓储</param>
+        /// <param name="roleMenuRepository">角色菜单仓储</param>
+        /// <param name="soldierRoleRepository">用户角色仓储</param>
+        /// <param name="soldierRepository">用户仓储</param>
+        /// <param name="roleRepository">角色仓储</param>
+        /// <param name="menuCacheService">菜单缓存服务</param>
         public MenuService(IMenuRepository menuRepository,
                            IRoleMenuRepository roleMenuRepository,
                            ISoldierRoleRepository soldierRoleRepository,
@@ -40,12 +52,29 @@ namespace EasyIotSharp.Core.Services.TenantAccount.Impl
             _menuCacheService = menuCacheService;
         }
 
+        /// <summary>
+        /// 获取单个菜单信息
+        /// </summary>
+        /// <param name="id">菜单ID</param>
+        /// <returns>菜单信息</returns>
         public async Task<MenuDto> GetMenu(string id)
         {
             var info = await _menuRepository.FirstOrDefaultAsync(x => x.IsDelete == false && x.Id == id);
             return info.MapTo<MenuDto>();
         }
 
+        /// <summary>
+        /// 查询菜单列表
+        /// </summary>
+        /// <param name="input">查询参数</param>
+        /// <returns>分页后的菜单树形结构</returns>
+        /// <remarks>
+        /// 当满足以下条件时使用缓存：
+        /// 1. 无关键字搜索
+        /// 2. 启用状态为-1
+        /// 3. 使用分页且在前5页
+        /// 4. 每页大小为10
+        /// </remarks>
         public async Task<PagedResultDto<MenuTreeDto>> QueryMenu(QueryMenuInput input)
         {
             if (string.IsNullOrEmpty(input.Keyword) 
@@ -89,6 +118,17 @@ namespace EasyIotSharp.Core.Services.TenantAccount.Impl
             }
         }
 
+        /// <summary>
+        /// 根据用户ID查询菜单
+        /// </summary>
+        /// <param name="isTreeResult">是否返回树形结构</param>
+        /// <returns>菜单列表和原始菜单数据</returns>
+        /// <remarks>
+        /// 处理逻辑：
+        /// 1. 超级管理员获取所有菜单
+        /// 2. 普通用户通过角色关联获取菜单
+        /// 3. 可选择返回树形或平铺结构
+        /// </remarks>
         public async Task<(List<QueryMenuBySoldierIdOutput> output, List<Menu> menus)> QueryMenuBySoldierId(bool isTreeResult = true)
         {
             var soldier = await _soldierRepository.FirstOrDefaultAsync(x => x.IsDelete == false && x.Id == ContextUser.UserId);
@@ -172,6 +212,17 @@ namespace EasyIotSharp.Core.Services.TenantAccount.Impl
             return (output, menus);
         }
 
+        /// <summary>
+        /// 根据父级URL查询子菜单URL列表
+        /// </summary>
+        /// <param name="input">父级URL参数</param>
+        /// <returns>子菜单URL列表</returns>
+        /// <remarks>
+        /// 仅返回：
+        /// 1. Type为3的菜单
+        /// 2. 未删除的菜单
+        /// 3. 已启用的菜单
+        /// </remarks>
         public async Task<List<string>> QueryUrlMenuByParentUrl(QueryUrlMenuByParentUrlInput input)
         {
             var menus = await QueryMenuBySoldierId(false);
@@ -184,6 +235,19 @@ namespace EasyIotSharp.Core.Services.TenantAccount.Impl
             return children.Select(x => x.Url).ToList();
         }
 
+        /// <summary>
+        /// 新增菜单
+        /// </summary>
+        /// <param name="input">新增参数</param>
+        /// <returns>无</returns>
+        /// <exception cref="BizException">当菜单名称或路由重复时抛出异常</exception>
+        /// <remarks>
+        /// 创建内容包括：
+        /// 1. 基本信息（名称、图标、URL等）
+        /// 2. 层级关系（父级ID）
+        /// 3. 权限信息（超级管理员权限）
+        /// 4. 清除相关缓存
+        /// </remarks>
         public async Task InsertMenu(InsertMenuInput input)
         {
             var isExist = await _menuRepository.VerifyMenu(input);
@@ -211,6 +275,16 @@ namespace EasyIotSharp.Core.Services.TenantAccount.Impl
             await EventBus.TriggerAsync(new MenuEventData() { });
         }
 
+        /// <summary>
+        /// 修改菜单信息
+        /// </summary>
+        /// <param name="input">修改参数</param>
+        /// <returns>无</returns>
+        /// <exception cref="BizException">
+        /// 抛出异常的情况：
+        /// 1. 菜单不存在
+        /// 2. 菜单名称或路由重复
+        /// </exception>
         public async Task UpdateMenu(InsertMenuInput input)
         {
             var info = await _menuRepository.GetByIdAsync(input.Id);
@@ -238,6 +312,18 @@ namespace EasyIotSharp.Core.Services.TenantAccount.Impl
             await EventBus.TriggerAsync(new MenuEventData() { });
         }
 
+        /// <summary>
+        /// 更新菜单启用状态
+        /// </summary>
+        /// <param name="input">启用状态更新参数</param>
+        /// <returns>无</returns>
+        /// <exception cref="BizException">当菜单不存在时抛出异常</exception>
+        /// <remarks>
+        /// 仅当启用状态发生变化时才更新：
+        /// 1. 更新启用状态
+        /// 2. 记录操作者信息
+        /// 3. 清除相关缓存
+        /// </remarks>
         public async Task UpdateIsEnableMenu(UpdateIsEnableMenuInput input)
         {
             var info = await _menuRepository.GetByIdAsync(input.Id);
@@ -258,6 +344,18 @@ namespace EasyIotSharp.Core.Services.TenantAccount.Impl
             await EventBus.TriggerAsync(new MenuEventData() { });
         }
 
+        /// <summary>
+        /// 删除菜单
+        /// </summary>
+        /// <param name="input">删除参数</param>
+        /// <returns>无</returns>
+        /// <exception cref="BizException">当菜单不存在时抛出异常</exception>
+        /// <remarks>
+        /// 执行软删除：
+        /// 1. 更新IsDelete状态
+        /// 2. 记录操作者信息
+        /// 3. 清除相关缓存
+        /// </remarks>
         public async Task DeleteMenu(DeleteMenuInput input)
         {
             var info = await _menuRepository.GetByIdAsync(input.Id);

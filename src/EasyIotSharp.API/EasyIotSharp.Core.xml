@@ -716,6 +716,11 @@
             状态
             </summary>
         </member>
+        <member name="P:EasyIotSharp.Core.Domain.Export.ExportRecord.ResourceId">
+            <summary>
+            资源Id
+            </summary>
+        </member>
         <member name="T:EasyIotSharp.Core.Domain.Files.Resource">
             <summary>
             资源表
@@ -1760,6 +1765,76 @@
         <member name="F:EasyIotSharp.Core.Dto.Enum.ResourceEnums.全部">
             <summary>
             string
+            </summary>
+        </member>
+        <member name="P:EasyIotSharp.Core.Dto.Export.ExportDataRecordDto.Id">
+            <summary>
+            主键
+            </summary>
+        </member>
+        <member name="P:EasyIotSharp.Core.Dto.Export.ExportDataRecordDto.Name">
+            <summary>
+            名称
+            </summary>
+        </member>
+        <member name="P:EasyIotSharp.Core.Dto.Export.ExportDataRecordDto.TenantId">
+            <summary>
+            租户Id
+            </summary>
+        </member>
+        <member name="P:EasyIotSharp.Core.Dto.Export.ExportDataRecordDto.ProjectId">
+            <summary>
+            项目Id
+            </summary>
+        </member>
+        <member name="P:EasyIotSharp.Core.Dto.Export.ExportDataRecordDto.ExecuteTime">
+            <summary>
+            执行时间
+            </summary>
+        </member>
+        <member name="P:EasyIotSharp.Core.Dto.Export.ExportDataRecordDto.State">
+            <summary>
+            状态
+            </summary>
+        </member>
+        <member name="P:EasyIotSharp.Core.Dto.Export.ExportDataRecordDto.ResourceId">
+            <summary>
+            资源Id
+            </summary>
+        </member>
+        <member name="P:EasyIotSharp.Core.Dto.Export.Params.ExportDataInput.SensorId">
+            <summary>
+            设备Id
+            </summary>
+        </member>
+        <member name="P:EasyIotSharp.Core.Dto.Export.Params.ExportDataInput.SensorPointId">
+            <summary>
+            测点Id
+            </summary>
+        </member>
+        <member name="P:EasyIotSharp.Core.Dto.Export.Params.ExportDataInput.SensorQuotaId">
+            <summary>
+            测点记录类型Id
+            </summary>
+        </member>
+        <member name="P:EasyIotSharp.Core.Dto.Export.Params.ExportDataInput.ProjectId">
+            <summary>
+            测点Id
+            </summary>
+        </member>
+        <member name="P:EasyIotSharp.Core.Dto.Export.Params.ExportDataInput.StartTime">
+            <summary>
+            开始时间
+            </summary>
+        </member>
+        <member name="P:EasyIotSharp.Core.Dto.Export.Params.ExportDataInput.EndTime">
+            <summary>
+            结束时间
+            </summary>
+        </member>
+        <member name="P:EasyIotSharp.Core.Dto.Export.Params.ExportRecordInput.ProjectId">
+            <summary>
+            项目ID
             </summary>
         </member>
         <member name="T:EasyIotSharp.Core.Dto.File.FileDownloadDto">
@@ -5766,6 +5841,23 @@
             导出zip文件拓展类
             </summary>
         </member>
+        <member name="M:EasyIotSharp.Core.Extensions.ZipHelper.ZipFile(System.String,System.String,System.Int32,System.Int32)">
+            <summary>
+            单文件压缩
+            </summary>
+            <param name="sourceFile">源文件</param>
+            <param name="zipedFile">zip压缩文件</param>
+            <param name="blockSize">缓冲区大小</param>
+            <param name="compressionLevel">压缩级别</param>
+        </member>
+        <member name="M:EasyIotSharp.Core.Extensions.ZipHelper.ZipFiles(System.String,System.String[],System.String)">
+            <summary>
+            多文件压缩
+            </summary>
+            <param name="zipfile">zip压缩文件</param>
+            <param name="filenames">源文件集合</param>
+            <param name="password">压缩加密</param>
+        </member>
         <member name="T:EasyIotSharp.Core.GlobalConsts">
             <summary>
             全局的常量
@@ -6127,6 +6219,26 @@
             获取未执行的导出任务
             </summary>
             <returns></returns>
+        </member>
+        <member name="M:EasyIotSharp.Core.Repositories.Export.IExportRecordRepository.QueryExportRecordPage(System.String,System.String,System.Int32,System.Int32,System.Boolean)">
+            <summary>
+            分页查询导出记录
+            </summary>
+            <param name="input">查询参数</param>
+            <returns>总数和导出记录列表</returns>
+        </member>
+        <member name="M:EasyIotSharp.Core.Repositories.Export.Impl.ExportRecordRepository.QueryExportRecord">
+            <summary>
+            查询出未执行的任务
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:EasyIotSharp.Core.Repositories.Export.Impl.ExportRecordRepository.QueryExportRecordPage(System.String,System.String,System.Int32,System.Int32,System.Boolean)">
+            <summary>
+            分页查询导出记录
+            </summary>
+            <param name="input">查询参数</param>
+            <returns>总数和导出记录列表</returns>
         </member>
         <member name="M:EasyIotSharp.Core.Repositories.Files.Impl.ResourceRepository.Query(System.String,System.Nullable{System.Boolean},EasyIotSharp.Core.Dto.Enum.ResourceEnums,System.Int32,System.Int32,System.Boolean)">
             <summary>
@@ -6559,6 +6671,59 @@
             <param name="ids">ID集合</param>
             <returns></returns>
         </member>
+        <member name="T:EasyIotSharp.Core.Repositories.Project.Impl.ClassificationRepository">
+            <summary>
+            分类仓储实现类
+            </summary>
+        </member>
+        <member name="M:EasyIotSharp.Core.Repositories.Project.Impl.ClassificationRepository.#ctor(EasyIotSharp.Core.Repositories.Mysql.ISqlSugarDatabaseProvider)">
+            <summary>
+            构造函数
+            </summary>
+            <param name="databaseProvider">数据库提供者</param>
+        </member>
+        <member name="M:EasyIotSharp.Core.Repositories.Project.Impl.ClassificationRepository.Query(System.Int32,System.String,System.Int32,System.Int32,System.Boolean)">
+            <summary>
+            查询分类列表
+            </summary>
+            <param name="tenantNumId">租户编号</param>
+            <param name="projectId">项目ID</param>
+            <param name="pageIndex">页码</param>
+            <param name="pageSize">每页大小</param>
+            <param name="isPage">是否分页</param>
+            <returns>总数和分类列表</returns>
+            <remarks>
+            查询条件：
+            1. 未删除的记录
+            2. 指定租户的记录（如果提供）
+            3. 指定项目的记录（如果提供）
+            
+            排序方式：
+            1. 优先按Sort字段降序
+            2. 其次按创建时间降序
+            
+            分页处理：
+            - 当isPage为true时执行分页查询
+            - 当isPage为false时返回所有结果
+            </remarks>
+        </member>
+        <member name="M:EasyIotSharp.Core.Repositories.Project.Impl.ClassificationRepository.QueryByIds(System.Collections.Generic.List{System.String})">
+            <summary>
+            根据ID列表批量查询分类
+            </summary>
+            <param name="ids">分类ID列表</param>
+            <returns>分类列表</returns>
+            <remarks>
+            查询特点：
+            1. 使用 LinqKit 的 PredicateBuilder 构建动态查询条件
+            2. 使用 OR 条件组合多个ID查询
+            3. 排除已删除的记录
+            4. 使用临时变量避免闭包问题
+            
+            空值处理：
+            - 当传入的ID列表为空时返回空列表
+            </remarks>
+        </member>
         <member name="M:EasyIotSharp.Core.Repositories.Project.Impl.GatewayProtocolRepository.GetGatewayProtocol(System.String)">
             <summary>
             通过网关id获取数据
@@ -6566,19 +6731,157 @@
             <param name="id"></param>
             <returns></returns>
         </member>
+        <member name="T:EasyIotSharp.Core.Repositories.Project.Impl.GatewayRepository">
+            <summary>
+            网关仓储实现类
+            </summary>
+        </member>
+        <member name="M:EasyIotSharp.Core.Repositories.Project.Impl.GatewayRepository.#ctor(EasyIotSharp.Core.Repositories.Mysql.ISqlSugarDatabaseProvider)">
+            <summary>
+            构造函数
+            </summary>
+            <param name="databaseProvider">数据库提供者</param>
+        </member>
         <member name="M:EasyIotSharp.Core.Repositories.Project.Impl.GatewayRepository.GetGateway(System.String)">
             <summary>
-            根据网关id获取单条信息
+            获取单个网关信息
             </summary>
-            <param name="id"></param>
-            <returns></returns>
+            <param name="id">网关ID</param>
+            <returns>网关基础信息</returns>
+            <remarks>
+            关联查询：
+            - 租户信息（获取租户简称）
+            </remarks>
         </member>
         <member name="M:EasyIotSharp.Core.Repositories.Project.Impl.GatewayRepository.GetByIds(System.Collections.Generic.List{System.String})">
             <summary>
-            根据网关ids获取集合
+            根据ID列表批量获取网关信息
             </summary>
-            <param name="ids"></param>
-            <returns></returns>
+            <param name="ids">网关ID列表</param>
+            <returns>网关列表</returns>
+            <remarks>
+            查询条件：
+            1. ID在指定列表中
+            2. 未删除的记录
+            </remarks>
+        </member>
+        <member name="M:EasyIotSharp.Core.Repositories.Project.Impl.GatewayRepository.Query(System.Int32,System.String,System.Int32,System.String,System.String,System.Int32,System.Int32)">
+            <summary>
+            分页查询网关列表
+            </summary>
+            <param name="tenantNumId">租户编号</param>
+            <param name="Keyword">关键字（网关名称）</param>
+            <param name="state">状态</param>
+            <param name="protocolId">协议ID</param>
+            <param name="projectId">项目ID</param>
+            <param name="pageIndex">页码</param>
+            <param name="pageSize">每页大小</param>
+            <returns>总数和网关列表</returns>
+            <remarks>
+            查询条件：
+            1. 未删除的记录
+            2. 指定租户的记录（如果提供）
+            3. 名称包含关键字（如果提供）
+            4. 指定状态的记录（如果提供）
+            5. 指定协议的记录（如果提供）
+            6. 指定项目的记录（如果提供）
+            
+            排序方式：
+            - 按创建时间降序
+            </remarks>
+        </member>
+        <member name="M:EasyIotSharp.Core.Repositories.Project.Impl.GatewayRepository.QueryByIds(System.Collections.Generic.List{System.String})">
+            <summary>
+            根据ID列表批量查询网关
+            </summary>
+            <param name="ids">网关ID列表</param>
+            <returns>网关列表</returns>
+            <remarks>
+            使用 LinqKit 的 PredicateBuilder 构建动态查询条件
+            注意：
+            1. 排除已删除的网关
+            2. 使用临时变量避免闭包问题
+            3. 使用 OR 条件组合多个ID查询
+            </remarks>
+        </member>
+        <member name="T:EasyIotSharp.Core.Repositories.Project.Impl.ProjectBaseRepository">
+            <summary>
+            项目基础信息仓储实现类
+            </summary>
+        </member>
+        <member name="M:EasyIotSharp.Core.Repositories.Project.Impl.ProjectBaseRepository.#ctor(EasyIotSharp.Core.Repositories.Mysql.ISqlSugarDatabaseProvider)">
+            <summary>
+            构造函数
+            </summary>
+            <param name="databaseProvider">数据库提供者</param>
+        </member>
+        <member name="M:EasyIotSharp.Core.Repositories.Project.Impl.ProjectBaseRepository.Query(System.Int32,System.String,System.Int32,System.Nullable{System.DateTime},System.Nullable{System.DateTime},System.Int32,System.Int32)">
+            <summary>
+            查询项目列表
+            </summary>
+            <param name="tenantNumId">租户编号</param>
+            <param name="keyword">关键字（项目名称或备注）</param>
+            <param name="state">状态</param>
+            <param name="createStartTime">创建开始时间</param>
+            <param name="createEndTime">创建结束时间</param>
+            <param name="pageIndex">页码</param>
+            <param name="pageSize">每页大小</param>
+            <returns>返回总数和项目列表</returns>
+            <remarks>
+            关联查询：
+            1. RabbitProject（消息队列项目配置）
+            2. RabbitServerInfo（消息队列服务器信息）
+            3. Resource（资源信息）
+            </remarks>
+        </member>
+        <member name="M:EasyIotSharp.Core.Repositories.Project.Impl.ProjectBaseRepository.QueryByProjectBaseFirst(System.String)">
+            <summary>
+            查询单个项目详细信息
+            </summary>
+            <param name="id">项目ID</param>
+            <returns>项目详细信息</returns>
+            <remarks>
+            关联查询：
+            1. RabbitProject（消息队列项目配置）
+            2. RabbitServerInfo（消息队列服务器信息）
+            </remarks>
+        </member>
+        <member name="M:EasyIotSharp.Core.Repositories.Project.Impl.ProjectBaseRepository.QueryByIds(System.Collections.Generic.List{System.String})">
+            <summary>
+            根据ID列表批量查询项目
+            </summary>
+            <param name="ids">项目ID列表</param>
+            <returns>项目列表</returns>
+            <remarks>
+            使用 LinqKit 的 PredicateBuilder 构建动态查询条件
+            注意：
+            1. 排除已删除的项目
+            2. 使用临时变量避免闭包问题
+            </remarks>
+        </member>
+        <member name="M:EasyIotSharp.Core.Repositories.Project.Impl.ProjectBaseRepository.QueryRabbitProject(System.String)">
+            <summary>
+            查询项目关联的消息队列配置
+            </summary>
+            <param name="projectId">项目ID</param>
+            <returns>消息队列项目配置信息</returns>
+            <remarks>
+            仅返回未删除的配置信息
+            </remarks>
+        </member>
+        <member name="M:EasyIotSharp.Core.Repositories.Project.Impl.ProjectBaseRepository.AddRabbitProject(EasyIotSharp.Core.Domain.Queue.RabbitProject)">
+            <summary>
+            添加项目消息队列配置
+            </summary>
+            <param name="rabbitProject">消息队列项目配置信息</param>
+            <returns>无</returns>
+        </member>
+        <member name="M:EasyIotSharp.Core.Repositories.Project.Impl.ProjectBaseRepository.UpdateRabbitProject(EasyIotSharp.Core.Domain.Queue.RabbitProject)">
+            <summary>
+            更新项目消息队列配置
+            </summary>
+            <param name="rabbitProject">消息队列项目配置信息</param>
+            <returns>无</returns>
         </member>
         <member name="M:EasyIotSharp.Core.Repositories.Project.Impl.SensorPointRepository.QueryList(System.String)">
             <summary>
@@ -7063,6 +7366,46 @@
             <param name="soldierId"></param>
             <returns></returns>
         </member>
+        <member name="T:EasyIotSharp.Core.Repositories.Tenant.Impl.TenantRepository">
+            <summary>
+            租户仓储实现类
+            </summary>
+        </member>
+        <member name="M:EasyIotSharp.Core.Repositories.Tenant.Impl.TenantRepository.#ctor(EasyIotSharp.Core.Repositories.Mysql.ISqlSugarDatabaseProvider)">
+            <summary>
+            构造函数
+            </summary>
+            <param name="databaseProvider">数据库提供者</param>
+        </member>
+        <member name="M:EasyIotSharp.Core.Repositories.Tenant.Impl.TenantRepository.Query(System.String,System.Int32,System.Nullable{System.DateTime},System.Nullable{System.DateTime},System.Int32,System.Int32,System.Int32)">
+            <summary>
+            查询租户列表
+            </summary>
+            <param name="keyword">关键字（租户名称）</param>
+            <param name="expiredType">过期类型（0:待授权, 1:生效中, 2:已过期）</param>
+            <param name="contractStartTime">合同开始时间</param>
+            <param name="contractEndTime">合同结束时间</param>
+            <param name="isFreeze">冻结状态（-1:全部, 0:未冻结, 1:已冻结）</param>
+            <param name="pageIndex">页码</param>
+            <param name="pageSize">每页大小</param>
+            <returns>总数和租户列表</returns>
+            <remarks>
+            查询条件：
+            1. 未删除的记录
+            2. 名称包含关键字（如果提供）
+            3. 根据过期类型筛选：
+               - 待授权：合同开始时间大于当前时间
+               - 生效中：当前时间在合同期限内
+               - 已过期：合同结束时间小于当前时间
+            4. 合同时间范围筛选（如果提供）
+            5. 冻结状态筛选（如果提供）
+            
+            分页处理：
+            - 先获取总记录数
+            - 当总记录数为0时返回空列表
+            - 使用基类的分页查询方法获取数据
+            </remarks>
+        </member>
         <member name="T:EasyIotSharp.Core.Repositories.Tenant.ITenantRepository">
             <summary>
             租户仓储接口类
@@ -7182,6 +7525,68 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="T:EasyIotSharp.Core.Services.Export.IExportRecordService">
+            <summary>
+            导出记录服务接口
+            </summary>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.Export.IExportRecordService.CreateExportRecord(EasyIotSharp.Core.Dto.Export.Params.ExportRecordInsert)">
+            <summary>
+            创建导出记录
+            </summary>
+            <param name="input">创建参数</param>
+            <returns>新创建的记录ID</returns>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.Export.IExportRecordService.UpdateExportRecord(EasyIotSharp.Core.Dto.Export.Params.ExportRecordInsert)">
+            <summary>
+            更新导出记录
+            </summary>
+            <param name="input">更新参数</param>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.Export.IExportRecordService.DeleteExportRecord(System.String)">
+            <summary>
+            删除导出记录
+            </summary>
+            <param name="id">记录ID</param>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.Export.IExportRecordService.QueryExportRecord(EasyIotSharp.Core.Dto.Export.Params.ExportRecordInput)">
+            <summary>
+            分页查询导出记录
+            </summary>
+            <param name="input">查询参数</param>
+            <returns>分页结果</returns>
+        </member>
+        <member name="T:EasyIotSharp.Core.Services.Export.Impl.ExportRecordService">
+            <summary>
+            导出记录服务实现类
+            </summary>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.Export.Impl.ExportRecordService.QueryExportRecord(EasyIotSharp.Core.Dto.Export.Params.ExportRecordInput)">
+            <summary>
+            分页查询导出记录
+            </summary>
+            <param name="input">查询参数</param>
+            <returns>分页结果</returns>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.Export.Impl.ExportRecordService.CreateExportRecord(EasyIotSharp.Core.Dto.Export.Params.ExportRecordInsert)">
+            <summary>
+            创建导出记录
+            </summary>
+            <param name="input">创建参数</param>
+            <returns>新创建的记录ID</returns>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.Export.Impl.ExportRecordService.UpdateExportRecord(EasyIotSharp.Core.Dto.Export.Params.ExportRecordInsert)">
+            <summary>
+            更新导出记录
+            </summary>
+            <param name="input">更新参数</param>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.Export.Impl.ExportRecordService.DeleteExportRecord(System.String)">
+            <summary>
+            删除导出记录
+            </summary>
+            <param name="id">记录ID</param>
+        </member>
         <member name="M:EasyIotSharp.Core.Services.Files.Impl.ResourceService.QueryResources(EasyIotSharp.Core.Dto.File.Params.ResourceInput)">
             <summary>
             查询资源列表
@@ -7268,6 +7673,136 @@
             <param name="input">下载参数</param>
             <returns>文件下载信息</returns>
         </member>
+        <member name="T:EasyIotSharp.Core.Services.Hardware.Impl.ProtocolConfigService">
+            <summary>
+            协议配置服务实现类
+            </summary>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.Hardware.Impl.ProtocolConfigService.#ctor(EasyIotSharp.Core.Repositories.Hardware.IProtocolRepository,EasyIotSharp.Core.Repositories.Hardware.IProtocolConfigRepository,EasyIotSharp.Core.Repositories.Hardware.IProtocolConfigExtRepository,EasyIotSharp.Core.Caching.Hardware.IProtocolConfigCacheService)">
+            <summary>
+            构造函数
+            </summary>
+            <param name="protocolRepository">协议仓储</param>
+            <param name="protocolConfigRepository">协议配置仓储</param>
+            <param name="protocolConfigExtRepository">协议配置扩展仓储</param>
+            <param name="protocolConfigCacheService">协议配置缓存服务</param>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.Hardware.Impl.ProtocolConfigService.GetProtocolConfig(System.String)">
+            <summary>
+            通过id获取一条协议配置信息
+            </summary>
+            <param name="id">协议配置ID</param>
+            <returns>协议配置信息</returns>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.Hardware.Impl.ProtocolConfigService.QueryProtocolConfig(EasyIotSharp.Core.Dto.Hardware.Params.QueryProtocolConfigInput)">
+            <summary>
+            查询协议配置列表
+            </summary>
+            <param name="input">查询参数</param>
+            <returns>分页后的协议配置列表</returns>
+            <remarks>
+            当满足以下条件时使用缓存：
+            1. 无关键字搜索
+            2. 标签类型为None
+            3. 无协议ID筛选
+            4. 使用分页且在前5页
+            5. 每页大小为10
+            </remarks>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.Hardware.Impl.ProtocolConfigService.InsertProtocolConfig(EasyIotSharp.Core.Dto.Hardware.Params.InsertProtocolConfigInput)">
+            <summary>
+            新增协议配置
+            </summary>
+            <param name="input">新增参数</param>
+            <returns>无</returns>
+            <exception cref="T:EasyIotSharp.Core.BizException">当标识符重复时抛出异常</exception>
+            <remarks>
+            同时会处理：
+            1. 基本配置信息
+            2. 扩展配置信息（Options）
+            3. 清除相关缓存
+            </remarks>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.Hardware.Impl.ProtocolConfigService.UpdateProtocolConfig(EasyIotSharp.Core.Dto.Hardware.Params.UpdateProtocolConfigInput)">
+            <summary>
+            修改协议配置
+            </summary>
+            <param name="input">修改参数</param>
+            <returns>无</returns>
+            <exception cref="T:EasyIotSharp.Core.BizException">
+            抛出异常的情况：
+            1. 协议配置不存在
+            2. 标识符重复
+            </exception>
+            <remarks>
+            更新内容包括：
+            1. 基本配置信息
+            2. 可选更新扩展配置（由IsUpdateExt控制）
+            3. 清除相关缓存
+            </remarks>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.Hardware.Impl.ProtocolConfigService.DeleteProtocolConfig(EasyIotSharp.Core.Dto.Hardware.Params.DeleteProtocolConfigInput)">
+            <summary>
+            删除协议配置
+            </summary>
+            <param name="input">删除参数</param>
+            <returns>无</returns>
+            <exception cref="T:EasyIotSharp.Core.BizException">当协议配置不存在时抛出异常</exception>
+            <remarks>
+            执行软删除：
+            1. 更新IsDelete状态
+            2. 记录操作者信息
+            3. 清除相关缓存
+            </remarks>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.Hardware.Impl.ProtocolService.QueryProtocol(EasyIotSharp.Core.Dto.Hardware.Params.QueryProtocolInput)">
+            <summary>
+            根据条件分页查询协议列表
+            </summary>
+            <param name="input"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.Hardware.Impl.ProtocolService.InsertProtocol(EasyIotSharp.Core.Dto.Hardware.Params.InsertProtocolInput)">
+            <summary>
+            添加一条协议信息
+            </summary>
+            <param name="input"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.Hardware.Impl.ProtocolService.UpdateProtocol(EasyIotSharp.Core.Dto.Hardware.Params.UpdateProtocolInput)">
+            <summary>
+            通过id修改一条协议信息
+            </summary>
+            <param name="input"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.Hardware.Impl.ProtocolService.DeleteProtocol(EasyIotSharp.Core.Dto.Hardware.Params.DeleteProtocolInput)">
+            <summary>
+            通过id删除一条协议信息
+            </summary>
+            <param name="input"></param>
+            <returns></returns>
+        </member>
+        <member name="T:EasyIotSharp.Core.Services.Hardware.Impl.SensorQuotaService">
+            <summary>
+            传感器指标服务实现类
+            </summary>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.Hardware.Impl.SensorQuotaService.#ctor(EasyIotSharp.Core.Repositories.Hardware.ISensorQuotaRepository,EasyIotSharp.Core.Repositories.Hardware.ISensorRepository,EasyIotSharp.Core.Caching.Hardware.ISensorQuotaCacheService)">
+            <summary>
+            构造函数
+            </summary>
+            <param name="sensorQuotaRepository">传感器指标仓储</param>
+            <param name="sensorRepository">传感器仓储</param>
+            <param name="sensorQuotaCacheService">传感器指标缓存服务</param>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.Hardware.Impl.SensorQuotaService.GetSensorQuota(System.String)">
+            <summary>
+            获取单个传感器指标信息
+            </summary>
+            <param name="id">指标ID</param>
+            <returns>传感器指标信息</returns>
+        </member>
         <member name="M:EasyIotSharp.Core.Services.Hardware.Impl.SensorQuotaService.QuerySensorQuota(EasyIotSharp.Core.Dto.Hardware.Params.QuerySensorQuotaInput)">
             <summary>
             传感器指标列表
@@ -7312,11 +7847,94 @@
             <param name="dataRespost">数据请求参数</param>
             <returns>响应结果</returns>
         </member>
+        <member name="T:EasyIotSharp.Core.Services.Hardware.Impl.SensorService">
+            <summary>
+            传感器服务实现类
+            </summary>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.Hardware.Impl.SensorService.#ctor(EasyIotSharp.Core.Repositories.Hardware.ISensorRepository,EasyIotSharp.Core.Caching.Hardware.ISensorCacheService)">
+            <summary>
+            构造函数
+            </summary>
+            <param name="sensorRepository">传感器仓储</param>
+            <param name="sensorCacheService">传感器缓存服务</param>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.Hardware.Impl.SensorService.GetSensor(System.String)">
+            <summary>
+            获取单个传感器信息
+            </summary>
+            <param name="id">传感器ID</param>
+            <returns>传感器信息</returns>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.Hardware.Impl.SensorService.QuerySensor(EasyIotSharp.Core.Dto.Hardware.Params.QuerySensorInput)">
+            <summary>
+            查询传感器列表
+            </summary>
+            <param name="input">查询参数</param>
+            <returns>分页后的传感器列表</returns>
+            <remarks>
+            当满足以下条件时使用缓存：
+            1. 无关键字搜索
+            2. 使用分页且在前5页
+            3. 每页大小为10
+            </remarks>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.Hardware.Impl.SensorService.InsertSensor(EasyIotSharp.Core.Dto.Hardware.Params.InsertSensorInput)">
+            <summary>
+            新增传感器
+            </summary>
+            <param name="input">新增参数</param>
+            <returns>无</returns>
+            <exception cref="T:EasyIotSharp.Core.BizException">当传感器简称重复时抛出异常</exception>
+            <remarks>
+            执行操作：
+            1. 检查简称是否重复
+            2. 创建新传感器记录
+            3. 清除相关缓存
+            </remarks>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.Hardware.Impl.SensorService.UpdateSensor(EasyIotSharp.Core.Dto.Hardware.Params.UpdateSensorInput)">
+            <summary>
+            修改传感器信息
+            </summary>
+            <param name="input">修改参数</param>
+            <returns>无</returns>
+            <exception cref="T:EasyIotSharp.Core.BizException">
+            抛出异常的情况：
+            1. 传感器不存在
+            2. 传感器简称重复
+            </exception>
+            <remarks>
+            更新内容包括：
+            1. 基本信息（名称、简称、供应商等）
+            2. 更新时间和操作者信息
+            3. 清除相关缓存
+            </remarks>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.Hardware.Impl.SensorService.DeleteSensor(EasyIotSharp.Core.Dto.Hardware.Params.DeleteSensorInput)">
+            <summary>
+            删除传感器
+            </summary>
+            <param name="input">删除参数</param>
+            <returns>无</returns>
+            <exception cref="T:EasyIotSharp.Core.BizException">当传感器不存在时抛出异常</exception>
+            <remarks>
+            执行软删除：
+            1. 更新IsDelete状态
+            2. 记录操作者信息
+            3. 清除相关缓存
+            </remarks>
+        </member>
         <member name="M:EasyIotSharp.Core.Services.Hardware.Impl.SensorService.GetSensorList">
             <summary>
-            列表
+            获取传感器列表
             </summary>
-            <returns></returns>
+            <returns>传感器列表</returns>
+            <remarks>
+            优先从缓存获取数据：
+            1. 如果缓存中有数据，直接返回
+            2. 如果缓存为空，从数据库获取
+            </remarks>
         </member>
         <member name="M:EasyIotSharp.Core.Services.Hardware.IProtocolConfigService.GetProtocolConfig(System.String)">
             <summary>
@@ -8522,6 +9140,289 @@
             <param name="input"></param>
             <returns></returns>
         </member>
+        <member name="T:EasyIotSharp.Core.Services.TenantAccount.Impl.MenuService">
+            <summary>
+            菜单服务实现类
+            </summary>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.TenantAccount.Impl.MenuService.#ctor(EasyIotSharp.Core.Repositories.TenantAccount.IMenuRepository,EasyIotSharp.Core.Repositories.TenantAccount.IRoleMenuRepository,EasyIotSharp.Core.Repositories.TenantAccount.ISoldierRoleRepository,EasyIotSharp.Core.Repositories.TenantAccount.ISoldierRepository,EasyIotSharp.Core.Repositories.TenantAccount.IRoleRepository,EasyIotSharp.Core.Caching.TenantAccount.IMenuCacheService)">
+            <summary>
+            构造函数
+            </summary>
+            <param name="menuRepository">菜单仓储</param>
+            <param name="roleMenuRepository">角色菜单仓储</param>
+            <param name="soldierRoleRepository">用户角色仓储</param>
+            <param name="soldierRepository">用户仓储</param>
+            <param name="roleRepository">角色仓储</param>
+            <param name="menuCacheService">菜单缓存服务</param>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.TenantAccount.Impl.MenuService.GetMenu(System.String)">
+            <summary>
+            获取单个菜单信息
+            </summary>
+            <param name="id">菜单ID</param>
+            <returns>菜单信息</returns>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.TenantAccount.Impl.MenuService.QueryMenu(EasyIotSharp.Core.Dto.TenantAccount.Params.QueryMenuInput)">
+            <summary>
+            查询菜单列表
+            </summary>
+            <param name="input">查询参数</param>
+            <returns>分页后的菜单树形结构</returns>
+            <remarks>
+            当满足以下条件时使用缓存：
+            1. 无关键字搜索
+            2. 启用状态为-1
+            3. 使用分页且在前5页
+            4. 每页大小为10
+            </remarks>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.TenantAccount.Impl.MenuService.QueryMenuBySoldierId(System.Boolean)">
+            <summary>
+            根据用户ID查询菜单
+            </summary>
+            <param name="isTreeResult">是否返回树形结构</param>
+            <returns>菜单列表和原始菜单数据</returns>
+            <remarks>
+            处理逻辑：
+            1. 超级管理员获取所有菜单
+            2. 普通用户通过角色关联获取菜单
+            3. 可选择返回树形或平铺结构
+            </remarks>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.TenantAccount.Impl.MenuService.QueryUrlMenuByParentUrl(EasyIotSharp.Core.Dto.TenantAccount.Params.QueryUrlMenuByParentUrlInput)">
+            <summary>
+            根据父级URL查询子菜单URL列表
+            </summary>
+            <param name="input">父级URL参数</param>
+            <returns>子菜单URL列表</returns>
+            <remarks>
+            仅返回：
+            1. Type为3的菜单
+            2. 未删除的菜单
+            3. 已启用的菜单
+            </remarks>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.TenantAccount.Impl.MenuService.InsertMenu(EasyIotSharp.Core.Dto.TenantAccount.Params.InsertMenuInput)">
+            <summary>
+            新增菜单
+            </summary>
+            <param name="input">新增参数</param>
+            <returns>无</returns>
+            <exception cref="T:EasyIotSharp.Core.BizException">当菜单名称或路由重复时抛出异常</exception>
+            <remarks>
+            创建内容包括：
+            1. 基本信息（名称、图标、URL等）
+            2. 层级关系（父级ID）
+            3. 权限信息（超级管理员权限）
+            4. 清除相关缓存
+            </remarks>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.TenantAccount.Impl.MenuService.UpdateMenu(EasyIotSharp.Core.Dto.TenantAccount.Params.InsertMenuInput)">
+            <summary>
+            修改菜单信息
+            </summary>
+            <param name="input">修改参数</param>
+            <returns>无</returns>
+            <exception cref="T:EasyIotSharp.Core.BizException">
+            抛出异常的情况：
+            1. 菜单不存在
+            2. 菜单名称或路由重复
+            </exception>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.TenantAccount.Impl.MenuService.UpdateIsEnableMenu(EasyIotSharp.Core.Dto.TenantAccount.Params.UpdateIsEnableMenuInput)">
+            <summary>
+            更新菜单启用状态
+            </summary>
+            <param name="input">启用状态更新参数</param>
+            <returns>无</returns>
+            <exception cref="T:EasyIotSharp.Core.BizException">当菜单不存在时抛出异常</exception>
+            <remarks>
+            仅当启用状态发生变化时才更新：
+            1. 更新启用状态
+            2. 记录操作者信息
+            3. 清除相关缓存
+            </remarks>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.TenantAccount.Impl.MenuService.DeleteMenu(EasyIotSharp.Core.Dto.TenantAccount.Params.DeleteMenuInput)">
+            <summary>
+            删除菜单
+            </summary>
+            <param name="input">删除参数</param>
+            <returns>无</returns>
+            <exception cref="T:EasyIotSharp.Core.BizException">当菜单不存在时抛出异常</exception>
+            <remarks>
+            执行软删除：
+            1. 更新IsDelete状态
+            2. 记录操作者信息
+            3. 清除相关缓存
+            </remarks>
+        </member>
+        <member name="T:EasyIotSharp.Core.Services.TenantAccount.Impl.SoldierRoleService">
+            <summary>
+            用户角色关联服务实现类
+            </summary>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.TenantAccount.Impl.SoldierRoleService.#ctor(EasyIotSharp.Core.Repositories.TenantAccount.ISoldierRepository,EasyIotSharp.Core.Repositories.TenantAccount.ISoldierRoleRepository)">
+            <summary>
+            构造函数
+            </summary>
+            <param name="soldierRepository">用户仓储</param>
+            <param name="soldierRoleRepository">用户角色关联仓储</param>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.TenantAccount.Impl.SoldierRoleService.UpdateSoldierRole(EasyIotSharp.Core.Dto.TenantAccount.Params.UpdateSoldierRoleInput)">
+            <summary>
+            更新用户角色关联
+            </summary>
+            <param name="input">更新参数，包含用户ID和角色列表</param>
+            <returns>无</returns>
+            <exception cref="T:EasyIotSharp.Core.BizException">当用户不存在时抛出异常</exception>
+            <remarks>
+            更新流程：
+            1. 验证用户是否存在
+            2. 删除该用户的所有现有角色关联
+            3. 批量创建新的角色关联
+            4. 记录操作者信息
+            </remarks>
+        </member>
+        <member name="T:EasyIotSharp.Core.Services.TenantAccount.Impl.SoldierService">
+            <summary>
+            用户服务实现类
+            </summary>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.TenantAccount.Impl.SoldierService.#ctor(EasyIotSharp.Core.Repositories.TenantAccount.ISoldierRepository,EasyIotSharp.Core.Repositories.Tenant.ITenantRepository,EasyIotSharp.Core.Repositories.TenantAccount.ISoldierRoleRepository,EasyIotSharp.Core.Services.TenantAccount.IRoleService,EasyIotSharp.Core.Repositories.TenantAccount.IRoleRepository,EasyIotSharp.Core.Caching.TenantAccount.ISoldierCacheService)">
+            <summary>
+            构造函数
+            </summary>
+            <param name="soldierRepository">用户仓储</param>
+            <param name="tenantRepository">租户仓储</param>
+            <param name="soldierRoleRepository">用户角色关联仓储</param>
+            <param name="roleService">角色服务</param>
+            <param name="roleRepository">角色仓储</param>
+            <param name="soldierCacheService">用户缓存服务</param>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.TenantAccount.Impl.SoldierService.GetSoldier(System.String)">
+            <summary>
+            获取单个用户信息
+            </summary>
+            <param name="id">用户ID</param>
+            <returns>用户信息</returns>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.TenantAccount.Impl.SoldierService.ValidateSoldier(EasyIotSharp.Core.Dto.TenantAccount.Params.ValidateSoldierInput)">
+            <summary>
+            验证用户登录
+            </summary>
+            <param name="input">登录参数</param>
+            <returns>验证结果，包含用户信息、租户信息和Token</returns>
+            <remarks>
+            验证流程：
+            1. 验证用户名密码
+            2. 检查用户状态
+            3. 验证租户状态（存在性、删除状态、冻结状态、合同有效期）
+            4. 更新最后登录时间
+            5. 生成访问令牌
+            </remarks>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.TenantAccount.Impl.SoldierService.QuerySoldier(EasyIotSharp.Core.Dto.TenantAccount.Params.QuerySoldierInput)">
+            <summary>
+            查询用户列表
+            </summary>
+            <param name="input">查询参数</param>
+            <returns>分页后的用户列表</returns>
+            <remarks>
+            当满足以下条件时使用缓存：
+            1. 无关键字搜索
+            2. 启用状态为-1
+            3. 使用分页且在前5页
+            4. 每页大小为10
+            
+            查询结果包含：
+            1. 基本用户信息
+            2. 关联的角色信息
+            </remarks>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.TenantAccount.Impl.SoldierService.InsertSoldier(EasyIotSharp.Core.Dto.TenantAccount.Params.InsertSoldierInput)">
+            <summary>
+            新增普通用户
+            </summary>
+            <param name="input">新增参数</param>
+            <returns>新创建的用户ID</returns>
+            <exception cref="T:EasyIotSharp.Core.BizException">
+            抛出异常的情况：
+            1. 租户不存在或已冻结
+            2. 手机号已存在
+            3. 用户名重复
+            4. 管理员角色重复分配
+            </exception>
+            <remarks>
+            创建内容包括：
+            1. 基本用户信息（默认密码123456）
+            2. 用户角色关联
+            3. 清除相关缓存
+            </remarks>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.TenantAccount.Impl.SoldierService.InsertAdminSoldier(EasyIotSharp.Core.Dto.TenantAccount.Params.InsertAdminSoldierInput)">
+            <summary>
+            新增管理员用户
+            </summary>
+            <param name="input">新增参数</param>
+            <returns>新创建的用户ID</returns>
+            <exception cref="T:EasyIotSharp.Core.BizException">当手机号已存在时抛出异常</exception>
+            <remarks>
+            创建内容包括：
+            1. 管理员用户信息（IsManager=1）
+            2. 创建管理员角色
+            3. 用户角色关联
+            4. 清除相关缓存
+            </remarks>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.TenantAccount.Impl.SoldierService.UpdateSoldier(EasyIotSharp.Core.Dto.TenantAccount.Params.UpdateSoldierInput)">
+            <summary>
+            更新用户信息
+            </summary>
+            <param name="input">更新参数</param>
+            <returns>更新的用户ID</returns>
+            <exception cref="T:EasyIotSharp.Core.BizException">
+            抛出异常的情况：
+            1. 用户不存在
+            2. 用户名重复
+            3. 管理员角色重复分配
+            </exception>
+            <remarks>
+            更新内容包括：
+            1. 基本信息（用户名、性别等）
+            2. 可选更新角色信息
+            3. 清除相关缓存
+            </remarks>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.TenantAccount.Impl.SoldierService.UpdateSoldierIsEnable(EasyIotSharp.Core.Dto.TenantAccount.Params.UpdateSoldierIsEnableInput)">
+            <summary>
+            更新用户启用状态
+            </summary>
+            <param name="input">启用状态更新参数</param>
+            <returns>更新的用户ID</returns>
+            <exception cref="T:EasyIotSharp.Core.BizException">当用户不存在时抛出异常</exception>
+            <remarks>
+            仅当启用状态发生变化时才更新：
+            1. 更新启用状态
+            2. 记录操作者信息
+            3. 清除相关缓存
+            </remarks>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.TenantAccount.Impl.SoldierService.DeleteSoldier(EasyIotSharp.Core.Dto.TenantAccount.Params.DeleteSoldierInput)">
+            <summary>
+            删除用户
+            </summary>
+            <param name="input">删除参数</param>
+            <returns>无</returns>
+            <exception cref="T:EasyIotSharp.Core.BizException">当用户不存在时抛出异常</exception>
+            <remarks>
+            执行软删除：
+            1. 更新IsDelete状态
+            2. 记录操作者信息
+            3. 清除相关缓存
+            </remarks>
+        </member>
         <member name="M:EasyIotSharp.Core.Services.TenantAccount.IRoleService.GetRoleMenu(System.String)">
             <summary>
             通过id查询一条角色菜单信息
@@ -8633,6 +9534,104 @@
             </summary>
             <param name="input"></param>
             <returns></returns>
+        </member>
+        <member name="T:EasyIotSharp.Core.Services.Tenant.Impl.TenantService">
+            <summary>
+            租户服务实现类
+            </summary>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.Tenant.Impl.TenantService.#ctor(EasyIotSharp.Core.Repositories.Tenant.ITenantRepository,EasyIotSharp.Core.Services.TenantAccount.ISoldierService,EasyIotSharp.Core.Caching.Tenant.ITenantCacheService)">
+            <summary>
+            构造函数
+            </summary>
+            <param name="tenantRepository">租户仓储</param>
+            <param name="soldierService">用户服务</param>
+            <param name="tenantCacheService">租户缓存服务</param>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.Tenant.Impl.TenantService.GetTenant(System.String)">
+            <summary>
+            获取单个租户信息
+            </summary>
+            <param name="id">租户ID</param>
+            <returns>租户信息</returns>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.Tenant.Impl.TenantService.QueryTenant(EasyIotSharp.Core.Dto.Tenant.Params.QueryTenantInput)">
+            <summary>
+            查询租户列表
+            </summary>
+            <param name="input">查询参数</param>
+            <returns>分页后的租户列表</returns>
+            <remarks>
+            当满足以下条件时使用缓存：
+            1. 无关键字搜索
+            2. 过期类型为-1
+            3. 无合同开始和结束时间筛选
+            4. 使用分页且在前5页
+            5. 每页大小为10
+            </remarks>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.Tenant.Impl.TenantService.InsertTenant(EasyIotSharp.Core.Dto.Tenant.Params.InsertTenantInput)">
+            <summary>
+            新增租户
+            </summary>
+            <param name="input">新增参数</param>
+            <returns>无</returns>
+            <exception cref="T:EasyIotSharp.Core.BizException">当租户名称重复时抛出异常</exception>
+            <remarks>
+            执行操作：
+            1. 检查租户名称是否重复
+            2. 生成租户编号
+            3. 创建租户管理员账号
+            4. 创建租户记录
+            5. 清除相关缓存
+            </remarks>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.Tenant.Impl.TenantService.UpdateTenant(EasyIotSharp.Core.Dto.Tenant.Params.UpdateTenantInput)">
+            <summary>
+            修改租户信息
+            </summary>
+            <param name="input">修改参数</param>
+            <returns>无</returns>
+            <exception cref="T:EasyIotSharp.Core.BizException">
+            抛出异常的情况：
+            1. 租户不存在
+            2. 租户名称重复
+            </exception>
+            <remarks>
+            更新内容包括：
+            1. 基本信息（名称、合同信息等）
+            2. 联系信息（手机、邮箱等）
+            3. 状态信息（版本、冻结状态等）
+            4. 清除相关缓存
+            </remarks>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.Tenant.Impl.TenantService.UpdateIsFreezeTenant(EasyIotSharp.Core.Dto.Tenant.Params.UpdateIsFreezeTenantTenantInput)">
+            <summary>
+            更新租户冻结状态
+            </summary>
+            <param name="input">冻结状态更新参数</param>
+            <returns>无</returns>
+            <exception cref="T:EasyIotSharp.Core.BizException">当租户不存在时抛出异常</exception>
+            <remarks>
+            仅当冻结状态发生变化时才更新：
+            1. 更新冻结状态和描述
+            2. 记录操作者信息
+            3. 清除相关缓存
+            </remarks>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.Tenant.Impl.TenantService.DeleteTenant(EasyIotSharp.Core.Dto.Tenant.Params.DeleteTenantInput)">
+            <summary>
+            删除租户
+            </summary>
+            <param name="input">删除参数</param>
+            <returns>无</returns>
+            <exception cref="T:EasyIotSharp.Core.BizException">当租户不存在时抛出异常</exception>
+            <remarks>
+            执行软删除：
+            1. 更新IsDelete状态
+            2. 记录操作者信息
+            3. 清除相关缓存
+            </remarks>
         </member>
         <member name="M:EasyIotSharp.Core.Services.Tenant.ITenantService.GetTenant(System.String)">
             <summary>
