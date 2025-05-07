@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using SqlSugar;
 
 namespace EasyIotSharp.Core.Domain.Export
 {
@@ -33,6 +34,7 @@ namespace EasyIotSharp.Core.Domain.Export
         /// <summary>
         /// 执行时间
         /// </summary>
+        [SugarColumn(IsNullable = true)]
         public DateTime? ExecuteTime { get; set; }
 
         /// <summary>
