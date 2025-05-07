@@ -100,9 +100,10 @@ namespace EasyIotSharp.Core.Repositories.Project.Impl
             var sql = Client.Queryable<ProjectBase>()
                  .LeftJoin<RabbitProject>((p, rp) => p.Id == rp.ProjectId && rp.IsDelete == false)
                  .LeftJoin<RabbitServerInfo>((p, rp, rs) => rp.RabbitServerInfoId == rs.Id && rs.IsDelete == false)
+                  .LeftJoin<Resource>((p, rp, rs, r) => r.Id == p.ResourceId)
                  .Where((p, rp, rs) => p.IsDelete == false);
 
-            var items = await sql.Select((p, rp, rs) => new ProjectBaseDto
+            var items = await sql.Select((p, rp, rs,r) => new ProjectBaseDto
             {
                 Id = p.Id,
                 TenantNumId = p.TenantNumId,
@@ -116,7 +117,8 @@ namespace EasyIotSharp.Core.Repositories.Project.Impl
                 Remark = p.Remark,
                 State = p.State == 1 ? true : false,
                 Host = rs.Host,
-                RabbitServerInfoId = rs.Id
+                RabbitServerInfoId = rs.Id,
+                ResourceUrl = r.Url,
             }).FirstAsync();
 
             return items;

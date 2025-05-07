@@ -27,7 +27,6 @@ namespace EasyIotSharp.DataProcessor.Processing.Implementation
         /// 消息接收事件
         /// </summary>
         public event EventHandler<MessageReceivedEventArgs> MessageReceived;
-        
         /// <summary>
         /// 初始化消息接收器
         /// </summary>
@@ -40,6 +39,13 @@ namespace EasyIotSharp.DataProcessor.Processing.Implementation
                 {
                     string projectId = kvp.Key;
                     RabbitMQClient client = kvp.Value;
+                    
+                    // 订阅重连事件
+                    client.ConnectionReestablished += async (sender, e) =>
+                    {
+                        LogHelper.Info($"RabbitMQ连接已重建，重新启动项目 {projectId} 的消费者...");
+                        await ResubscribeProjectQueueAsync(client, projectId, "queue_");
+                    };
                     
                     LogHelper.Info($"正在为项目 {projectId} 初始化 RabbitMQ 客户端");
                     
@@ -57,6 +63,33 @@ namespace EasyIotSharp.DataProcessor.Processing.Implementation
                 LogHelper.Error($"初始化RabbitMQ消息接收器时发生错误: {ex.Message}");
                 throw;
             }
+        }
+        
+        /// <summary>
+        /// 重新订阅项目队列（用于重连后恢复消费）
+        /// </summary>
+        private async Task<bool> ResubscribeProjectQueueAsync(RabbitMQClient client, string projectId, string queuePrefix)
+        {
+            LogHelper.Info($"重新订阅项目 {projectId} 的队列");
+            
+            // 如果通道存在，先尝试关闭
+            if (_channels.TryGetValue(projectId, out var existingChannel))
+            {
+                try
+                {
+                    if (existingChannel != null && existingChannel.IsOpen)
+                    {
+                        await existingChannel.CloseAsync();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    LogHelper.Warn($"关闭项目 {projectId} 的旧通道时发生错误: {ex.Message}");
+                }
+            }
+            
+            // 重新订阅
+            return await SubscribeProjectQueueAsync(client, projectId, queuePrefix);
         }
         
         /// <summary>
@@ -100,7 +133,7 @@ namespace EasyIotSharp.DataProcessor.Processing.Implementation
                 var consumer = new AsyncEventingBasicConsumer(channel);
                 LogHelper.Info($"为项目 {projectId} 创建了异步消费者");
                 
-                 consumer.ReceivedAsync += async (model, ea) =>
+                consumer.ReceivedAsync += async (model, ea) =>
                 {
                     LogHelper.Info($"收到项目 {projectId} 的消息，DeliveryTag: {ea.DeliveryTag}");
                     try

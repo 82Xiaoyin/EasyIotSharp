@@ -26,6 +26,7 @@ namespace EasyIotSharp.DataProcessor.Model.RaddbitDTO
         private bool _isInitialized = false;
         private int _retryCount = 3;
         private int _retryInterval = 2000; // 毫秒
+        public event EventHandler ConnectionReestablished;
         
         /// <summary>
         /// 初始化RabbitMQ连接
@@ -131,6 +132,8 @@ namespace EasyIotSharp.DataProcessor.Model.RaddbitDTO
             try
             {
                 await InitAsync();
+                 // 重连成功后触发事件
+                 ConnectionReestablished?.Invoke(this, EventArgs.Empty);
             }
             catch (Exception ex)
             {

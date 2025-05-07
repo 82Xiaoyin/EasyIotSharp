@@ -177,7 +177,7 @@ namespace EasyIotSharp.DataProcessor.Processing.Implementation
                     {
                         // 获取目标ID和参数ID
                         string targetId = condition["targetId"]?.ToString();
-                        string paramId = condition["paramId"]?.ToString();
+                        string paramCode = condition["paramCode"]?.ToString();
                         
                         // 检查数据点是否匹配目标
                         if (!dataPoint.TryGetValue("pointId", out object pointIdObj) || 
@@ -186,8 +186,8 @@ namespace EasyIotSharp.DataProcessor.Processing.Implementation
                             conditionMet = false;
                             conditionResults.Add($"目标不匹配: 期望={targetId}, 实际={pointIdObj}");
                         }
-                        else if (!string.IsNullOrEmpty(paramId) && 
-                                 dataPoint.TryGetValue(paramId, out object paramValue))
+                        else if (!string.IsNullOrEmpty(paramCode) && 
+                                 dataPoint.TryGetValue(paramCode, out object paramValue))
                         {
                             // 检查参数值是否满足条件
                             string operatorType = condition["operator"]?.ToString();
@@ -197,17 +197,17 @@ namespace EasyIotSharp.DataProcessor.Processing.Implementation
                             if (!paramConditionMet)
                             {
                                 conditionMet = false;
-                                conditionResults.Add($"参数条件不满足: {paramId} {operatorType} {conditionValue}, 实际值={paramValue}");
+                                conditionResults.Add($"参数条件不满足: {paramCode} {operatorType} {conditionValue}, 实际值={paramValue}");
                             }
                             else
                             {
-                                conditionResults.Add($"参数条件满足: {paramId} {operatorType} {conditionValue}, 实际值={paramValue}");
+                                conditionResults.Add($"参数条件满足: {paramCode} {operatorType} {conditionValue}, 实际值={paramValue}");
                             }
                         }
                         else
                         {
                             conditionMet = false;
-                            conditionResults.Add($"参数不存在: {paramId}");
+                            conditionResults.Add($"参数不存在: {paramCode}");
                         }
                     }
                     
