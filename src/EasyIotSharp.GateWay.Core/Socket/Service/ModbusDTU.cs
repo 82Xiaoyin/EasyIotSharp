@@ -60,11 +60,11 @@ namespace EasyIotSharp.GateWay.Core.Socket.Service
                 {
                     //3.1ModbusDevieConfig未查询到,则进行解码、
                     string strData = System.Text.Encoding.ASCII.GetString(bReceived, 0, bReceived.Length);//转换为Ascll码
-                    LogHelper.Info("  收到注册包:  " + strData);
+                    Logger.Info("  收到注册包:  " + strData);
                     var gatewayprotocol = _gatewayProtocolRepository.GetGatewayProtocol(strData);
                     if (gatewayprotocol == null)
                     {
-                        LogHelper.Info("未找到注册包: " + strData);
+                        Logger.Info("未找到注册包: " + strData);
                         return;
                     }
 
@@ -281,13 +281,13 @@ namespace EasyIotSharp.GateWay.Core.Socket.Service
                     }
                     catch (Exception ex)
                     {
-                        LogHelper.Error($"解析配置项时发生错误: {ex.Message}");
+                        Logger.Error($"解析配置项时发生错误: {ex.Message}");
                     }
                 }
 
                 if (commandList.Count == 0)
                 {
-                    LogHelper.Error("没有有效的命令可发送");
+                    Logger.Error("没有有效的命令可发送");
                     return;
                 }
 
@@ -309,7 +309,7 @@ namespace EasyIotSharp.GateWay.Core.Socket.Service
                                     if (isok)
                                     {
                                         int cmdSleepTime = intervalMap.TryGetValue(BitConverter.ToString(cmd), out int time) ? time : defaultSleepTime;
-                                        LogHelper.Info($"发送命令成功: {cmdHex}, 间隔: {cmdSleepTime}ms");
+                                        Logger.Info($"发送命令成功: {cmdHex}, 间隔: {cmdSleepTime}ms");
 
                                         // 记录发送的命令到网关连接管理器
                                         GatewayConnectionManager.Instance.UpdateGatewayData(
@@ -319,7 +319,7 @@ namespace EasyIotSharp.GateWay.Core.Socket.Service
                                     }
                                     else
                                     {
-                                        LogHelper.Error($"发送命令失败: {cmdHex}");
+                                        Logger.Error($"发送命令失败: {cmdHex}");
                                         return;
                                     }
 
@@ -328,7 +328,7 @@ namespace EasyIotSharp.GateWay.Core.Socket.Service
                                 }
                                 catch (Exception ex)
                                 {
-                                    LogHelper.Error($"发送命令时发生错误: {ex.Message}");
+                                    Logger.Error($"发送命令时发生错误: {ex.Message}");
                                 }
                             }
 
@@ -338,13 +338,13 @@ namespace EasyIotSharp.GateWay.Core.Socket.Service
                     }
                     catch (Exception ex)
                     {
-                        LogHelper.Error($"命令发送循环中断: {ex.ToString()}");
+                        Logger.Error($"命令发送循环中断: {ex.ToString()}");
                     }
                 });
             }
             catch (Exception ex)
             {
-                LogHelper.Error($"SendMsgToClient() 发生异常: {ex.ToString()}");
+                Logger.Error($"SendMsgToClient() 发生异常: {ex.ToString()}");
             }
         }
     }

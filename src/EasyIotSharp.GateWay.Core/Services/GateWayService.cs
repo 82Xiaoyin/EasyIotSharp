@@ -4,6 +4,7 @@ using EasyIotSharp.GateWay.Core.UI;
 using EasyIotSharp.GateWay.Core.Util;
 using System;
 using log4net;
+using UPrime;
 
 namespace EasyIotSharp.GateWay.Core.Services
 {
@@ -43,7 +44,7 @@ namespace EasyIotSharp.GateWay.Core.Services
             });
             // 初始化MQTT服务
             var mqttService = UPrimeEngine.Instance.Resolve<IMqttService>();
-            LogHelper.Info("MQTT服务已初始化");
+            Logger.Info("MQTT服务已初始化");
             ConsoleUI.ShowSeparator();
             ConsoleUI.ShowSuccess("所有服务已启动完成");
             Logger.Info("项目启动完成");

@@ -4,6 +4,7 @@ using EasyIotSharp.GateWay.Core.Util;
 using HPSocket;
 using HPSocket.Tcp;
 using HPSocket.Thread;
+using log4net;
 using System;
 using System.Collections.Generic;
 using System.Net.Sockets;
@@ -38,6 +39,7 @@ namespace EasyIotSharp.GateWay.Core.Socket
         delegate void AddLogHandler(string log);
         private EasyTCPSuper tcpManufacture = null;
         private InitParamsInfo _initParamsInfo = null;
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(EasyTcpServer));
 
         /// <summary>
         /// 最大封包长度
@@ -62,7 +64,7 @@ namespace EasyIotSharp.GateWay.Core.Socket
                     tcpManufacture = EasyTCPFactory.CreateManufacturer(initParamsInfo.Description);
                     if (tcpManufacture == null)
                     {
-                        LogHelper.Error("TCPFactory.CreateManufacturer 工厂创建对象失败！manufacturer = " + initParamsInfo.Description);
+                        Logger.Error("TCPFactory.CreateManufacturer 工厂创建对象失败！manufacturer = " + initParamsInfo.Description);
                         return;
                     }
                     // 定时输出线程池任务数
@@ -72,7 +74,7 @@ namespace EasyIotSharp.GateWay.Core.Socket
                         if (_server.HasStarted && _threadPool.HasStarted && DateTime.Now.Minute == 0 && DateTime.Now.Second > 54)
                         {
                             // AddLog($"线程池当前在执行的任务数: {_threadPool.TaskCount}, 任务队列数: {_threadPool.QueueSize}");
-                            LogHelper.Info("client当前链接数 ：" + _server.ConnectionCount + $"线程池当前在执行的任务数: {_threadPool.TaskCount}, 任务队列数: {_threadPool.QueueSize}");
+                            Logger.Info("client当前链接数 ：" + _server.ConnectionCount + $"线程池当前在执行的任务数: {_threadPool.TaskCount}, 任务队列数: {_threadPool.QueueSize}");
                         }
                     };
                     _timer.Start();
@@ -85,9 +87,9 @@ namespace EasyIotSharp.GateWay.Core.Socket
                     // 启动服务
                     if (!_server.Start())
                     {
-                        LogHelper.Error($"error code: {_server.ErrorCode}, error message: {_server.ErrorMessage}");
+                        Logger.Error($"error code: {_server.ErrorCode}, error message: {_server.ErrorMessage}");
                     }
-                    LogHelper.Info("TcpServer 已启动 ..................................端口号 Port: " + _server.Port);
+                    Logger.Info("TcpServer 已启动 ..................................端口号 Port: " + _server.Port);
 
                     // 停止并等待线程池任务全部完成
                     await _threadPool.WaitAsync();
@@ -108,7 +110,7 @@ namespace EasyIotSharp.GateWay.Core.Socket
             }
             catch (Exception ex)
             {
-                LogHelper.Error("TCPUtil.InitTCPServr 初始化失败！=> " + ex.ToString());
+                Logger.Error("TCPUtil.InitTCPServr 初始化失败！=> " + ex.ToString());
                 return;
             }
         }
@@ -140,7 +142,7 @@ namespace EasyIotSharp.GateWay.Core.Socket
             // 添加到网关连接管理器
             GatewayConnectionManager.Instance.AddConnection(connId, ip, port);
             
-            LogHelper.Info($"OnAccept({connId}), ip: {ip}, port: {port}");
+            Logger.Info($"OnAccept({connId}), ip: {ip}, port: {port}");
             return HandleResult.Ok;
         }
 
@@ -179,7 +181,7 @@ namespace EasyIotSharp.GateWay.Core.Socket
                 
                 return HandleResult.Error;
             }
-            LogHelper.Info($"OnClose({connId}), socket operation: {socketOperation}, error code: {errorCode}");
+            Logger.Info($"OnClose({connId}), socket operation: {socketOperation}, error code: {errorCode}");
             return HandleResult.Ok;
         }
 
@@ -233,7 +235,7 @@ namespace EasyIotSharp.GateWay.Core.Socket
             }
             catch (Exception ex)
             {
-                LogHelper.Error("释放资源异常", ex);
+                Logger.Error("释放资源异常", ex);
             }
         }
     }
