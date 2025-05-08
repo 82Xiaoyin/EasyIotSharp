@@ -150,7 +150,7 @@ namespace EasylotSharp.Quartz.Service
                         {
                             if (i == 0)
                             {
-                                table += Convert.ToDateTime(str[i]).ToShortDateString();
+                                table += Convert.ToDateTime(str[i]).ToString("yyyy-MM-dd HH:mm:ss");
                                 table += ",";
                             }
                             else
