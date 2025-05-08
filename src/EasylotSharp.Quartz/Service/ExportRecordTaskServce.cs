@@ -32,8 +32,8 @@ namespace EasylotSharp.Quartz.Service
     [DisallowConcurrentExecution]
     public class ExportRecordTaskServce : IJob
     {
-        // 添加静态日志记录器
-        private static readonly ILogger Logger = LogManager.GetCurrentClassLogger();
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(ExportRecordTaskServce));
+        
         /// <summary>
         /// 导出任务执行入口
         /// </summary>
@@ -42,7 +42,7 @@ namespace EasylotSharp.Quartz.Service
         {
             try
             {
-                Console.WriteLine($"当前时间：{DateTime.Now}，开始执行导出任务");
+                Logger.Info($"当前时间：{DateTime.Now}，开始执行导出任务");
                 var exportRecordService = UPrimeEngine.Instance.Resolve<IExportRecordService>();
 
                 // 查询待处理的导出记录
@@ -50,6 +50,7 @@ namespace EasylotSharp.Quartz.Service
                 if (exportRecords == null || exportRecords.Count == 0)
                 {
                     Console.WriteLine("没有需要处理的导出数据");
+                    Logger.Info($"没有需要处理的导出数据");
                     return;
                 }
 
@@ -74,6 +75,7 @@ namespace EasylotSharp.Quartz.Service
             {
                 Console.WriteLine($"导出任务执行失败: {ex.Message}");
                 Console.WriteLine($"堆栈跟踪: {ex.StackTrace}");
+                Logger.Error("导出任务执行失败", ex);
                 throw new JobExecutionException("导出任务执行失败", ex, false);
             }
         }
@@ -152,7 +154,7 @@ namespace EasylotSharp.Quartz.Service
 
             // 生成CSV内容
             string csvContent = GenerateCsvContent(sensorData);
-
+            
             // 保存CSV文件
             await SaveCsvFile(sensorPoint.Name, folderPath, csvContent);
         }
@@ -180,7 +182,7 @@ namespace EasylotSharp.Quartz.Service
         private string GenerateCsvContent(dynamic sensorData)
         {
             StringBuilder sb = new StringBuilder();
-
+            
             // 生成表头
             List<string> headers = new List<string>();
             foreach (var quota in sensorData.Quotas)
