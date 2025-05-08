@@ -253,8 +253,8 @@ namespace EasyIotSharp.GateWay.Core.Socket
                 if (connectionInfo.RecentData.Count > 20)
                 {
                     connectionInfo.RecentData.RemoveAt(0);
-                    // 修改这里，使用EventBus.Default来触发事件
-                    EventBus.Default.Trigger(new SensorBaseEventData());
+                    // 清理缓存
+                    _registeredGatewayCacheService.Clear();
                 }
                 var list = _registeredGatewayCacheService.GetAllRegisteredGateways(() => { return _connectionMap.Values.Where(c => c.IsRegistered).ToList(); });
                 if (list.Count == 0)

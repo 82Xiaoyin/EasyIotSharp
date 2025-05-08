@@ -150,6 +150,11 @@
             <param name="action"></param>
             <returns></returns>
         </member>
+        <member name="M:EasyIotSharp.Core.Caching.Gateways.IRegisteredGatewayCacheService.Clear">
+            <summary>
+            清除缓存
+            </summary>
+        </member>
         <member name="M:EasyIotSharp.Core.Caching.Hardware.IProtocolCacheService.QueryProtocol(EasyIotSharp.Core.Dto.Hardware.Params.QueryProtocolInput,System.Func{System.Threading.Tasks.Task{UPrime.Services.Dto.PagedResultDto{EasyIotSharp.Core.Dto.Hardware.ProtocolDto}}})">
             <summary>
             获取协议列表

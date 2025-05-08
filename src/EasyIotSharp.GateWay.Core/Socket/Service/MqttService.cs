@@ -200,22 +200,18 @@ namespace EasyIotSharp.GateWay.Core.Socket.Service
             try
             {
                 string topic = e.ApplicationMessage.Topic;
-                string payload = Encoding.UTF8.GetString(e.ApplicationMessage.Payload);
+                string payload = Encoding.UTF8.GetString(e.ApplicationMessage.PayloadSegment);
                 
                 LogHelper.Debug($"收到MQTT消息，主题: {topic}, 内容: {payload}");
                 
                 // 检查是否是网关遥测数据
-                if (topic.StartsWith("devices/telemetry/"))
+                if (topic.StartsWith("devices/telemetry"))
                 {
                     // 提取网关ID
                     string gatewayId = topic.Substring("devices/telemetry/".Length);
                     
                     // 处理网关遥测数据
                     await ProcessGatewayTelemetryAsync(gatewayId, payload);
-                }
-                else
-                {
-                   
                 }
             }
             catch (Exception ex)

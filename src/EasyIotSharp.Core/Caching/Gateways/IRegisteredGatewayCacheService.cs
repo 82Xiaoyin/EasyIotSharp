@@ -13,5 +13,9 @@ namespace EasyIotSharp.Core.Caching.Gateways
         /// <param name="action"></param>
         /// <returns></returns>
         List<GatewayConnectionInfo> GetAllRegisteredGateways(Func<List<GatewayConnectionInfo>> action);
+        /// <summary>
+        /// 清除缓存
+        /// </summary>
+        void Clear();
     }
 }
