@@ -13,6 +13,10 @@ using System.Threading;
 using UPrime;
 using UPrime.Configuration;
 using EasyIotSharp.Core.Extensions;
+using Microsoft.Extensions.Hosting;
+using EasyIotSharp.GateWay.Core.Interfaces;
+using Microsoft.Extensions.DependencyInjection;
+using EasyIotSharp.GateWay.Core.Socket.Service;
 
 namespace EasyIotSharp.GateWay.Core
 {
@@ -42,6 +46,7 @@ namespace EasyIotSharp.GateWay.Core
             Log.Logger = loggerConfig.CreateLogger();
             Log.Information("Settings {@Settings}", configDictionary);
 
+         
             if (appOptions.SetMinThreads > 16)
             {
                 //https://stackexchange.github.io/StackExchange.Redis/Timeouts
@@ -62,9 +67,7 @@ namespace EasyIotSharp.GateWay.Core
             try
             {
                 AppDomain.CurrentDomain.ProcessExit += AppDomain_ProcessExit;
-                
                 ConsoleUI.ShowBanner();
-                
                 var serviceManager = new GateWayService();
                 serviceManager.InitializeServices();
                 var exitEvent = new ManualResetEvent(false);
@@ -85,7 +88,6 @@ namespace EasyIotSharp.GateWay.Core
                 ConsoleUI.ShowError($"程序启动异常: {ex.Message}");
             }
         }
-        
         // 在应用程序退出时关闭RabbitMQ连接
         static void AppDomain_ProcessExit(object sender, EventArgs e)
         {

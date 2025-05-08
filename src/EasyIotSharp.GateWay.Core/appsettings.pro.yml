@@ -3,6 +3,15 @@ Name:  'easyiotsharp'
 
 Host: '106.75.118.194:5999'
 
+
+Mqtt:
+  Host: 82.156.125.76
+  Port: 1883
+  ClientId: EasyIotSharp_DataProcessor
+  Username: admin 
+  Password: ZTXH2025!@# 
+  TopicFormat: "{0}/{1}/rawdata"
+
 Storage: 
   Elasticsearch:
     - 'http://106.75.84.97:9200'
