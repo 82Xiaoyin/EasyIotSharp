@@ -86,7 +86,7 @@
             <param name="input">创建参数</param>
             <returns></returns>
         </member>
-        <member name="M:EasyIotSharp.API.Controllers.ExportController.UpdateExportRecord(EasyIotSharp.Core.Dto.Export.Params.ExportRecordInsert)">
+        <member name="M:EasyIotSharp.API.Controllers.ExportController.UpdateExportRecord(EasyIotSharp.Core.Dto.Export.ExportRecordDto)">
             <summary>
             更新导出记录
             </summary>

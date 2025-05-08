@@ -12,6 +12,7 @@ using EasyIotSharp.Core.Services.Queue.Impl;
 using EasyIotSharp.Core.Services.Queue;
 using EasyIotSharp.Core.Repositories.Queue.Impl;
 using EasyIotSharp.Core.Repositories.Queue;
+using System.Threading.Tasks;
 
 namespace EasyIotSharp.GateWay.Core.LoadingConfig.RabbitMQ
 {
@@ -49,11 +50,9 @@ namespace EasyIotSharp.GateWay.Core.LoadingConfig.RabbitMQ
         /// <summary>
         /// 初始化RabbitMQ配置
         /// </summary>
-        // 修改查询和初始化逻辑
-        public static void InitMQ(IServiceProvider serviceProvider = null)
+        public static async Task InitMQ(IServiceProvider serviceProvider = null)
         {
             var rabbitServerInfoService = UPrimeEngine.Instance.Resolve<IRabbitServerInfoService>();
-
 
             // 防止重复初始化
             if (_isInitialized)
@@ -62,87 +61,80 @@ namespace EasyIotSharp.GateWay.Core.LoadingConfig.RabbitMQ
                 return;
             }
 
-            lock (_initLock)
-            {
-                if (_isInitialized) return;
+            if (_isInitialized) return;
 
+            try
+            {
+
+                LogHelper.Info("开始初始化RabbitMQ配置...");
+
+                // 清空现有配置
+                lsMQs.Clear();
+                dicPid2MQClient.Clear();
+                m_RoutingKey.Clear();
+
+                // 获取 MQ 配置并初始化 MQ 客户端
                 try
                 {
+                    // 查询MQ服务器和项目配置信息
+                    var mqlist = rabbitServerInfoService.GetRabbitProject();
 
-                    LogHelper.Info("开始初始化RabbitMQ配置...");
+                    LogHelper.Info($"找到 {mqlist.Count} 个RabbitMQ配置");
 
-                    // 清空现有配置
-                    lsMQs.Clear();
-                    dicPid2MQClient.Clear();
-                    m_RoutingKey.Clear();
-
-                    // 获取 MQ 配置并初始化 MQ 客户端
-                    try
+                    if (mqlist.Count > 0)
                     {
-                        // 查询MQ服务器和项目配置信息
-                        var mqlist = rabbitServerInfoService.GetRabbitProject();
-
-
-                        LogHelper.Info($"找到 {mqlist.Count} 个RabbitMQ配置");
-
-                        if (mqlist.Count > 0)
+                        foreach (var item in mqlist)
                         {
-                            foreach (var item in mqlist)
+                            try
                             {
-                                try
+                                // 创建并初始化MQ客户端
+                                RabbitMQClient m_MQClient = new RabbitMQClient();
+                                m_MQClient.Host = item.Host;
+                                m_MQClient.Port = item.Port;
+                                m_MQClient.UserName = item.Username;
+                                m_MQClient.Password = item.Password;
+                                m_MQClient.VirtualHost = item.VirtualHost;
+                                m_MQClient.Exchange = item.Exchange;
+                                m_MQClient.mqid = item.MqId;
+
+                                // 初始化连接
+                                await m_MQClient.InitAsync();
+                                lsMQs.Add(m_MQClient);
+
+                                // 添加项目ID到MQ客户端的映射
+                                if (!dicPid2MQClient.ContainsKey(item.ProjectId))
                                 {
-                                    // 创建并初始化MQ客户端
-                                    RabbitMQClient m_MQClient = new RabbitMQClient();
-                                    m_MQClient.Host = item.Host;
-                                    m_MQClient.Port = item.Port;
-                                    m_MQClient.UserName = item.Username;
-                                    m_MQClient.Password = item.Password;
-                                    m_MQClient.VirtualHost = item.VirtualHost;
-                                    m_MQClient.Exchange = item.Exchange;
-                                    m_MQClient.mqid = item.MqId;
-
-                                    // 初始化连接
-                                    m_MQClient.Init();
-                                    lsMQs.Add(m_MQClient);
-
-                                    // 添加项目ID到MQ客户端的映射
-                                    if (!dicPid2MQClient.ContainsKey(item.ProjectId))
-                                    {
-                                        dicPid2MQClient.Add(item.ProjectId, m_MQClient);
-                                    }
-
-                                    // 添加路由键映射
-                                    string key = item.ProjectId.ToString();
-                                    if (!m_RoutingKey.ContainsKey(key))
-                                    {
-                                        m_RoutingKey.Add(key, item.RoutingKey);
-                                    }
-
-                                    LogHelper.Info($"成功初始化RabbitMQ客户端: {item.Host}:{item.Port}, 项目ID: {item.ProjectId}, 路由键: {item.RoutingKey}");
+                                    dicPid2MQClient.Add(item.ProjectId, m_MQClient);
                                 }
-                                catch (Exception ex)
+
+                                // 添加路由键映射
+                                string key = item.ProjectId.ToString();
+                                if (!m_RoutingKey.ContainsKey(key))
                                 {
-                                    // 单个 MQ 初始化失败，不影响其他
-                                    LogHelper.Error($"MQ Client 初始化失败: {ex.ToString()}");
-                                    continue;
+                                    m_RoutingKey.Add(key, item.RoutingKey);
                                 }
+
+                                LogHelper.Info($"成功初始化RabbitMQ客户端: {item.Host}:{item.Port}, 项目ID: {item.ProjectId}, 路由键: {item.RoutingKey}");
+                            }
+                            catch (Exception ex)
+                            {
+                                // 单个 MQ 初始化失败，不影响其他
+                                LogHelper.Error($"MQ Client 初始化失败: {ex.ToString()}");
                             }
                         }
                     }
-                    catch (Exception ex)
-                    {
-                        LogHelper.Error($"获取MQ配置失败: {ex.ToString()}");
-                        return;
-                    }
-
-                    _isInitialized = true;
-                    LogHelper.Info($"RabbitMQ配置初始化完成，共初始化 {lsMQs.Count} 个客户端");
                 }
                 catch (Exception ex)
                 {
-                    LogHelper.Error($"RabbitMQ初始化过程中发生异常: {ex.ToString()}");
-                    return;
+                    LogHelper.Error($"获取MQ配置失败: {ex.ToString()}");
                 }
+
+                _isInitialized = true;
+                LogHelper.Info($"RabbitMQ配置初始化完成，共初始化 {lsMQs.Count} 个客户端");
+            }
+            catch (Exception ex)
+            {
+                LogHelper.Error($"RabbitMQ初始化过程中发生异常: {ex.ToString()}");
             }
         }
 
@@ -178,13 +170,13 @@ namespace EasyIotSharp.GateWay.Core.LoadingConfig.RabbitMQ
         /// <summary>
         /// 关闭所有RabbitMQ连接
         /// </summary>
-        public static void CloseAllConnections()
+        public static async Task CloseAllConnections()
         {
             foreach (var mqClient in lsMQs)
             {
                 try
                 {
-                    mqClient.Close();
+                    await mqClient.CloseConnectionAsync();
                 }
                 catch (Exception ex)
                 {
