@@ -29,6 +29,7 @@ namespace EasyIotSharp.Core.Domain.Export
         /// <summary>
         /// Json条件
         /// </summary>
+        [SugarColumn(ColumnDataType = "TEXT")]
         public string ConditionJson { get; set; }
 
         /// <summary>
