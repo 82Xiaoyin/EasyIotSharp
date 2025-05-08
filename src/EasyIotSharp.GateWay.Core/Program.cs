@@ -13,15 +13,21 @@ using System.Threading;
 using UPrime;
 using UPrime.Configuration;
 using EasyIotSharp.Core.Extensions;
+using log4net;
 
 namespace EasyIotSharp.GateWay.Core
 {
     public class Program
     {
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(Program));
         static EasySocketBase easySocketBase = null;
 
         public static void Main(string[] args)
         {
+            // 初始化 log4net
+            var logRepository = LogManager.GetRepository(System.Reflection.Assembly.GetEntryAssembly());
+            log4net.Config.XmlConfigurator.Configure(logRepository, new FileInfo("log4net.config"));
+            
             string environment = GetEnv(args);
             var config = new ConfigurationBuilder()
                     .SetBasePath(Directory.GetCurrentDirectory())
@@ -72,7 +78,7 @@ namespace EasyIotSharp.GateWay.Core
                 {
                     e.Cancel = true;
                     Console.WriteLine("正在停止服务...");
-                    LogHelper.Info("收到停止信号，正在停止服务...");
+                    Logger.Info("收到停止信号，正在停止服务...");
                     exitEvent.Set();
                 };
                 
@@ -81,41 +87,36 @@ namespace EasyIotSharp.GateWay.Core
             }
             catch (Exception ex)
             {
-                LogHelper.Error($"程序启动异常: {ex.ToString()}");
+                Logger.Error("程序启动异常", ex);
                 ConsoleUI.ShowError($"程序启动异常: {ex.Message}");
             }
         }
         
-        // 在应用程序退出时关闭RabbitMQ连接
         static void AppDomain_ProcessExit(object sender, EventArgs e)
         {
-            LogHelper.Info("应用程序正在退出，清理资源...");
+            Logger.Info("应用程序正在退出，清理资源...");
             CleanupResources();
         }
         
-        // 清理资源
         static void CleanupResources()
         {
             try
             {
-                // 关闭RabbitMQ连接
                 try
                 {
                     EasyIotSharp.GateWay.Core.LoadingConfig.RabbitMQ.RabbitMQConfig.CloseAllConnections();
-                    LogHelper.Info("RabbitMQ连接已关闭");
+                    Logger.Info("RabbitMQ连接已关闭");
                 }
                 catch (Exception ex)
                 {
-                    LogHelper.Error($"关闭RabbitMQ连接异常: {ex.Message}");
+                    Logger.Error("关闭RabbitMQ连接异常", ex);
                 }
                 
-                // 其他资源清理...
-                
-                LogHelper.Info("所有资源已清理完毕");
+                Logger.Info("所有资源已清理完毕");
             }
             catch (Exception ex)
             {
-                LogHelper.Error($"资源清理异常: {ex.ToString()}");
+                Logger.Error("资源清理异常", ex);
             }
         }
         private static string GetEnv(string[] args)

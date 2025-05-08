@@ -2,11 +2,13 @@ using EasyIotSharp.GateWay.Core.Socket;
 using EasyIotSharp.GateWay.Core.UI;
 using EasyIotSharp.GateWay.Core.Util;
 using System;
+using log4net;
 
 namespace EasyIotSharp.GateWay.Core.Services
 {
     public class GateWayService
     {
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(GateWayService));
         private readonly EasySocketBase _socketBase;
 
         public GateWayService()
@@ -29,19 +31,19 @@ namespace EasyIotSharp.GateWay.Core.Services
                     Manufacturer = "modbusRTU",
                     TimeOutMS = 3600000
                 });
-                LogHelper.Info("TCP服务器初始化成功，端口：5020");
+                Logger.Info("TCP服务器初始化成功，端口：5020");
             });
 
             // 初始化RabbitMQ
             ConsoleUI.ShowProgress("正在初始化RabbitMQ服务...", () =>
             {
                 EasyIotSharp.GateWay.Core.LoadingConfig.RabbitMQ.RabbitMQConfig.InitMQ();
-                LogHelper.Info("RabbitMQ初始化成功");
+                Logger.Info("RabbitMQ初始化成功");
             });
 
             ConsoleUI.ShowSeparator();
             ConsoleUI.ShowSuccess("所有服务已启动完成");
-            LogHelper.Info("项目启动完成");
+            Logger.Info("项目启动完成");
         }
 
         public void CleanupServices()
@@ -49,12 +51,12 @@ namespace EasyIotSharp.GateWay.Core.Services
             try
             {
                 EasyIotSharp.GateWay.Core.LoadingConfig.RabbitMQ.RabbitMQConfig.CloseAllConnections();
-                LogHelper.Info("RabbitMQ连接已关闭");
-                LogHelper.Info("所有资源已清理完毕");
+                Logger.Info("RabbitMQ连接已关闭");
+                Logger.Info("所有资源已清理完毕");
             }
             catch (Exception ex)
             {
-                LogHelper.Error($"资源清理异常: {ex.ToString()}");
+                Logger.Error("资源清理异常", ex);
             }
         }
     }
