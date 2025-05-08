@@ -1882,6 +1882,11 @@
             文件流
             </summary>
         </member>
+        <member name="P:EasyIotSharp.Core.Dto.File.Params.ResourceInsert.Abbreviation">
+            <summary>
+            租互别名
+            </summary>
+        </member>
         <member name="P:EasyIotSharp.Core.Dto.File.Params.UpdateResourceInput.Id">
             <summary>
             主键
@@ -7627,7 +7632,7 @@
             根据文件名获取Content-Type
             </summary>
         </member>
-        <member name="M:EasyIotSharp.Core.Services.Files.Impl.ResourceService.UploadResponse(System.String,EasyIotSharp.Core.Dto.Enum.ResourceEnums,Microsoft.AspNetCore.Http.IFormFile)">
+        <member name="M:EasyIotSharp.Core.Services.Files.Impl.ResourceService.UploadResponse(System.String,EasyIotSharp.Core.Dto.Enum.ResourceEnums,Microsoft.AspNetCore.Http.IFormFile,System.String)">
             <summary>
             上传文件
             </summary>

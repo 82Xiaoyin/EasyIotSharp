@@ -71,7 +71,7 @@ namespace EasyIotSharp.Core.Services.Files.Impl
         /// <returns>默认访问URL</returns>
         public async Task<string> UploadResponseInsert(ResourceInsert insert)
         {
-            var url = await UploadResponse(insert.Name, insert.ResourceType, insert.FormFile);
+            var url = await UploadResponse(insert.Name, insert.ResourceType, insert.FormFile, null);
 
             var resource = new Domain.Files.Resource
             {
@@ -101,20 +101,20 @@ namespace EasyIotSharp.Core.Services.Files.Impl
         /// <returns>默认访问URL</returns>
         public async Task<string> UploadResponseSensor(ResourceInsert insert)
         {
-            var url = await UploadResponse(insert.Name, ResourceEnums.Sensor, insert.FormFile);
+            var url = await UploadResponse(insert.Name, ResourceEnums.Sensor, insert.FormFile, insert.Abbreviation);
 
             var resource = new Domain.Files.Resource
             {
                 Id = Guid.NewGuid().ToString().Replace("-", ""),
-                TenantId = ContextUser?.TenantId ?? Guid.NewGuid().ToString("N"),
+                TenantId = Guid.NewGuid().ToString("N"),
                 Name = insert.Name,
                 Type = (int)ResourceEnums.Sensor,
                 Url = url,
                 State = false,
                 Remark = insert.Remark ?? "",
                 CreationTime = DateTime.Now,
-                OperatorId = ContextUser?.UserId ?? "",
-                OperatorName = ContextUser?.UserName ?? ""
+                OperatorId = Guid.NewGuid().ToString("N"),
+                OperatorName = "System"
             };
 
             // 保存到数据库
@@ -154,7 +154,7 @@ namespace EasyIotSharp.Core.Services.Files.Impl
                             await _minIOFileService.DeleteFileAsync(bucketName, objectName);
                         }
                     }
-                    resource.Url = await UploadResponse(input.Name, (ResourceEnums)input.ResourceType, input.FormFile);
+                    resource.Url = await UploadResponse(input.Name, (ResourceEnums)input.ResourceType, input.FormFile, null);
                 }
 
                 // 更新资源信息
@@ -334,7 +334,7 @@ namespace EasyIotSharp.Core.Services.Files.Impl
         /// <param name="formFile"></param>
         /// <returns></returns>
         /// <exception cref="BizException"></exception>
-        public async Task<string> UploadResponse(string name, ResourceEnums type, IFormFile formFile)
+        public async Task<string> UploadResponse(string name, ResourceEnums type, IFormFile formFile, string abbreviation)
         {
             var fileExtension = Path.GetExtension(formFile.FileName).ToLower();
             if (type == ResourceEnums.Unity)
@@ -366,16 +366,39 @@ namespace EasyIotSharp.Core.Services.Files.Impl
             {
                 using (var stream = formFile.OpenReadStream())
                 {
-                    await _minIOFileService.UploadAsync(
-                        ContextUser?.TenantAbbreviation.ToLower() ?? "cs0001",
-                        objectName,
-                        stream);
+                    if (!string.IsNullOrEmpty(abbreviation))
+                    {
+
+                        await _minIOFileService.UploadAsync(
+                            abbreviation,
+                            objectName,
+                            stream);
+                    }
+                    else
+                    {
+                        await _minIOFileService.UploadAsync(
+                            ContextUser?.TenantAbbreviation.ToLower(),
+                            objectName,
+                            stream);
+                    }
                 }
 
                 // 获取文件URL
-                return await _minIOFileService.GetFileUrlAsync(
-                    ContextUser?.TenantAbbreviation.ToLower() ?? "cs0001",
+                var url = string.Empty;
+                if (!string.IsNullOrEmpty(abbreviation))
+                {
+                    url = await _minIOFileService.GetFileUrlAsync(
+                    abbreviation,
                     objectName);
+                }
+                else
+                {
+                    url = await _minIOFileService.GetFileUrlAsync(
+                    ContextUser?.TenantAbbreviation.ToLower() ?? abbreviation,
+                    objectName);
+                }
+
+                return url;
             }
             catch (Exception ex)
             {

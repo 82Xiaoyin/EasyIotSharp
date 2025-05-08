@@ -22,6 +22,9 @@ using Microsoft.AspNetCore.Http;
 using EasyIotSharp.Core.Dto.File.Params;
 using EasyIotSharp.Core.Services.Files;
 using EasyIotSharp.Core.Services.Project.Impl;
+using System.Data;
+using MongoDB.Bson.IO;
+using Minio.DataModel;
 
 namespace EasylotSharp.Quartz.Service
 {
@@ -39,29 +42,35 @@ namespace EasylotSharp.Quartz.Service
             {
                 Console.WriteLine($"当前时间：{DateTime.Now}，执行 Cron 任务逻辑");
                 var _exportRecordService = UPrimeEngine.Instance.Resolve<IExportRecordService>();
-                // 执行实际的业务逻辑
 
                 var data = await _exportRecordService.QueryExportRecord();
                 if (data == null || data.Count == 0)
                 {
                     Console.WriteLine("不存在导出数据！");
-                    await Task.CompletedTask;
+                    return; // 直接返回，不需要 await Task.CompletedTask
                 }
-                Console.WriteLine(data);
-                // 处理数据...
+
                 foreach (ExportRecordDto dto in data)
                 {
-                    dto.Id = await ProcessingExportRecord(dto);
-                    dto.State = 1;
-                    await _exportRecordService.UpdateExportRecord(dto);
+                    try
+                    {
+                        Console.WriteLine($"开始处理导出记录: {dto.Name}");
+                        dto.ResourceId = await ProcessingExportRecord(dto);
+                        dto.State = 1;
+                        await _exportRecordService.UpdateExportRecord(dto);
+                        Console.WriteLine($"成功处理导出记录: {dto.Name}");
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"处理导出记录失败: {dto.Name}, 错误: {ex.Message}");
+                    }
                 }
-
-                await Task.CompletedTask;
-
             }
             catch (Exception ex)
             {
-                throw; // 重新抛出异常，让 Quartz 知道任务失败
+                Console.WriteLine($"任务执行失败: {ex.Message}");
+                Console.WriteLine($"堆栈跟踪: {ex.StackTrace}");
+                throw new JobExecutionException("导出任务执行失败", ex, false);
             }
         }
 
@@ -71,91 +80,134 @@ namespace EasylotSharp.Quartz.Service
         /// <returns></returns>
         public async Task<string> ProcessingExportRecord(ExportRecordDto dto)
         {
-            var _resourceService = UPrimeEngine.Instance.Resolve<IResourceService>();
-            var _sensorQuotaService = UPrimeEngine.Instance.Resolve<ISensorQuotaService>();
-            var _sensorPointService = UPrimeEngine.Instance.Resolve<ISensorPointService>();
-
-
-            var list = Newtonsoft.Json.JsonConvert.DeserializeObject<List<ExportDataInput>>(dto.ConditionJson);
-
             // 要创建的临时文件夹路径
             string folderPath = AppDomain.CurrentDomain.BaseDirectory + $@"\{dto.Name}";
 
             // 最终生成的 ZIP 文件路径
             string zipFilePath = AppDomain.CurrentDomain.BaseDirectory + $@"\{dto.Name}.zip";
-
-            // 1. 如果文件夹已存在，先删除（避免冲突）
-            if (Directory.Exists(folderPath))
-                Directory.Delete(folderPath, true);
-
-            // 2. 创建新文件夹
-            Directory.CreateDirectory(folderPath);
-
-            foreach (var item in list)
+            try 
             {
-                var dataRespost = new DataRespost();
-                dataRespost.ProjectId = item.ProjectId;
-                dataRespost.SensorId = item.SensorId;
-                dataRespost.SensorQuotaId = item.SensorQuotaId;
-                dataRespost.SensorPointId = item.SensorPointId;
-                dataRespost.StartTime = item.StartTime;
-                dataRespost.EndTime = item.EndTime;
-                dataRespost.Abbreviation = item.Abbreviation;
+                var _resourceService = UPrimeEngine.Instance.Resolve<IResourceService>();
+                var _sensorQuotaService = UPrimeEngine.Instance.Resolve<ISensorQuotaService>();
+                var _sensorPointService = UPrimeEngine.Instance.Resolve<ISensorPointService>();
+            
+                var model = new ResourceInsert();
+                model.Name = dto.Name;
+                model.Remark = "任务生成";
+            
+                var list = Newtonsoft.Json.JsonConvert.DeserializeObject<List<ExportDataInput>>(dto.ConditionJson);
 
-                var dt = await _sensorQuotaService.GetSensorData(dataRespost);
-                var sensorPoint = await _sensorPointService.GetSensorPoint(item.SensorId);
-
-                StringBuilder stringBuilder = new StringBuilder();
-                foreach (var name in dt.Quotas.Select(f => f.Name).ToList())
+            
+                // 检查并删除已存在的 ZIP 文件
+                if (File.Exists(zipFilePath))
                 {
-                    stringBuilder.Append(name);
+                    File.Delete(zipFilePath);
                 }
-                stringBuilder.AppendLine("\n");
-
-                stringBuilder.AppendLine(dt.Data.ToString());
-
-                await GenerateCsv(sensorPoint.Name, folderPath, zipFilePath, stringBuilder.ToString());
+            
+                // 1. 如果文件夹已存在，先删除（避免冲突）
+                if (Directory.Exists(folderPath))
+                {
+                    Directory.Delete(folderPath, true);
+                }
+            
+                // 2. 创建新文件夹
+                Directory.CreateDirectory(folderPath);
+            
+                foreach (var item in list)
+                {
+                    int number = 0;
+                    int strNumber = 0;
+                    int sNumber = 0;
+                    var dataRespost = new DataRespost();
+                    dataRespost.ProjectId = item.ProjectId;
+                    dataRespost.SensorId = item.SensorId;
+                    dataRespost.SensorQuotaId = item.SensorQuotaId;
+                    dataRespost.SensorPointId = item.SensorPointId;
+                    dataRespost.StartTime = item.StartTime;
+                    dataRespost.EndTime = item.EndTime;
+                    dataRespost.Abbreviation = item.Abbreviation;
+                    model.Abbreviation = item.Abbreviation;
+            
+                    var dt = await _sensorQuotaService.GetSensorData(dataRespost);
+                    var sensorPoint = await _sensorPointService.GetSensorPoint(item.SensorPointId);
+            
+                    StringBuilder stringBuilder = new StringBuilder();
+                    string tableName = string.Empty;
+                    foreach (var name in dt.Quotas.Select(f => f.Name).ToList())
+                    {
+                        number++;
+                        tableName += name;
+                        tableName += ",";
+                    }
+                    stringBuilder.AppendLine(tableName);
+                    var strdt = Newtonsoft.Json.JsonConvert.SerializeObject(dt.Data);
+                    var strList = Newtonsoft.Json.JsonConvert.DeserializeObject<List<string[]>>(strdt);
+            
+                    foreach (var str in strList)
+                    {
+                        string table = string.Empty;
+                        for (int i = 0; i < number; i++)
+                        {
+                            if (i == 0)
+                            {
+                                table += Convert.ToDateTime(str[i]).ToShortDateString();
+                                table += ",";
+                            }
+                            else
+                            {
+                                table += str[i];
+                                table += ",";
+                            }
+                        }
+                        stringBuilder.AppendLine(table);
+                    }
+            
+                    await GenerateCsv(sensorPoint.Name, folderPath, zipFilePath, stringBuilder.ToString());
+                }
+            
+                // 5. 压缩整个文件夹为 ZIP 文件
+                ZipFile.CreateFromDirectory(folderPath, zipFilePath, CompressionLevel.Optimal, false);
+            
+                Console.WriteLine($"ZIP 文件已成功生成：{zipFilePath}");
+            
+                // 使用 using 语句确保资源正确释放
+                using (var stream = new FileStream(zipFilePath, FileMode.Open, FileAccess.Read))
+                {
+                    var formFile = new FormFile(
+                        baseStream: stream,
+                        baseStreamOffset: 0,
+                        length: stream.Length,
+                        name: "file",
+                        fileName: Path.GetFileName(zipFilePath))
+                    {
+                        Headers = new HeaderDictionary(),
+                        ContentType = "application/zip"
+                    };
+            
+                    model.FormFile = formFile;
+                    var resourceId = await _resourceService.UploadResponseSensor(model);
+                    return resourceId;
+                }
             }
-
-            // 5. 压缩整个文件夹为 ZIP 文件
-            ZipFile.CreateFromDirectory(folderPath, zipFilePath, CompressionLevel.Optimal, false);
-
-            Console.WriteLine($"ZIP 文件已成功生成：{zipFilePath}");
-
-            //
-            var formFile = await CreateIFormFileFromPath(zipFilePath);
-
-            var model = new ResourceInsert();
-            model.FormFile = formFile;
-            model.Name = dto.Name;
-            model.Remark = "任务生成";
-
-            var resourceId = await _resourceService.UploadResponseSensor(model);
-
-            return resourceId;
-
-        }
-
-        public async Task<IFormFile> CreateIFormFileFromPath(string filePath)
-        {
-            if (!File.Exists(filePath))
-                throw new FileNotFoundException("文件未找到", filePath);
-
-            var fileName = Path.GetFileName(filePath);
-            var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read);
-
-            var formFile = new FormFile(
-                baseStream: fileStream,
-                baseStreamOffset: 0,
-                length: fileStream.Length,
-                name: "file",
-                fileName: fileName)
+            finally 
             {
-                Headers = new HeaderDictionary(),
-                ContentType = "application/octet-stream"
-            };
-
-            return formFile;
+                // 清理临时文件
+                try
+                {
+                    if (File.Exists(zipFilePath))
+                    {
+                        File.Delete(zipFilePath);
+                    }
+                    if (Directory.Exists(folderPath))
+                    {
+                        Directory.Delete(folderPath, true);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"清理临时文件失败: {ex.Message}");
+                }
+            }
         }
 
         public async Task GenerateCsv(string csvFileName, string folderPath, string zipFilePath, string stringBuilder)
