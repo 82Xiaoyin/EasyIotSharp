@@ -3,6 +3,7 @@ using EasyIotSharp.GateWay.Core.Util;
 using System;
 using System.Text;
 using System.Text.Json;
+using System.Threading.Tasks;
 using log4net;
 
 namespace EasyIotSharp.GateWay.Core.Services
@@ -18,7 +19,10 @@ namespace EasyIotSharp.GateWay.Core.Services
         /// <summary>
         /// 发送消息到指定项目的RabbitMQ
         /// </summary>
-        public bool SendMessage(string projectId, object message)
+        /// <param name="projectId">项目ID</param>
+        /// <param name="message">消息内容</param>
+        /// <returns>是否发送成功</returns>
+        public async Task<bool> SendMessage(string projectId, object message)
         {
             try
             {
@@ -39,7 +43,8 @@ namespace EasyIotSharp.GateWay.Core.Services
                 string messageJson = message.ToString();
                 byte[] messageBytes = Encoding.UTF8.GetBytes(messageJson);
                 
-                mqClient.SendMessage(routingKey, messageBytes);
+                // 发送消息
+                await  mqClient.SendMessageAsync(routingKey, messageBytes);
                 
                 Logger.Info($"成功发送消息到项目 {projectId} 的RabbitMQ，路由键: {routingKey}");
                 return true;
@@ -54,7 +59,10 @@ namespace EasyIotSharp.GateWay.Core.Services
         /// <summary>
         /// 发送原始字节数据到指定项目的RabbitMQ
         /// </summary>
-        public bool SendRawData(string projectId, byte[] data)
+        /// <param name="projectId">项目ID</param>
+        /// <param name="data">字节数据</param>
+        /// <returns>是否发送成功</returns>
+        public async Task<bool> SendRawData(string projectId, byte[] data)
         {
             try
             {
@@ -72,7 +80,8 @@ namespace EasyIotSharp.GateWay.Core.Services
                     return false;
                 }
                 
-                mqClient.SendMessage(routingKey, data);
+                // 发送消息
+                await  mqClient.SendMessageAsync(routingKey, data);
                 
                 Logger.Info($"成功发送原始数据到项目 {projectId} 的RabbitMQ，路由键: {routingKey}");
                 return true;

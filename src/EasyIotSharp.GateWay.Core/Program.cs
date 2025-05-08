@@ -44,6 +44,7 @@ namespace EasyIotSharp.GateWay.Core
 
             Logger.Info($"应用程序配置已加载，环境：{environment}");
 
+         
             if (appOptions.SetMinThreads > 16)
             {
                 ThreadPool.GetMinThreads(out int minWorker, out int minIOC);
@@ -62,9 +63,7 @@ namespace EasyIotSharp.GateWay.Core
             try
             {
                 AppDomain.CurrentDomain.ProcessExit += AppDomain_ProcessExit;
-                
                 ConsoleUI.ShowBanner();
-                
                 var serviceManager = new GateWayService();
                 serviceManager.InitializeServices();
                 var exitEvent = new ManualResetEvent(false);

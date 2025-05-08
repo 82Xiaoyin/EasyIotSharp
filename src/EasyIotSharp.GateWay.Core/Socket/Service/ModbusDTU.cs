@@ -33,8 +33,7 @@ namespace EasyIotSharp.GateWay.Core.Socket.Service
         {
             _rabbitMQService = new RabbitMQService();
         }
-
-        public override void DecodeData(TaskInfo taskData)
+        public override async Task DecodeData(TaskInfo taskData)
         {
             try
             {
@@ -55,7 +54,7 @@ namespace EasyIotSharp.GateWay.Core.Socket.Service
                 if (!string.IsNullOrEmpty(modbusConfig))
                 {
                     // 如果是数据包，进行解析
-                    ParseReceivedData(taskData.Client.ConnId, bReceived, modbusConfig);
+                   await  ParseReceivedData(taskData.Client.ConnId, bReceived, modbusConfig);
                 }
                 else
                 {
@@ -91,7 +90,7 @@ namespace EasyIotSharp.GateWay.Core.Socket.Service
         /// <summary>
         /// 解析接收到的数据包
         /// </summary>
-        private void ParseReceivedData(IntPtr connId, byte[] data, string configJson)
+        private async Task ParseReceivedData(IntPtr connId, byte[] data, string configJson)
         {
             var _sensorPointRepository = UPrimeEngine.Instance.Resolve<ISensorPointService>();
             var _sensorRepository = UPrimeEngine.Instance.Resolve<ISensorService>();
@@ -190,7 +189,7 @@ namespace EasyIotSharp.GateWay.Core.Socket.Service
                             }
 
                             sensorData.Points.Add(pointData);
-                            DataParserHelper.SendEncryptedData(sensorData, connectionInfo, _rabbitMQService);
+                            await DataParserHelper.SendEncryptedData(sensorData, connectionInfo, _rabbitMQService);
                         }
                         break; // 找到匹配的配置后退出循环
                     }

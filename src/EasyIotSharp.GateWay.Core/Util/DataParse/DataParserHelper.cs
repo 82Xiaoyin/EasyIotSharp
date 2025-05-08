@@ -6,13 +6,14 @@ using EasyIotSharp.GateWay.Core.Socket;
 using System;
 using System.Linq;
 using System.Text.Json;
+using System.Threading.Tasks;
 using UPrime;
 
 namespace EasyIotSharp.GateWay.Core.Util
 {
     public static class DataParserHelper
     {
-        public static void SendEncryptedData(
+        public static async Task SendEncryptedData(
             LowFrequencyData sensorData,
             GatewayConnectionInfo connectionInfo,
             RabbitMQService rabbitMQService)
@@ -27,7 +28,7 @@ namespace EasyIotSharp.GateWay.Core.Util
                 {
                     sensorData.TenantAbbreviation = gateway.TenantAbbreviation;
                     string encryptedData = sensorData.ToEncryptedString();
-                    rabbitMQService.SendMessage(gateway.ProjectId, encryptedData);
+                    await rabbitMQService.SendMessage(gateway.ProjectId, encryptedData);
                     LogHelper.Info($"发送加密数据到RabbitMQ成功, 网关ID: {connectionInfo.GatewayId}");
                 }
                 catch (Exception ex)
