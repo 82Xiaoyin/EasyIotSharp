@@ -352,11 +352,11 @@ namespace EasyIotSharp.Core.Services.Hardware.Impl
                 {
                     sqlBuilder.Append($" Limit {dataRespost.PageSize}  Offset {dataRespost.PageIndex - 1}");
                 }
-
+                
                 // 创建仓储实例
                 var repository = InfluxdbRepositoryFactory.Create<Dictionary<string, object>>(
                     measurementName: measurementName,
-                    tenantDatabase: ContextUser.TenantAbbreviation
+                    tenantDatabase: dataRespost.Abbreviation == null ? ContextUser.TenantAbbreviation : dataRespost.Abbreviation //ContextUser.TenantAbbreviation
                 );
 
                 // 查询数据

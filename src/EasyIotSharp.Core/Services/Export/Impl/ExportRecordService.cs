@@ -94,21 +94,17 @@ namespace EasyIotSharp.Core.Services.Export.Impl
         /// 更新导出记录
         /// </summary>
         /// <param name="input">更新参数</param>
-        public async Task UpdateExportRecord(ExportRecordInsert input)
+        public async Task UpdateExportRecord(ExportRecordDto input)
         {
             var entity = await _exportRecordRepository.FirstOrDefaultAsync(x => x.Id == input.Id && x.IsDelete == false);
             if (entity == null)
             {
                 throw new BizException(BizError.BIND_EXCEPTION_ERROR, "未找到指定记录");
             }
-            if (string.IsNullOrEmpty(input.Name))
-            {
-                input.Name = "Data";
-            }
 
-            entity.Name = input.Name + "-" + DateTime.Now.ToString("yyyyMMddHHmmss");
             entity.ConditionJson = input.ConditionJson;
             entity.State = input.State;
+            entity.ResourceId = input.ResourceId;
             entity.UpdatedAt = DateTime.Now;
             entity.OperatorId = ContextUser.UserId;
             entity.OperatorName = ContextUser.UserName;

@@ -1747,6 +1747,11 @@
             资源枚举
             </summary>
         </member>
+        <member name="F:EasyIotSharp.Core.Dto.Enum.ResourceEnums.Sensor">
+            <summary>
+            string
+            </summary>
+        </member>
         <member name="F:EasyIotSharp.Core.Dto.Enum.ResourceEnums.File">
             <summary>
             string
@@ -1767,39 +1772,9 @@
             string
             </summary>
         </member>
-        <member name="P:EasyIotSharp.Core.Dto.Export.ExportDataRecordDto.Id">
+        <member name="P:EasyIotSharp.Core.Dto.Export.Params.ExportDataInput.Abbreviation">
             <summary>
-            主键
-            </summary>
-        </member>
-        <member name="P:EasyIotSharp.Core.Dto.Export.ExportDataRecordDto.Name">
-            <summary>
-            名称
-            </summary>
-        </member>
-        <member name="P:EasyIotSharp.Core.Dto.Export.ExportDataRecordDto.TenantId">
-            <summary>
-            租户Id
-            </summary>
-        </member>
-        <member name="P:EasyIotSharp.Core.Dto.Export.ExportDataRecordDto.ProjectId">
-            <summary>
-            项目Id
-            </summary>
-        </member>
-        <member name="P:EasyIotSharp.Core.Dto.Export.ExportDataRecordDto.ExecuteTime">
-            <summary>
-            执行时间
-            </summary>
-        </member>
-        <member name="P:EasyIotSharp.Core.Dto.Export.ExportDataRecordDto.State">
-            <summary>
-            状态
-            </summary>
-        </member>
-        <member name="P:EasyIotSharp.Core.Dto.Export.ExportDataRecordDto.ResourceId">
-            <summary>
-            资源Id
+            租户别名
             </summary>
         </member>
         <member name="P:EasyIotSharp.Core.Dto.Export.Params.ExportDataInput.SensorId">
@@ -1819,7 +1794,7 @@
         </member>
         <member name="P:EasyIotSharp.Core.Dto.Export.Params.ExportDataInput.ProjectId">
             <summary>
-            测点Id
+            项目Id
             </summary>
         </member>
         <member name="P:EasyIotSharp.Core.Dto.Export.Params.ExportDataInput.StartTime">
@@ -2035,6 +2010,11 @@
         <member name="P:EasyIotSharp.Core.Dto.Gateways.GatewayDataRecord.ParsedResult">
             <summary>
             解析结果
+            </summary>
+        </member>
+        <member name="P:EasyIotSharp.Core.Dto.Hardware.Params.DataRespost.Abbreviation">
+            <summary>
+            租户别名
             </summary>
         </member>
         <member name="P:EasyIotSharp.Core.Dto.Hardware.Params.DataRespost.SensorId">
@@ -7543,7 +7523,7 @@
             <param name="input">创建参数</param>
             <returns>新创建的记录ID</returns>
         </member>
-        <member name="M:EasyIotSharp.Core.Services.Export.IExportRecordService.UpdateExportRecord(EasyIotSharp.Core.Dto.Export.Params.ExportRecordInsert)">
+        <member name="M:EasyIotSharp.Core.Services.Export.IExportRecordService.UpdateExportRecord(EasyIotSharp.Core.Dto.Export.ExportRecordDto)">
             <summary>
             更新导出记录
             </summary>
@@ -7587,7 +7567,7 @@
             <param name="input">创建参数</param>
             <returns>新创建的记录ID</returns>
         </member>
-        <member name="M:EasyIotSharp.Core.Services.Export.Impl.ExportRecordService.UpdateExportRecord(EasyIotSharp.Core.Dto.Export.Params.ExportRecordInsert)">
+        <member name="M:EasyIotSharp.Core.Services.Export.Impl.ExportRecordService.UpdateExportRecord(EasyIotSharp.Core.Dto.Export.ExportRecordDto)">
             <summary>
             更新导出记录
             </summary>
@@ -7609,6 +7589,13 @@
         <member name="M:EasyIotSharp.Core.Services.Files.Impl.ResourceService.UploadResponseInsert(EasyIotSharp.Core.Dto.File.Params.ResourceInsert)">
             <summary>
             资源新增
+            </summary>
+            <param name="insert">上传资源参数</param>
+            <returns>默认访问URL</returns>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.Files.Impl.ResourceService.UploadResponseSensor(EasyIotSharp.Core.Dto.File.Params.ResourceInsert)">
+            <summary>
+            测点下载新增
             </summary>
             <param name="insert">上传资源参数</param>
             <returns>默认访问URL</returns>
@@ -7662,6 +7649,13 @@
             资源文件上传
             </summary>
             <param name="input"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.Files.IResourceService.UploadResponseSensor(EasyIotSharp.Core.Dto.File.Params.ResourceInsert)">
+            <summary>
+            测点资源下载
+            </summary>
+            <param name="insert"></param>
             <returns></returns>
         </member>
         <member name="M:EasyIotSharp.Core.Services.Files.IResourceService.UpdateResource(EasyIotSharp.Core.Dto.File.Params.UpdateResourceInput)">

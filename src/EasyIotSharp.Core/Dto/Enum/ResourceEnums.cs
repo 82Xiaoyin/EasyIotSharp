@@ -13,6 +13,12 @@ namespace EasyIotSharp.Core.Dto.Enum
         /// <summary>
         /// string
         /// </summary>
+        [EnumAlias("Sensor")]
+        Sensor = 4,
+
+        /// <summary>
+        /// string
+        /// </summary>
         [EnumAlias("File")]
         File = 3,
 

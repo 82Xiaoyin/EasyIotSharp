@@ -29,6 +29,13 @@ namespace EasyIotSharp.Core.Services.Files
         Task<string> UploadResponseInsert(ResourceInsert insert);
 
         /// <summary>
+        /// 测点资源下载
+        /// </summary>
+        /// <param name="insert"></param>
+        /// <returns></returns>
+        Task<string> UploadResponseSensor(ResourceInsert insert);
+
+        /// <summary>
         /// 修改资源
         /// </summary>
         /// <param name="input"></param>

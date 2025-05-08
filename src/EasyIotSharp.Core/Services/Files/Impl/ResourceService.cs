@@ -92,6 +92,36 @@ namespace EasyIotSharp.Core.Services.Files.Impl
 
             return resource.Url;
         }
+
+
+        /// <summary>
+        /// 测点下载新增
+        /// </summary>
+        /// <param name="insert">上传资源参数</param>
+        /// <returns>默认访问URL</returns>
+        public async Task<string> UploadResponseSensor(ResourceInsert insert)
+        {
+            var url = await UploadResponse(insert.Name, ResourceEnums.Sensor, insert.FormFile);
+
+            var resource = new Domain.Files.Resource
+            {
+                Id = Guid.NewGuid().ToString().Replace("-", ""),
+                TenantId = ContextUser?.TenantId ?? Guid.NewGuid().ToString("N"),
+                Name = insert.Name,
+                Type = (int)ResourceEnums.Sensor,
+                Url = url,
+                State = false,
+                Remark = insert.Remark ?? "",
+                CreationTime = DateTime.Now,
+                OperatorId = ContextUser?.UserId ?? "",
+                OperatorName = ContextUser?.UserName ?? ""
+            };
+
+            // 保存到数据库
+            await _resourceRepository.InsertAsync(resource);
+
+            return resource.Id;
+        }
         /// <summary>
         /// 修改资源信息
         /// </summary>

@@ -7,6 +7,10 @@ namespace EasyIotSharp.Core.Dto.Export.Params
     public class ExportDataInput
     {
         /// <summary>
+        /// 租户别名
+        /// </summary>
+        public string Abbreviation { get; set; }
+        /// <summary>
         /// 设备Id
         /// </summary>
         public string SensorId { get; set; }

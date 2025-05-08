@@ -28,7 +28,7 @@ namespace EasyIotSharp.Core.Services.Export
         /// 更新导出记录
         /// </summary>
         /// <param name="input">更新参数</param>
-        Task UpdateExportRecord(ExportRecordInsert input);
+        Task UpdateExportRecord(ExportRecordDto input);
 
         /// <summary>
         /// 删除导出记录

@@ -55,7 +55,7 @@ namespace EasyIotSharp.API.Controllers
         /// <returns></returns>
         [HttpPost("/Export/ExportRecord/Update")]
         [Authorize]
-        public async Task<UPrimeResponse> UpdateExportRecord([FromBody] ExportRecordInsert input)
+        public async Task<UPrimeResponse> UpdateExportRecord([FromBody] ExportRecordDto input)
         {
             await _exportRecordService.UpdateExportRecord(input); ;
             return new UPrimeResponse();
