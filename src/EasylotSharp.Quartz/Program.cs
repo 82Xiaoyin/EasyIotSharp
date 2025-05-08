@@ -11,12 +11,20 @@ using System.Threading.Tasks;
 using Quartz;
 using Quartz.Impl;
 using EasylotSharp.Quartz.Service;
+using log4net.Config;
+using System.Reflection;
+using log4net;
+
 namespace EasylotSharp.Quartz
 {
     internal class Program
     {
         static async Task Main(string[] args)
         {
+            // 添加 log4net 配置初始化
+            var logRepository = LogManager.GetRepository(Assembly.GetEntryAssembly());
+            XmlConfigurator.Configure(logRepository, new FileInfo("log4net.config"));
+            
             //var builder = WebApplication.CreateBuilder(args);
 
             //// 注册 Quartz 服务

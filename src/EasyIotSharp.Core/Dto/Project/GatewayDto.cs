@@ -74,5 +74,15 @@ namespace EasyIotSharp.Core.Dto.Project
         /// 操作人
         /// </summary>
         public string OperatorName { get; set; }
+
+        /// <summary>
+        ///IMEI号
+        /// </summary>
+        public string Imei { get; set; }
+
+        /// <summary>
+        /// 设备型号
+        /// </summary>
+        public string DeviceModel { get; set; }
     }
 }

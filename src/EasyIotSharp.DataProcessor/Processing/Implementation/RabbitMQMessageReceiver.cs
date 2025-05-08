@@ -5,9 +5,9 @@ using System.Text;
 using System.Threading.Tasks;
 using EasyIotSharp.DataProcessor.Model.RaddbitDTO;
 using EasyIotSharp.DataProcessor.Processing.Interfaces;
-using EasyIotSharp.DataProcessor.Util;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
+using log4net;
 
 namespace EasyIotSharp.DataProcessor.Processing.Implementation
 {
@@ -16,6 +16,8 @@ namespace EasyIotSharp.DataProcessor.Processing.Implementation
     /// </summary>
     public class RabbitMQMessageReceiver : IMessageReceiver 
     {
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(RabbitMQMessageReceiver));
+        
         // 存储项目ID和对应的RabbitMQ通道映射关系
         private readonly Dictionary<string, IChannel> _channels = new Dictionary<string, IChannel>();
         // 存储项目ID和对应的队列名称映射关系
@@ -27,6 +29,7 @@ namespace EasyIotSharp.DataProcessor.Processing.Implementation
         /// 消息接收事件
         /// </summary>
         public event EventHandler<MessageReceivedEventArgs> MessageReceived;
+
         /// <summary>
         /// 初始化消息接收器
         /// </summary>
@@ -34,33 +37,30 @@ namespace EasyIotSharp.DataProcessor.Processing.Implementation
         {
             try
             {
-                // 遍历所有已配置的RabbitMQ客户端
                 foreach (var kvp in EasyIotSharp.DataProcessor.LoadingConfig.RabbitMQ.RabbitMQConfig.dicPid2MQClient)
                 {
                     string projectId = kvp.Key;
                     RabbitMQClient client = kvp.Value;
                     
-                    // 订阅重连事件
                     client.ConnectionReestablished += async (sender, e) =>
                     {
-                        LogHelper.Info($"RabbitMQ连接已重建，重新启动项目 {projectId} 的消费者...");
+                        Logger.Info($"RabbitMQ连接已重建，重新启动项目 {projectId} 的消费者...");
                         await ResubscribeProjectQueueAsync(client, projectId, "queue_");
                     };
                     
-                    LogHelper.Info($"正在为项目 {projectId} 初始化 RabbitMQ 客户端");
+                    Logger.Info($"正在为项目 {projectId} 初始化 RabbitMQ 客户端");
                     
-                    // 为每个项目订阅队列
                     if (await SubscribeProjectQueueAsync(client, projectId, "queue_"))
                     {
                         _rabbitClients.Add(client);
                     }
                 }
                 
-                LogHelper.Info("RabbitMQ消息接收器初始化完成");
+                Logger.Info("RabbitMQ消息接收器初始化完成");
             }
             catch (Exception ex)
             {
-                LogHelper.Error($"初始化RabbitMQ消息接收器时发生错误: {ex.Message}");
+                Logger.Error("初始化RabbitMQ消息接收器时发生错误", ex);
                 throw;
             }
         }
@@ -70,9 +70,8 @@ namespace EasyIotSharp.DataProcessor.Processing.Implementation
         /// </summary>
         private async Task<bool> ResubscribeProjectQueueAsync(RabbitMQClient client, string projectId, string queuePrefix)
         {
-            LogHelper.Info($"重新订阅项目 {projectId} 的队列");
+            Logger.Info($"重新订阅项目 {projectId} 的队列");
             
-            // 如果通道存在，先尝试关闭
             if (_channels.TryGetValue(projectId, out var existingChannel))
             {
                 try
@@ -84,11 +83,10 @@ namespace EasyIotSharp.DataProcessor.Processing.Implementation
                 }
                 catch (Exception ex)
                 {
-                    LogHelper.Warn($"关闭项目 {projectId} 的旧通道时发生错误: {ex.Message}");
+                    Logger.Warn($"关闭项目 {projectId} 的旧通道时发生错误", ex);
                 }
             }
             
-            // 重新订阅
             return await SubscribeProjectQueueAsync(client, projectId, queuePrefix);
         }
         
@@ -99,25 +97,20 @@ namespace EasyIotSharp.DataProcessor.Processing.Implementation
         {
             try
             {
-                // 确保客户端已初始化
                 await client.InitAsync();
                 
-                // 构建队列名称并保存
                 string queueName = $"{queuePrefix}{projectId}";
                 _queueNames[projectId] = queueName;
                 
-                // 获取RabbitMQ通道
                 var channel = client._channel;
                 if (channel == null)
                 {
-                    LogHelper.Error($"项目 {projectId} 的RabbitMQ通道为空");
+                    Logger.Error($"项目 {projectId} 的RabbitMQ通道为空");
                     return false;
                 }
                 
-                // 设置QoS，提高每个消费者可以同时处理的消息数量
                 await channel.BasicQosAsync(0, 2000, false);
                 
-                // 声明队列，确保队列存在
                 var queueDeclareResult = await channel.QueueDeclareAsync(
                     queue: queueName,
                     durable: true,
@@ -125,68 +118,60 @@ namespace EasyIotSharp.DataProcessor.Processing.Implementation
                     autoDelete: false,
                     arguments: null);
                     
-                // 记录队列中的消息数量 - 使用新的方法获取消息数量
                 var messageCount = await channel.MessageCountAsync(queueName);
-                LogHelper.Info($"队列 {queueName} 中有 {messageCount} 条待处理消息");
+                Logger.Info($"队列 {queueName} 中有 {messageCount} 条待处理消息");
                 
-                // 创建异步消费者
                 var consumer = new AsyncEventingBasicConsumer(channel);
-                LogHelper.Info($"为项目 {projectId} 创建了异步消费者");
+                Logger.Info($"为项目 {projectId} 创建了异步消费者");
                 
                 consumer.ReceivedAsync += async (model, ea) =>
                 {
-                    LogHelper.Info($"收到项目 {projectId} 的消息，DeliveryTag: {ea.DeliveryTag}");
+                    Logger.Info($"收到项目 {projectId} 的消息，DeliveryTag: {ea.DeliveryTag}");
                     try
                     {
-                        // 获取消息内容
                         var body = ea.Body.ToArray();
                         var message = Encoding.UTF8.GetString(body);
-                        LogHelper.Debug($"项目 {projectId} 收到消息内容: {message.Substring(0, Math.Min(100, message.Length))}...");
+                        Logger.Debug($"项目 {projectId} 收到消息内容: {message.Substring(0, Math.Min(100, message.Length))}...");
                         
-                        // 触发消息接收事件
                         if (MessageReceived != null)
                         {
-                            LogHelper.Debug($"触发项目 {projectId} 的消息接收事件");
-                             MessageReceived.Invoke(this, new MessageReceivedEventArgs
+                            Logger.Debug($"触发项目 {projectId} 的消息接收事件");
+                            MessageReceived.Invoke(this, new MessageReceivedEventArgs
                             {
                                 ProjectId = projectId,
                                 RawMessage = message
                             });
-                            LogHelper.Debug($"项目 {projectId} 的消息接收事件处理完成");
+                            Logger.Debug($"项目 {projectId} 的消息接收事件处理完成");
                         }
                         else
                         {
-                            LogHelper.Warn($"项目 {projectId} 的消息接收事件未注册");
+                            Logger.Warn($"项目 {projectId} 的消息接收事件未注册");
                         }
                         
-                        // 确认消息已处理
                         await channel.BasicAckAsync(ea.DeliveryTag, false);
-                        LogHelper.Debug($"已确认项目 {projectId} 的消息，DeliveryTag: {ea.DeliveryTag}");
+                        Logger.Debug($"已确认项目 {projectId} 的消息，DeliveryTag: {ea.DeliveryTag}");
                     }
                     catch (Exception ex)
                     {
-                        // 处理失败，消息重新入队
-                        LogHelper.Error($"处理项目 {projectId} 的消息时发生错误: {ex.Message}, 堆栈: {ex.StackTrace}");
-                       await channel.BasicNackAsync(ea.DeliveryTag, false, true);
+                        Logger.Error($"处理项目 {projectId} 的消息时发生错误", ex);
+                        await channel.BasicNackAsync(ea.DeliveryTag, false, true);
                     }
                 };
                 
-                // 开始消费队列 - 使用批量确认模式提高性能
                 string consumerTag = await channel.BasicConsumeAsync(
                     queue: queueName,
-                    autoAck: false,  // 尝试修改为 true 进行测试
+                    autoAck: false,
                     consumer: consumer);
                 
-                // 保存通道引用
                 _channels[projectId] = channel;
                 
-                LogHelper.Info($"已订阅项目 {projectId} 的队列 {queueName}，消费者标签: {consumerTag}");
+                Logger.Info($"已订阅项目 {projectId} 的队列 {queueName}，消费者标签: {consumerTag}");
                 
                 return true;
             }
             catch (Exception ex)
             {
-                LogHelper.Error($"订阅项目 {projectId} 队列时发生错误: {ex.Message}");
+                Logger.Error($"订阅项目 {projectId} 队列时发生错误", ex);
                 return false;
             }
         }
@@ -198,24 +183,23 @@ namespace EasyIotSharp.DataProcessor.Processing.Implementation
         {
             try
             {
-                // 释放RabbitMQ客户端
                 foreach (var client in _rabbitClients)
                 {
                     try
                     {
-                       await  client.Dispose();
+                        await client.Dispose();
                     }
                     catch (Exception ex)
                     {
-                        LogHelper.Error($"释放RabbitMQ客户端时发生错误: {ex.Message}");
+                        Logger.Error("释放RabbitMQ客户端时发生错误", ex);
                     }
                 }
                 
-                LogHelper.Info("RabbitMQ连接已关闭");
+                Logger.Info("RabbitMQ连接已关闭");
             }
             catch (Exception ex)
             {
-                LogHelper.Error($"关闭RabbitMQ消息接收器时发生错误: {ex.Message}");
+                Logger.Error("关闭RabbitMQ消息接收器时发生错误", ex);
             }
         }
         
@@ -224,7 +208,7 @@ namespace EasyIotSharp.DataProcessor.Processing.Implementation
         /// </summary>
         public async Task Dispose()
         {
-           await  Shutdown();
+            await Shutdown();
         }
     }
 }

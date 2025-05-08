@@ -26,9 +26,9 @@ namespace EasyIotSharp.GateWay.Core.Socket.Service
 {
     public class ModbusDTU : EasyTCPSuper
     {
-        // 在类的成员变量中添加
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(ModbusDTU));
         private RabbitMQService _rabbitMQService;
-        // 修改构造函数
+
         public ModbusDTU()
         {
             _rabbitMQService = new RabbitMQService();
@@ -42,7 +42,7 @@ namespace EasyIotSharp.GateWay.Core.Socket.Service
                 string modbusConfig = taskData.Client.ConfigJson;
                 if (taskData.Packet == null || taskData.Packet.BData == null)
                 {
-                    LogHelper.Error("taskData.Packet == null || taskData.Packet.BData == null ");
+                    Logger.Error("taskData.Packet == null || taskData.Packet.BData == null ");
                     return;
                 }
                 byte[] bReceived = taskData.Packet.BData;//队列的封包数据
@@ -60,11 +60,11 @@ namespace EasyIotSharp.GateWay.Core.Socket.Service
                 {
                     //3.1ModbusDevieConfig未查询到,则进行解码、
                     string strData = System.Text.Encoding.ASCII.GetString(bReceived, 0, bReceived.Length);//转换为Ascll码
-                    LogHelper.Info("  收到注册包:  " + strData);
+                    Logger.Info("  收到注册包:  " + strData);
                     var gatewayprotocol = _gatewayProtocolRepository.GetGatewayProtocol(strData);
                     if (gatewayprotocol == null)
                     {
-                        LogHelper.Info("未找到注册包: " + strData);
+                        Logger.Info("未找到注册包: " + strData);
                         return;
                     }
 
@@ -82,7 +82,7 @@ namespace EasyIotSharp.GateWay.Core.Socket.Service
             }
             catch (Exception ex)
             {
-                LogHelper.Error("ModbusDTU 异常:" + ex.ToString());
+                Logger.Error("ModbusDTU 异常:", ex);
                 return;
             }
         }
@@ -107,7 +107,7 @@ namespace EasyIotSharp.GateWay.Core.Socket.Service
 
                 if (configModels == null || configModels.Count == 0)
                 {
-                    LogHelper.Error("配置解析失败或为空");
+                    Logger.Error("配置解析失败或为空");
                     return;
                 }
                 var sensorPointList = _sensorPointRepository.GetBySensorPointList();
@@ -122,7 +122,7 @@ namespace EasyIotSharp.GateWay.Core.Socket.Service
                         // 通过测点id拿到sensorid
                         if (string.IsNullOrEmpty(config.MeasurementPoint))
                         {
-                            LogHelper.Error($"测点ID为空，跳过处理");
+                            Logger.Error($"测点ID为空，跳过处理");
                             continue;
                         }
 
@@ -130,7 +130,7 @@ namespace EasyIotSharp.GateWay.Core.Socket.Service
                         var sensorPoint = sensorPointList.Where(w => w.Id == config.MeasurementPoint).FirstOrDefault();
                         if (sensorPoint == null)
                         {
-                            LogHelper.Error($"未找到测点信息，测点ID: {config.MeasurementPoint}");
+                            Logger.Error($"未找到测点信息，测点ID: {config.MeasurementPoint}");
                             continue;
                         }
 
@@ -138,14 +138,14 @@ namespace EasyIotSharp.GateWay.Core.Socket.Service
                         var sensor = sensorList.Where(w => w.Id == sensorPoint.SensorId).FirstOrDefault();
                         if (sensor == null)
                         {
-                            LogHelper.Error($"未找到测点类型信息，测点类型id: {sensorPoint.SensorId}");
+                            Logger.Error($"未找到测点类型信息，测点类型id: {sensorPoint.SensorId}");
                             continue;
                         }
                         //var sensorQuotaList = _sensorQuotaRepository.GetSensorQuotaList(sensorPoint.SensorId);
                         var sensorQuotaList = sensorQuotaLists.Where(w => w.SensorId == sensorPoint.SensorId).ToList();
                         if (sensorQuotaList == null || !sensorQuotaList.Any())
                         {
-                            LogHelper.Warn($"未找到传感器指标信息，传感器ID: {sensorPoint.SensorId}");
+                            Logger.Warn($"未找到传感器指标信息，传感器ID: {sensorPoint.SensorId}");
                         }
 
                         // 使用SensorDataFactory创建传感器数据对象
@@ -197,7 +197,7 @@ namespace EasyIotSharp.GateWay.Core.Socket.Service
             }
             catch (Exception ex)
             {
-                LogHelper.Error($"解析数据包异常: {ex.ToString()}");
+                Logger.Error("解析数据包异常:", ex);
             }
         }
 
@@ -214,11 +214,11 @@ namespace EasyIotSharp.GateWay.Core.Socket.Service
 
                 // 注册网关ID与连接的关联
                 GatewayConnectionManager.Instance.RegisterGateway(connId, gatewayId);
-                LogHelper.Info($"网关 {gatewayId} 注册成功，连接ID: {connId}, IP: {ip}, 端口: {port}");
+                Logger.Info($"网关 {gatewayId} 注册成功，连接ID: {connId}, IP: {ip}, 端口: {port}");
             }
             catch (Exception ex)
             {
-                LogHelper.Error($"处理网关注册包异常: {ex.Message}");
+                Logger.Error("处理网关注册包异常:", ex);
             }
         }
 
@@ -227,7 +227,7 @@ namespace EasyIotSharp.GateWay.Core.Socket.Service
         {
             if (string.IsNullOrEmpty(taskData.Client.ConfigJson))
             {
-                LogHelper.Error("ConfigJson为空，无法发送命令");
+                Logger.Error("ConfigJson为空，无法发送命令");
                 return;
             }
 
@@ -242,7 +242,7 @@ namespace EasyIotSharp.GateWay.Core.Socket.Service
 
                 if (configModels == null || configModels.Count == 0)
                 {
-                    LogHelper.Error("配置解析失败或为空");
+                    Logger.Error("配置解析失败或为空");
                     return;
                 }
 
@@ -254,7 +254,7 @@ namespace EasyIotSharp.GateWay.Core.Socket.Service
                         var formData = config.FormData;
                         if (formData == null)
                         {
-                            LogHelper.Warn("配置项缺少formData字段，跳过");
+                            Logger.Warn("配置项缺少formData字段，跳过");
                             continue;
                         }
 
@@ -281,13 +281,13 @@ namespace EasyIotSharp.GateWay.Core.Socket.Service
                     }
                     catch (Exception ex)
                     {
-                        LogHelper.Error($"解析配置项时发生错误: {ex.Message}");
+                        Logger.Error($"解析配置项时发生错误: {ex.Message}");
                     }
                 }
 
                 if (commandList.Count == 0)
                 {
-                    LogHelper.Error("没有有效的命令可发送");
+                    Logger.Error("没有有效的命令可发送");
                     return;
                 }
 
@@ -309,7 +309,7 @@ namespace EasyIotSharp.GateWay.Core.Socket.Service
                                     if (isok)
                                     {
                                         int cmdSleepTime = intervalMap.TryGetValue(BitConverter.ToString(cmd), out int time) ? time : defaultSleepTime;
-                                        LogHelper.Info($"发送命令成功: {cmdHex}, 间隔: {cmdSleepTime}ms");
+                                        Logger.Info($"发送命令成功: {cmdHex}, 间隔: {cmdSleepTime}ms");
 
                                         // 记录发送的命令到网关连接管理器
                                         GatewayConnectionManager.Instance.UpdateGatewayData(
@@ -319,7 +319,7 @@ namespace EasyIotSharp.GateWay.Core.Socket.Service
                                     }
                                     else
                                     {
-                                        LogHelper.Error($"发送命令失败: {cmdHex}");
+                                        Logger.Error($"发送命令失败: {cmdHex}");
                                         return;
                                     }
 
@@ -328,7 +328,7 @@ namespace EasyIotSharp.GateWay.Core.Socket.Service
                                 }
                                 catch (Exception ex)
                                 {
-                                    LogHelper.Error($"发送命令时发生错误: {ex.Message}");
+                                    Logger.Error($"发送命令时发生错误: {ex.Message}");
                                 }
                             }
 
@@ -338,13 +338,13 @@ namespace EasyIotSharp.GateWay.Core.Socket.Service
                     }
                     catch (Exception ex)
                     {
-                        LogHelper.Error($"命令发送循环中断: {ex.ToString()}");
+                        Logger.Error($"命令发送循环中断: {ex.ToString()}");
                     }
                 });
             }
             catch (Exception ex)
             {
-                LogHelper.Error($"SendMsgToClient() 发生异常: {ex.ToString()}");
+                Logger.Error($"SendMsgToClient() 发生异常: {ex.ToString()}");
             }
         }
     }

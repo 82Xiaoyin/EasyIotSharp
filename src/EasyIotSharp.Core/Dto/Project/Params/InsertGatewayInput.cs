@@ -23,5 +23,15 @@ namespace EasyIotSharp.Core.Dto.Project.Params
         /// 项目id
         /// </summary>
         public string ProjectId { get; set; }
+
+        /// <summary>
+        ///IMEI号
+        /// </summary>
+        public string Imei { get; set; }
+
+        /// <summary>
+        /// 设备型号
+        /// </summary>
+        public string DeviceModel { get; set; }
     }
 }

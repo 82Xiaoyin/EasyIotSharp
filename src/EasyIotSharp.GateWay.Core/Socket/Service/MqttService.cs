@@ -9,6 +9,7 @@ using EasyIotSharp.GateWay.Core.Interfaces;
 using EasyIotSharp.GateWay.Core.Model.AnalysisDTO;
 using EasyIotSharp.GateWay.Core.Model.ConfigDTO;
 using EasyIotSharp.GateWay.Core.Util;
+using log4net;
 using MQTTnet;
 using MQTTnet.Client;
 using Newtonsoft.Json;
@@ -26,6 +27,7 @@ namespace EasyIotSharp.GateWay.Core.Socket.Service
 {
    public class MqttService : IMqttService
     {
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(MqttService));
         private readonly IMqttClient _mqttClient;
         private readonly AppOptions _appOptions;
         
@@ -70,7 +72,7 @@ namespace EasyIotSharp.GateWay.Core.Socket.Service
                 var mqttUsername = _appOptions.MqttOptions.Username;
                 var mqttPassword = _appOptions.MqttOptions.Password;
 
-                LogHelper.Info($"正在连接MQTT服务器: {mqttHost}:{mqttPort}");
+                Logger.Info($"正在连接MQTT服务器: {mqttHost}:{mqttPort}");
 
                 // 构建MQTT客户端选项
                 var optionsBuilder = new MqttClientOptionsBuilder()
@@ -89,29 +91,29 @@ namespace EasyIotSharp.GateWay.Core.Socket.Service
                 // 设置断开连接时的重连逻辑
                 _mqttClient.DisconnectedAsync += async e =>
                 {
-                    LogHelper.Warn("MQTT客户端断开连接，尝试重新连接...");
+                    Logger.Warn("MQTT客户端断开连接，尝试重新连接...");
                     await Task.Delay(TimeSpan.FromSeconds(5));
                     try
                     {
                         await _mqttClient.ConnectAsync(options);
-                        LogHelper.Info("MQTT客户端重新连接成功");
+                        Logger.Info("MQTT客户端重新连接成功");
                         
                         // 重新订阅主题
                         await LoadMqttTelemetryConfigAsync();
                     }
                     catch (Exception ex)
                     {
-                        LogHelper.Error($"MQTT客户端重新连接失败: {ex.Message}");
+                        Logger.Error($"MQTT客户端重新连接失败: {ex.Message}");
                     }
                 };
 
                 // 连接到MQTT服务器
                 await _mqttClient.ConnectAsync(options);
-                LogHelper.Info("MQTT客户端连接成功");
+                Logger.Info("MQTT客户端连接成功");
             }
             catch (Exception ex)
             {
-                LogHelper.Error($"初始化MQTT客户端失败: {ex.Message}");
+                Logger.Error($"初始化MQTT客户端失败: {ex.Message}");
             }
         }
         
@@ -120,7 +122,7 @@ namespace EasyIotSharp.GateWay.Core.Socket.Service
         /// </summary>
         private async Task HandleConnectedAsync(MqttClientConnectedEventArgs e)
         {
-            LogHelper.Info("MQTT客户端连接成功");
+            Logger.Info("MQTT客户端连接成功");
             await LoadMqttTelemetryConfigAsync();
         }
         
@@ -132,17 +134,17 @@ namespace EasyIotSharp.GateWay.Core.Socket.Service
         {
             try
             {
-                LogHelper.Info("开始加载MQTT遥测配置...");
+                Logger.Info("开始加载MQTT遥测配置...");
                 
                 // 订阅所有网关层的主题
                 string gatewayTelemetryTopic = "devices/telemetry/#";
                 await SubscribeToTopicAsync(gatewayTelemetryTopic);
                 
-                LogHelper.Info($"成功订阅网关遥测主题: {gatewayTelemetryTopic}");
+                Logger.Info($"成功订阅网关遥测主题: {gatewayTelemetryTopic}");
             }
             catch (Exception ex)
             {
-                LogHelper.Error($"加载MQTT配置失败: {ex.Message}");
+                Logger.Error($"加载MQTT配置失败: {ex.Message}");
             }
         }
         
@@ -155,13 +157,13 @@ namespace EasyIotSharp.GateWay.Core.Socket.Service
             {
                 if (_subscribedTopics.Contains(topic))
                 {
-                    LogHelper.Debug($"主题 {topic} 已订阅，跳过");
+                    Logger.Debug($"主题 {topic} 已订阅，跳过");
                     return;
                 }
                 
                 if (!_mqttClient.IsConnected)
                 {
-                    LogHelper.Warn("MQTT客户端未连接，无法订阅主题");
+                    Logger.Warn("MQTT客户端未连接，无法订阅主题");
                     return;
                 }
                 
@@ -178,17 +180,17 @@ namespace EasyIotSharp.GateWay.Core.Socket.Service
                     // 将成功订阅的主题添加到已订阅主题集合中
                     _subscribedTopics.Add(topic);
                     // 记录成功订阅的日志
-                    LogHelper.Info($"成功订阅主题: {topic}");
+                    Logger.Info($"成功订阅主题: {topic}");
                 }
                 else
                 {
                     // 如果订阅失败，记录错误日志，包含失败的结果代码
-                    LogHelper.Error($"订阅主题 {topic} 失败: {result.Items.FirstOrDefault()?.ResultCode}");
+                    Logger.Error($"订阅主题 {topic} 失败: {result.Items.FirstOrDefault()?.ResultCode}");
                 }
             }
             catch (Exception ex)
             {
-                LogHelper.Error($"订阅主题 {topic} 失败: {ex.Message}");
+                Logger.Error($"订阅主题 {topic} 失败: {ex.Message}");
             }
         }
         
@@ -202,7 +204,7 @@ namespace EasyIotSharp.GateWay.Core.Socket.Service
                 string topic = e.ApplicationMessage.Topic;
                 string payload = Encoding.UTF8.GetString(e.ApplicationMessage.PayloadSegment);
                 
-                LogHelper.Debug($"收到MQTT消息，主题: {topic}, 内容: {payload}");
+                Logger.Debug($"收到MQTT消息，主题: {topic}, 内容: {payload}");
                 
                 // 检查是否是网关遥测数据
                 if (topic.StartsWith("devices/telemetry"))
@@ -216,7 +218,7 @@ namespace EasyIotSharp.GateWay.Core.Socket.Service
             }
             catch (Exception ex)
             {
-                LogHelper.Error($"处理MQTT消息失败: {ex.Message}");
+                Logger.Error($"处理MQTT消息失败: {ex.Message}");
             }
         }
         
@@ -227,7 +229,7 @@ namespace EasyIotSharp.GateWay.Core.Socket.Service
         {
             try
             {
-                //LogHelper.Info($"处理网关 {gatewayId} 的遥测数据");
+                //Logger.Info($"处理网关 {gatewayId} 的遥测数据");
                 
                 //// 获取网关仓储
                 //var gatewayRepository = UPrimeEngine.Instance.Resolve<IGatewayRepository>();
@@ -236,7 +238,7 @@ namespace EasyIotSharp.GateWay.Core.Socket.Service
                 //var gateway = await gatewayRepository.GetGateway(gatewayId);
                 //if (gateway == null)
                 //{
-                //    LogHelper.Warn($"未找到网关ID为 {gatewayId} 的网关信息");
+                //    Logger.Warn($"未找到网关ID为 {gatewayId} 的网关信息");
                 //    return;
                 //}
                 
@@ -246,17 +248,17 @@ namespace EasyIotSharp.GateWay.Core.Socket.Service
                 
                 //if (sensorPoints == null || !sensorPoints.Any())
                 //{
-                //    LogHelper.Warn($"网关 {gatewayId} 下未找到测点信息");
+                //    Logger.Warn($"网关 {gatewayId} 下未找到测点信息");
                 //    return;
                 //}
                 
-                //LogHelper.Info($"网关 {gatewayId} 下找到 {sensorPoints.Count()} 个测点");
+                //Logger.Info($"网关 {gatewayId} 下找到 {sensorPoints.Count()} 个测点");
                 
                 //// 解析遥测数据
                 //var telemetryData = JsonConvert.DeserializeObject<Dictionary<string, object>>(payload);
                 //if (telemetryData == null)
                 //{
-                //    LogHelper.Warn($"无法解析网关 {gatewayId} 的遥测数据: {payload}");
+                //    Logger.Warn($"无法解析网关 {gatewayId} 的遥测数据: {payload}");
                 //    return;
                 //}
                 
@@ -267,7 +269,7 @@ namespace EasyIotSharp.GateWay.Core.Socket.Service
                 //    var sensor = await _sensorService.GetSensor(sensorPoint.SensorId);
                 //    if (sensor == null)
                 //    {
-                //        LogHelper.Warn($"未找到测点 {sensorPoint.Id} 对应的传感器信息");
+                //        Logger.Warn($"未找到测点 {sensorPoint.Id} 对应的传感器信息");
                 //        continue;
                 //    }
                     
@@ -275,7 +277,7 @@ namespace EasyIotSharp.GateWay.Core.Socket.Service
                 //    var quotas = await _sensorQuotaService.GetQuotasBySensorId(sensor.Id);
                 //    if (quotas == null || !quotas.Any())
                 //    {
-                //        LogHelper.Warn($"传感器 {sensor.Id} 未配置指标");
+                //        Logger.Warn($"传感器 {sensor.Id} 未配置指标");
                 //        continue;
                 //    }
                     
@@ -298,14 +300,14 @@ namespace EasyIotSharp.GateWay.Core.Socket.Service
                 //            // 存储到InfluxDB
                 //            await StoreDataToInfluxDBAsync(sensorPoint.Id, quota.Identifier, pointData);
                             
-                //            LogHelper.Info($"成功处理测点 {sensorPoint.Id} 的指标 {quota.Identifier}, 值: {convertedValue}");
+                //            Logger.Info($"成功处理测点 {sensorPoint.Id} 的指标 {quota.Identifier}, 值: {convertedValue}");
                 //        }
                 //    }
                 //}
             }
             catch (Exception ex)
             {
-                LogHelper.Error($"处理网关 {gatewayId} 遥测数据失败: {ex.Message}");
+                Logger.Error($"处理网关 {gatewayId} 遥测数据失败: {ex.Message}");
             }
         }
         

@@ -49,6 +49,8 @@ namespace EasyIotSharp.Core.Repositories.Project.Impl
                     ProjectId = g.ProjectId,
                     State = g.State,
                     ProtocolId = g.ProtocolId,
+                    Imei = g.Imei,
+                    DeviceModel = g.DeviceModel,
                 }).First();
         }
 

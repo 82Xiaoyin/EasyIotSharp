@@ -9,6 +9,8 @@ using EasyIotSharp.Core.Repositories.Queue;
 using UPrime;
 using EasyIotSharp.Core.Services.Queue;
 using System.Threading.Tasks;
+using EasyIotSharp.DataProcessor.Processing.Implementation;
+using log4net;
 
 namespace EasyIotSharp.DataProcessor.LoadingConfig.RabbitMQ
 {
@@ -18,6 +20,7 @@ namespace EasyIotSharp.DataProcessor.LoadingConfig.RabbitMQ
     /// </summary>
     public class RabbitMQConfig
     {
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(MessageProcessor));
         /// <summary>
         /// 路由键映射表
         /// </summary>
@@ -53,7 +56,7 @@ namespace EasyIotSharp.DataProcessor.LoadingConfig.RabbitMQ
             // 防止重复初始化
             if (_isInitialized)
             {
-                LogHelper.Info("RabbitMQ已经初始化，跳过重复初始化");
+                Logger.Info("RabbitMQ已经初始化，跳过重复初始化");
                 return;
             }
 
@@ -62,7 +65,7 @@ namespace EasyIotSharp.DataProcessor.LoadingConfig.RabbitMQ
                 try
                 {
 
-                    LogHelper.Info("开始初始化RabbitMQ配置...");
+                    Logger.Info("开始初始化RabbitMQ配置...");
 
                     // 清空现有配置
                     lsMQs.Clear();
@@ -75,7 +78,7 @@ namespace EasyIotSharp.DataProcessor.LoadingConfig.RabbitMQ
                         // 查询MQ服务器和项目配置信息
                         var mqlist = rabbitServerInfoService.GetRabbitProject();
 
-                        LogHelper.Info($"找到 {mqlist.Count} 个RabbitMQ配置");
+                        Logger.Info($"找到 {mqlist.Count} 个RabbitMQ配置");
 
                         if (mqlist.Count > 0)
                         {
@@ -110,27 +113,27 @@ namespace EasyIotSharp.DataProcessor.LoadingConfig.RabbitMQ
                                         m_RoutingKey.Add(key, item.RoutingKey);
                                     }
 
-                                    LogHelper.Info($"成功初始化RabbitMQ客户端: {item.Host}:{item.Port}, 项目ID: {item.ProjectId}, 路由键: {item.RoutingKey}");
+                                    Logger.Info($"成功初始化RabbitMQ客户端: {item.Host}:{item.Port}, 项目ID: {item.ProjectId}, 路由键: {item.RoutingKey}");
                                 }
                                 catch (Exception ex)
                                 {
                                     // 单个 MQ 初始化失败，不影响其他
-                                    LogHelper.Error($"MQ Client 初始化失败: {ex.ToString()}");
+                                    Logger.Error($"MQ Client 初始化失败: {ex.ToString()}");
                                 }
                             }
                         }
                     }
                     catch (Exception ex)
                     {
-                        LogHelper.Error($"获取MQ配置失败: {ex.ToString()}");
+                        Logger.Error($"获取MQ配置失败: {ex.ToString()}");
                     }
 
                     _isInitialized = true;
-                    LogHelper.Info($"RabbitMQ配置初始化完成，共初始化 {lsMQs.Count} 个客户端");
+                    Logger.Info($"RabbitMQ配置初始化完成，共初始化 {lsMQs.Count} 个客户端");
                 }
                 catch (Exception ex)
                 {
-                    LogHelper.Error($"RabbitMQ初始化过程中发生异常: {ex.ToString()}");
+                    Logger.Error($"RabbitMQ初始化过程中发生异常: {ex.ToString()}");
                 }
         }
 
@@ -176,7 +179,7 @@ namespace EasyIotSharp.DataProcessor.LoadingConfig.RabbitMQ
                 }
                 catch (Exception ex)
                 {
-                    LogHelper.Error($"关闭RabbitMQ连接失败: {ex.Message}");
+                    Logger.Error($"关闭RabbitMQ连接失败: {ex.Message}");
                 }
             }
 
@@ -185,7 +188,7 @@ namespace EasyIotSharp.DataProcessor.LoadingConfig.RabbitMQ
             m_RoutingKey.Clear();
             _isInitialized = false;
 
-            LogHelper.Info("已关闭所有RabbitMQ连接");
+            Logger.Info("已关闭所有RabbitMQ连接");
         }
     }
 }

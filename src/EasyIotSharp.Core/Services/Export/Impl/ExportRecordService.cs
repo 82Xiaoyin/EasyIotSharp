@@ -97,7 +97,7 @@ namespace EasyIotSharp.Core.Services.Export.Impl
         public async Task UpdateExportRecord(ExportRecordDto input)
         {
             var entity = await _exportRecordRepository.FirstOrDefaultAsync(x => x.Id == input.Id && x.IsDelete == false);
-            if (entity == null)
+             if (entity == null)
             {
                 throw new BizException(BizError.BIND_EXCEPTION_ERROR, "未找到指定记录");
             }
@@ -106,8 +106,6 @@ namespace EasyIotSharp.Core.Services.Export.Impl
             entity.State = input.State;
             entity.ResourceId = input.ResourceId;
             entity.UpdatedAt = DateTime.Now;
-            entity.OperatorId = ContextUser.UserId;
-            entity.OperatorName = ContextUser.UserName;
 
             await _exportRecordRepository.UpdateAsync(entity);
         }

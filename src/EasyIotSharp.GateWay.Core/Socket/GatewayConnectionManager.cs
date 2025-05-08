@@ -6,6 +6,7 @@ using EasyIotSharp.Core.Events.Hardware;
 using EasyIotSharp.Core.Repositories.Project;
 using EasyIotSharp.Core.Services.Rule;
 using EasyIotSharp.GateWay.Core.Util;
+using log4net;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -26,6 +27,7 @@ namespace EasyIotSharp.GateWay.Core.Socket
         // 修改为懒加载单例模式
         private static volatile GatewayConnectionManager _instance;
         private static readonly object _lock = new object();
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(GatewayConnectionManager));
 
         /// <summary>
         /// 单例实例
@@ -41,7 +43,7 @@ namespace EasyIotSharp.GateWay.Core.Socket
                         if (_instance == null)
                         {
                             _instance = new GatewayConnectionManager();
-                            LogHelper.Info("GatewayConnectionManager单例已初始化");
+                            Logger.Info("GatewayConnectionManager单例已初始化");
                         }
                     }
                 }
@@ -135,19 +137,19 @@ namespace EasyIotSharp.GateWay.Core.Socket
 
                             foreach (var gatewayId in offlineGateways)
                             {
-                                LogHelper.Warn($"网关 {gatewayId} 因超时未收到心跳被标记为离线");
+                                Logger.Warn($"网关 {gatewayId} 因超时未收到心跳被标记为离线");
                             }
                         }
                         catch (Exception ex)
                         {
-                            LogHelper.Error($"更新网关离线状态时发生错误: {ex.Message}");
+                            Logger.Error($"更新网关离线状态时发生错误: {ex.Message}");
                         }
                     }
                 }
             }
             catch (Exception ex)
             {
-                LogHelper.Error($"检查网关状态时发生错误: {ex.Message}");
+                Logger.Error($"检查网关状态时发生错误: {ex.Message}");
             }
         }
 
@@ -176,11 +178,11 @@ namespace EasyIotSharp.GateWay.Core.Socket
                             scope.Complete();
                         }
                     }
-                    LogHelper.Info($"网关 {gatewayId} 已注册并更新状态为在线");
+                    Logger.Info($"网关 {gatewayId} 已注册并更新状态为在线");
                 }
                 catch (Exception ex)
                 {
-                    LogHelper.Error($"更新网关 {gatewayId} 注册状态时发生错误: {ex.Message}");
+                    Logger.Error($"更新网关 {gatewayId} 注册状态时发生错误: {ex.Message}");
                 }
             }
         }
@@ -206,11 +208,11 @@ namespace EasyIotSharp.GateWay.Core.Socket
                             scope.Complete();
                         }
                     }
-                    LogHelper.Info($"网关 {connectionInfo.GatewayId} 连接已断开并更新状态为离线");
+                    Logger.Info($"网关 {connectionInfo.GatewayId} 连接已断开并更新状态为离线");
                 }
                 catch (Exception ex)
                 {
-                    LogHelper.Error($"更新网关 {connectionInfo.GatewayId} 离线状态时发生错误: {ex.Message}");
+                    Logger.Error($"更新网关 {connectionInfo.GatewayId} 离线状态时发生错误: {ex.Message}");
                 }
             }
         }
