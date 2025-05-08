@@ -11,6 +11,7 @@ using Newtonsoft.Json.Linq;
 using System.Linq;
 using EasyIotSharp.Core.Dto.Rule.Params;
 using EasyIotSharp.Core.Dto.Rule;
+using log4net;
 
 namespace EasyIotSharp.DataProcessor.Processing.Implementation
 {
@@ -20,6 +21,8 @@ namespace EasyIotSharp.DataProcessor.Processing.Implementation
     /// </summary>
     public class SceneLinkageService : ISceneLinkageService
     {
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(SceneLinkageService));
+        
         // 缓存项目的场景联动配置，避免频繁查询数据库
         private readonly Dictionary<string, bool> _projectSceneLinkageCache = new Dictionary<string, bool>();
         
@@ -44,32 +47,28 @@ namespace EasyIotSharp.DataProcessor.Processing.Implementation
         {
             try
             {
-                // 先检查缓存，提高性能
                 if (_projectSceneLinkageCache.TryGetValue(projectId, out bool hasLinkage))
                 {
                     return hasLinkage;
                 }
                 
-                // 查询项目的场景联动规则
                 var input = new SceneManagementInput
                 {
                     ProjectId = projectId,
-                    IsPage = false // 不分页，获取所有规则
+                    IsPage = false
                 };
                 
-                // 调用服务查询规则链
                 var result = await _ruleChainService.QueryRuleChain(input);
                 bool hasRules = result != null && result.TotalCount > 0;
                 
-                // 更新缓存
                 _projectSceneLinkageCache[projectId] = hasRules;
                 
-                LogHelper.Debug($"项目 {projectId} 场景联动规则检查结果: {(hasRules ? "存在" : "不存在")}");
+                Logger.Debug($"项目 {projectId} 场景联动规则检查结果: {(hasRules ? "存在" : "不存在")}");
                 return hasRules;
             }
             catch (Exception ex)
             {
-                LogHelper.Error($"检查项目场景联动配置失败: {ex.Message}");
+                Logger.Error("检查项目场景联动配置失败", ex);
                 return false;
             }
         }
@@ -98,11 +97,11 @@ namespace EasyIotSharp.DataProcessor.Processing.Implementation
                 // 验证规则链是否有效
                 if (ruleChains == null || ruleChains.Items == null || !ruleChains.Items.Any())
                 {
-                    LogHelper.Debug($"项目 {projectId} 没有找到场景联动规则");
+                    Logger.Debug($"项目 {projectId} 没有找到场景联动规则");
                     return;
                 }
                 
-                LogHelper.Debug($"项目 {projectId} 找到 {ruleChains.Items.Count} 条场景联动规则");
+                Logger.Debug($"项目 {projectId} 找到 {ruleChains.Items.Count} 条场景联动规则");
                 
                 // 优化：转换为列表避免多次枚举
                 var dataPointsList = dataPoints.ToList();
@@ -117,11 +116,11 @@ namespace EasyIotSharp.DataProcessor.Processing.Implementation
                     }
                 }
                 
-                LogHelper.Debug($"项目 {projectId} 的场景联动处理完成，共处理 {dataPointsList.Count} 个数据点");
+                Logger.Debug($"项目 {projectId} 的场景联动处理完成，共处理 {dataPointsList.Count} 个数据点");
             }
             catch (Exception ex)
             {
-                LogHelper.Error($"处理场景联动失败: {ex.Message}, 堆栈: {ex.StackTrace}");
+                Logger.Error("处理场景联动失败", ex);
             }
         }
         
@@ -139,7 +138,7 @@ namespace EasyIotSharp.DataProcessor.Processing.Implementation
                 // 验证规则内容是否有效
                 if (string.IsNullOrEmpty(rule.RuleContentJson))
                 {
-                    LogHelper.Debug($"规则 {rule.Name} 的内容为空");
+                    Logger.Debug($"规则 {rule.Name} 的内容为空");
                     return;
                 }
                 
@@ -147,14 +146,14 @@ namespace EasyIotSharp.DataProcessor.Processing.Implementation
                 var conditionsObj = JsonConvert.DeserializeObject<JObject>(rule.RuleContentJson);
                 if (conditionsObj == null || !conditionsObj.ContainsKey("conditions"))
                 {
-                    LogHelper.Debug($"规则 {rule.Name} 的条件格式无效");
+                    Logger.Debug($"规则 {rule.Name} 的条件格式无效");
                     return;
                 }
                 
                 var conditions = conditionsObj["conditions"] as JArray;
                 if (conditions == null || !conditions.Any())
                 {
-                    LogHelper.Debug($"规则 {rule.Name} 没有条件");
+                    Logger.Debug($"规则 {rule.Name} 没有条件");
                     return;
                 }
                 
@@ -236,7 +235,7 @@ namespace EasyIotSharp.DataProcessor.Processing.Implementation
                 }
                 
                 // 记录条件评估详情
-                LogHelper.Debug($"规则 {rule.Name} 条件评估结果: {(allConditionsMet ? "满足" : "不满足")}, 详情: {string.Join(", ", conditionResults)}");
+                Logger.Debug($"规则 {rule.Name} 条件评估结果: {(allConditionsMet ? "满足" : "不满足")}, 详情: {string.Join(", ", conditionResults)}");
                 
                 // 如果所有条件都满足，执行动作
                 if (allConditionsMet)
@@ -246,7 +245,7 @@ namespace EasyIotSharp.DataProcessor.Processing.Implementation
             }
             catch (Exception ex)
             {
-                LogHelper.Error($"评估规则失败: {ex.Message}, 规则ID: {rule.Id}");
+                Logger.Error($"评估规则失败: {ex.Message}, 规则ID: {rule.Id}");
             }
         }
         
@@ -282,7 +281,7 @@ namespace EasyIotSharp.DataProcessor.Processing.Implementation
                         case "lt": return actualDouble < expectedDouble; // 小于
                         case "lte": return actualDouble <= expectedDouble; // 小于等于
                         default: 
-                            LogHelper.Warn($"不支持的操作符类型: {operatorType}");
+                            Logger.Warn($"不支持的操作符类型: {operatorType}");
                             return false;
                     }
                 }
@@ -298,14 +297,14 @@ namespace EasyIotSharp.DataProcessor.Processing.Implementation
                         case "contains": return actualString.Contains(expectedValue); // 包含
                         case "notcontains": return !actualString.Contains(expectedValue); // 不包含
                         default: 
-                            LogHelper.Warn($"不支持的操作符类型: {operatorType}");
+                            Logger.Warn($"不支持的操作符类型: {operatorType}");
                             return false;
                     }
                 }
             }
             catch (Exception ex)
             {
-                LogHelper.Error($"评估条件失败: {ex.Message}, 实际值: {actualValue}, 操作符: {operatorType}, 期望值: {expectedValue}");
+                Logger.Error($"评估条件失败: {ex.Message}, 实际值: {actualValue}, 操作符: {operatorType}, 期望值: {expectedValue}");
                 return false;
             }
         }
@@ -333,7 +332,7 @@ namespace EasyIotSharp.DataProcessor.Processing.Implementation
                             DateTime specificTime = condition["specificTime"].ToObject<DateTime>();
                             // 检查当前时间是否在特定时间点的前后5分钟内
                             var timeDiff = Math.Abs((now - specificTime).TotalMinutes);
-                            LogHelper.Debug($"特定时间条件: 当前时间={now}, 特定时间={specificTime}, 时间差={timeDiff}分钟");
+                            Logger.Debug($"特定时间条件: 当前时间={now}, 特定时间={specificTime}, 时间差={timeDiff}分钟");
                             return timeDiff <= 5;
                         }
                         break;
@@ -344,7 +343,7 @@ namespace EasyIotSharp.DataProcessor.Processing.Implementation
                         {
                             DateTime startTime = condition["startTime"].ToObject<DateTime>();
                             DateTime endTime = condition["endTime"].ToObject<DateTime>();
-                            LogHelper.Debug($"时间范围条件: 当前时间={now}, 开始时间={startTime}, 结束时间={endTime}");
+                            Logger.Debug($"时间范围条件: 当前时间={now}, 开始时间={startTime}, 结束时间={endTime}");
                             return now >= startTime && now <= endTime;
                         }
                         break;
@@ -361,7 +360,7 @@ namespace EasyIotSharp.DataProcessor.Processing.Implementation
                                 TimeSpan periodicTime = TimeSpan.Parse(condition["periodicTime"].ToString());
                                 TimeSpan currentTime = now.TimeOfDay;
                                 var timeDiff = Math.Abs((currentTime - periodicTime).TotalMinutes);
-                                LogHelper.Debug($"每日周期条件: 当前时间={currentTime}, 周期时间={periodicTime}, 时间差={timeDiff}分钟");
+                                Logger.Debug($"每日周期条件: 当前时间={currentTime}, 周期时间={periodicTime}, 时间差={timeDiff}分钟");
                                 return timeDiff <= 5;
                             }
                             else if (periodicType == "weekly" && condition["weekDays"] != null && condition["periodicTime"] != null)
@@ -375,19 +374,19 @@ namespace EasyIotSharp.DataProcessor.Processing.Implementation
                                     TimeSpan periodicTime = TimeSpan.Parse(condition["periodicTime"].ToString());
                                     TimeSpan currentTime = now.TimeOfDay;
                                     var timeDiff = Math.Abs((currentTime - periodicTime).TotalMinutes);
-                                    LogHelper.Debug($"每周周期条件: 当前星期={currentDayOfWeek}, 当前时间={currentTime}, 周期时间={periodicTime}, 时间差={timeDiff}分钟");
+                                    Logger.Debug($"每周周期条件: 当前星期={currentDayOfWeek}, 当前时间={currentTime}, 周期时间={periodicTime}, 时间差={timeDiff}分钟");
                                     return timeDiff <= 5;
                                 }
                                 else
                                 {
-                                    LogHelper.Debug($"每周周期条件: 当前星期={currentDayOfWeek}, 不在指定星期内={string.Join(",", weekDays)}");
+                                    Logger.Debug($"每周周期条件: 当前星期={currentDayOfWeek}, 不在指定星期内={string.Join(",", weekDays)}");
                                 }
                             }
                         }
                         break;
                         
                     default:
-                        LogHelper.Warn($"不支持的时间类型: {timeType}");
+                        Logger.Warn($"不支持的时间类型: {timeType}");
                         break;
                 }
                 
@@ -396,7 +395,7 @@ namespace EasyIotSharp.DataProcessor.Processing.Implementation
             }
             catch (Exception ex)
             {
-                LogHelper.Error($"评估时间条件失败: {ex.Message}, 时间类型: {timeType}");
+                Logger.Error($"评估时间条件失败: {ex.Message}, 时间类型: {timeType}");
                 return false;
             }
         }
@@ -412,7 +411,7 @@ namespace EasyIotSharp.DataProcessor.Processing.Implementation
         {
             try
             {
-                LogHelper.Info($"触发场景联动规则: {rule.Name}, 项目ID: {projectId}");
+                Logger.Info($"触发场景联动规则: {rule.Name}, 项目ID: {projectId}");
                 
                 // TODO: 实现规则动作执行逻辑
                 // 这里需要根据实际业务需求实现，可能包括：
@@ -431,13 +430,13 @@ namespace EasyIotSharp.DataProcessor.Processing.Implementation
                         var actions = ruleContent["actions"] as JArray;
                         if (actions != null && actions.Any())
                         {
-                            LogHelper.Info($"规则 {rule.Name} 包含 {actions.Count} 个动作");
+                            Logger.Info($"规则 {rule.Name} 包含 {actions.Count} 个动作");
                             
                             // 执行每个动作
                             foreach (var action in actions)
                             {
                                 string actionType = action["type"]?.ToString();
-                                LogHelper.Info($"执行动作: {actionType}");
+                                Logger.Info($"执行动作: {actionType}");
                                 
                                 // 根据动作类型执行不同的操作
                                 switch (actionType)
@@ -458,7 +457,7 @@ namespace EasyIotSharp.DataProcessor.Processing.Implementation
                                         break;
                                         
                                     default:
-                                        LogHelper.Warn($"不支持的动作类型: {actionType}");
+                                        Logger.Warn($"不支持的动作类型: {actionType}");
                                         break;
                                 }
                             }
@@ -467,11 +466,11 @@ namespace EasyIotSharp.DataProcessor.Processing.Implementation
                 }
                 
                 // 记录规则触发事件
-                LogHelper.Info($"规则 {rule.Name} 触发，数据点: {JsonConvert.SerializeObject(dataPoint)}");
+                Logger.Info($"规则 {rule.Name} 触发，数据点: {JsonConvert.SerializeObject(dataPoint)}");
             }
             catch (Exception ex)
             {
-                LogHelper.Error($"执行规则动作失败: {ex.Message}, 规则ID: {rule.Id}");
+                Logger.Error($"执行规则动作失败: {ex.Message}, 规则ID: {rule.Id}");
             }
         }
         
@@ -494,14 +493,14 @@ namespace EasyIotSharp.DataProcessor.Processing.Implementation
                     }
                 }
                 
-                LogHelper.Info($"发送{notificationType}通知: {content}");
+                Logger.Info($"发送{notificationType}通知: {content}");
                 
                 // TODO: 实现具体的通知发送逻辑
                 await Task.CompletedTask;
             }
             catch (Exception ex)
             {
-                LogHelper.Error($"发送通知失败: {ex.Message}");
+                Logger.Error($"发送通知失败: {ex.Message}");
             }
         }
         
@@ -515,14 +514,14 @@ namespace EasyIotSharp.DataProcessor.Processing.Implementation
                 string deviceId = action["deviceId"]?.ToString();
                 string command = action["command"]?.ToString();
                 
-                LogHelper.Info($"控制设备: 设备ID={deviceId}, 命令={command}");
+                Logger.Info($"控制设备: 设备ID={deviceId}, 命令={command}");
                 
                 // TODO: 实现具体的设备控制逻辑
                 await Task.CompletedTask;
             }
             catch (Exception ex)
             {
-                LogHelper.Error($"控制设备失败: {ex.Message}");
+                Logger.Error($"控制设备失败: {ex.Message}");
             }
         }
         
@@ -546,14 +545,14 @@ namespace EasyIotSharp.DataProcessor.Processing.Implementation
                     }
                 }
                 
-                LogHelper.Info($"记录事件: 类型={eventType}, 级别={eventLevel}, 描述={description}");
+                Logger.Info($"记录事件: 类型={eventType}, 级别={eventLevel}, 描述={description}");
                 
                 // TODO: 实现具体的事件记录逻辑
                 await Task.CompletedTask;
             }
             catch (Exception ex)
             {
-                LogHelper.Error($"记录事件失败: {ex.Message}");
+                Logger.Error($"记录事件失败: {ex.Message}");
             }
         }
     }

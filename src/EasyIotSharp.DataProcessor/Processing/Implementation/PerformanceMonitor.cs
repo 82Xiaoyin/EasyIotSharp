@@ -1,7 +1,7 @@
 using System;
 using System.Threading;
 using EasyIotSharp.DataProcessor.Processing.Interfaces;
-using EasyIotSharp.DataProcessor.Util;
+using log4net;
 
 namespace EasyIotSharp.DataProcessor.Processing.Implementation
 {
@@ -10,6 +10,8 @@ namespace EasyIotSharp.DataProcessor.Processing.Implementation
     /// </summary>
     public class PerformanceMonitor : IPerformanceMonitor, IDisposable
     {
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(PerformanceMonitor));
+        
         // 上次统计时的消息计数
         private long _lastProcessedCount = 0;
         // 上次统计时间
@@ -28,7 +30,7 @@ namespace EasyIotSharp.DataProcessor.Processing.Implementation
             // 启动性能监控，每3秒执行一次
             _performanceTimer = new Timer(MonitorPerformance, null, TimeSpan.Zero, TimeSpan.FromSeconds(3));
             
-            LogHelper.Info("性能监控已启动");
+            Logger.Info("性能监控已启动");
         }
         
         /// <summary>
@@ -39,7 +41,7 @@ namespace EasyIotSharp.DataProcessor.Processing.Implementation
             _performanceTimer?.Dispose();
             _performanceTimer = null;
             
-            LogHelper.Info("性能监控已停止");
+            Logger.Info("性能监控已停止");
         }
         
         /// <summary>
@@ -63,7 +65,7 @@ namespace EasyIotSharp.DataProcessor.Processing.Implementation
                 var processedSinceLastTime = currentCount - _lastProcessedCount;
                 var throughput = processedSinceLastTime / interval;
                 
-                LogHelper.Info($"处理吞吐量: {throughput:F2} 条/秒, 总计: {currentCount} 条");
+                Logger.Info($"处理吞吐量: {throughput:F2} 条/秒, 总计: {currentCount} 条");
                 Console.Title = $"EasyIotSharp数据处理器 - 吞吐量: {throughput:F2} 条/秒, 总计: {currentCount} 条";
                 
                 _lastStatTime = now;
@@ -71,7 +73,7 @@ namespace EasyIotSharp.DataProcessor.Processing.Implementation
             }
             catch (Exception ex)
             {
-                LogHelper.Error($"监控性能时发生错误: {ex.Message}");
+                Logger.Error("监控性能时发生错误", ex);
             }
         }
         

@@ -6,7 +6,6 @@ using EasyIotSharp.GateWay.Core.Util;
 using EasyIotSharp.GateWay.Core.Util.Encrypotion;
 using Microsoft.Extensions.Configuration;
 using UPrime.Configuration;
-using Serilog;
 using System;
 using System.IO;
 using System.Threading;
@@ -43,25 +42,20 @@ namespace EasyIotSharp.GateWay.Core
                }
                ).Initialize();
 
-            var configDictionary = config.ToDictionary("Serilog");
-            var loggerConfig = new LoggerConfiguration().ReadFrom.Configuration(config);
-            Log.Logger = loggerConfig.CreateLogger();
-            Log.Information("Settings {@Settings}", configDictionary);
+            Logger.Info($"应用程序配置已加载，环境：{environment}");
 
             if (appOptions.SetMinThreads > 16)
             {
-                //https://stackexchange.github.io/StackExchange.Redis/Timeouts
-                //https://docs.microsoft.com/en-us/dotnet/api/system.threading.threadpool.setminthreads?view=netcore-2.0#System_Threading_ThreadPool_SetMinThreads_System_Int32_System_Int32_
                 ThreadPool.GetMinThreads(out int minWorker, out int minIOC);
-                Log.Information($"默认最小线程：worker:{minWorker} ioc: {minIOC}");
+                Logger.Info($"默认最小线程：worker:{minWorker} ioc: {minIOC}");
 
                 if (ThreadPool.SetMinThreads(appOptions.SetMinThreads, minIOC))
                 {
-                    Log.Information($"最小线程设置成功: worker = {appOptions.SetMinThreads}");
+                    Logger.Info($"最小线程设置成功: worker = {appOptions.SetMinThreads}");
                 }
                 else
                 {
-                    Log.Information($"最小线程数没有改变: worker = {minWorker}");
+                    Logger.Info($"最小线程数没有改变: worker = {minWorker}");
                 }
             }
 

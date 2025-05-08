@@ -1,4 +1,6 @@
+using EasyIotSharp.DataProcessor.Processing.Implementation;
 using EasyIotSharp.DataProcessor.Util;
+using log4net;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using System;
@@ -27,7 +29,8 @@ namespace EasyIotSharp.DataProcessor.Model.RaddbitDTO
         private int _retryCount = 3;
         private int _retryInterval = 2000; // 毫秒
         public event EventHandler ConnectionReestablished;
-        
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(MessageProcessor));
+
         /// <summary>
         /// 初始化RabbitMQ连接
         /// </summary>
@@ -35,7 +38,7 @@ namespace EasyIotSharp.DataProcessor.Model.RaddbitDTO
         {
                 if (_isInitialized && _connection != null && _connection.IsOpen && _channel != null && !_channel.IsClosed)
                 {
-                    LogHelper.Debug("RabbitMQ客户端已初始化，无需重复初始化");
+                    Logger.Debug("RabbitMQ客户端已初始化，无需重复初始化");
                     return;
                 }
 
@@ -47,7 +50,7 @@ namespace EasyIotSharp.DataProcessor.Model.RaddbitDTO
             {
                 try
                 {
-                    LogHelper.Info($"正在初始化RabbitMQ客户端: {Host}:{Port}, 尝试次数: {retryAttempt + 1}");
+                    Logger.Info($"正在初始化RabbitMQ客户端: {Host}:{Port}, 尝试次数: {retryAttempt + 1}");
                     
                     var factory = new ConnectionFactory
                     {
@@ -79,7 +82,7 @@ namespace EasyIotSharp.DataProcessor.Model.RaddbitDTO
                         durable: true,
                         autoDelete: false,
                         arguments: null);
-                    LogHelper.Info($"使用或创建交换机: {formattedExchange}");
+                    Logger.Info($"使用或创建交换机: {formattedExchange}");
 
                     // 检查队列是否存在，如果不存在再创建
                     string queueName = $"queue_{Exchange}";
@@ -89,7 +92,7 @@ namespace EasyIotSharp.DataProcessor.Model.RaddbitDTO
                            exclusive: false,
                            autoDelete: false,
                            arguments: null);
-                    LogHelper.Info($"创建新的队列: {queueName}");
+                    Logger.Info($"创建新的队列: {queueName}");
                     
                     // 将队列绑定到交换机
                    await _channel.QueueBindAsync(
@@ -97,20 +100,20 @@ namespace EasyIotSharp.DataProcessor.Model.RaddbitDTO
                         exchange: formattedExchange,
                         routingKey: Exchange);
 
-                    LogHelper.Info($"成功创建交换机 [{formattedExchange}] 和队列 [{queueName}]");
+                    Logger.Info($"成功创建交换机 [{formattedExchange}] 和队列 [{queueName}]");
                     
                     _isInitialized = true;
-                    LogHelper.Info($"RabbitMQ客户端初始化成功: {Host}:{Port}, Exchange: {Exchange}");
+                    Logger.Info($"RabbitMQ客户端初始化成功: {Host}:{Port}, Exchange: {Exchange}");
                     return;
                 }
                 catch (Exception ex)
                 {
                     retryAttempt++;
-                    LogHelper.Error($"RabbitMQ客户端初始化失败 (尝试 {retryAttempt}/{_retryCount}): {ex.Message}");
+                    Logger.Error($"RabbitMQ客户端初始化失败 (尝试 {retryAttempt}/{_retryCount}): {ex.Message}");
                     
                     if (retryAttempt >= _retryCount)
                     {
-                        LogHelper.Error($"RabbitMQ客户端初始化失败，已达到最大重试次数: {_retryCount}");
+                        Logger.Error($"RabbitMQ客户端初始化失败，已达到最大重试次数: {_retryCount}");
                         throw new Exception($"无法连接到RabbitMQ服务器: {Host}:{Port}", ex);
                     }
                     
@@ -125,7 +128,7 @@ namespace EasyIotSharp.DataProcessor.Model.RaddbitDTO
         /// </summary>
         private async Task Connection_ConnectionShutdownAsync(object sender, ShutdownEventArgs e)
         {
-            LogHelper.Warn($"RabbitMQ连接已关闭: {e.ReplyText}");
+            Logger.Warn($"RabbitMQ连接已关闭: {e.ReplyText}");
             _isInitialized = false;
             
             // 可以在这里添加异步重连逻辑
@@ -137,7 +140,7 @@ namespace EasyIotSharp.DataProcessor.Model.RaddbitDTO
             }
             catch (Exception ex)
             {
-                LogHelper.Error($"RabbitMQ重连失败: {ex.Message}");
+                Logger.Error($"RabbitMQ重连失败: {ex.Message}");
             }
         }
         
@@ -148,13 +151,13 @@ namespace EasyIotSharp.DataProcessor.Model.RaddbitDTO
         {
             if (string.IsNullOrEmpty(routingKey))
             {
-                LogHelper.Error("路由键不能为空");
+                Logger.Error("路由键不能为空");
                 throw new ArgumentNullException(nameof(routingKey), "路由键不能为空");
             }
             
             if (message == null || message.Length == 0)
             {
-                LogHelper.Error("消息内容不能为空");
+                Logger.Error("消息内容不能为空");
                 throw new ArgumentNullException(nameof(message), "消息内容不能为空");
             }
             
@@ -165,7 +168,7 @@ namespace EasyIotSharp.DataProcessor.Model.RaddbitDTO
                 {
                     if (!_isInitialized || _connection == null || !_connection.IsOpen || _channel == null || _channel.IsClosed)
                     {
-                        LogHelper.Warn("RabbitMQ连接未初始化或已关闭，尝试重新初始化");
+                        Logger.Warn("RabbitMQ连接未初始化或已关闭，尝试重新初始化");
                         await InitAsync();
                     }
 
@@ -184,17 +187,17 @@ namespace EasyIotSharp.DataProcessor.Model.RaddbitDTO
                          mandatory: false,
                          basicProperties: properties,
                          body: message);
-                    LogHelper.Info($"成功发送消息到RabbitMQ，Exchange: {formattedExchange}, RoutingKey: {routingKey}, 消息大小: {message.Length} 字节");
+                    Logger.Info($"成功发送消息到RabbitMQ，Exchange: {formattedExchange}, RoutingKey: {routingKey}, 消息大小: {message.Length} 字节");
                     return;
                 }
                 catch (Exception ex)
                 {
                     retryAttempt++;
-                    LogHelper.Error($"发送RabbitMQ消息失败 (尝试 {retryAttempt}/{_retryCount}): {ex.Message}");
+                    Logger.Error($"发送RabbitMQ消息失败 (尝试 {retryAttempt}/{_retryCount}): {ex.Message}");
                     
                     if (retryAttempt >= _retryCount)
                     {
-                        LogHelper.Error($"发送RabbitMQ消息失败，已达到最大重试次数: {_retryCount}");
+                        Logger.Error($"发送RabbitMQ消息失败，已达到最大重试次数: {_retryCount}");
                         throw new Exception("发送RabbitMQ消息失败", ex);
                     }
                     
@@ -233,11 +236,11 @@ namespace EasyIotSharp.DataProcessor.Model.RaddbitDTO
                 }
                 
                 _isInitialized = false;
-                LogHelper.Info("RabbitMQ连接已异步关闭");
+                Logger.Info("RabbitMQ连接已异步关闭");
             }
             catch (Exception ex)
             {
-                LogHelper.Error($"异步关闭RabbitMQ连接失败: {ex.Message}");
+                Logger.Error($"异步关闭RabbitMQ连接失败: {ex.Message}");
             }
         }
 
@@ -272,7 +275,7 @@ namespace EasyIotSharp.DataProcessor.Model.RaddbitDTO
             }
             catch (Exception ex)
             {
-                LogHelper.Error($"关闭RabbitMQ连接失败: {ex.Message}");
+                Logger.Error($"关闭RabbitMQ连接失败: {ex.Message}");
             }
         }
 

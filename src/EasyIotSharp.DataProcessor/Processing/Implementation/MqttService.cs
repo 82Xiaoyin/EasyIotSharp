@@ -1,5 +1,4 @@
 using EasyIotSharp.DataProcessor.Processing.Interfaces;
-using EasyIotSharp.DataProcessor.Util;
 using MQTTnet;
 using MQTTnet.Client;
 using Newtonsoft.Json;
@@ -8,12 +7,14 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using UPrime;
-using EasyIotSharp.Core.Configuration; // 使用本地配置命名空间
+using EasyIotSharp.Core.Configuration;
+using log4net;
 
 namespace EasyIotSharp.DataProcessor.Processing.Implementation
 {
     public class MqttService : IMqttService
     {
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(MqttService));
         private readonly IMqttClient _mqttClient;
         private readonly AppOptions _appOptions; // 使用MqttOptions
 
@@ -37,7 +38,7 @@ namespace EasyIotSharp.DataProcessor.Processing.Implementation
                 var mqttUsername = _appOptions.MqttOptions.Username;
                 var mqttPassword = _appOptions.MqttOptions.Password;
 
-                LogHelper.Info($"正在连接MQTT服务器: {mqttHost}:{mqttPort}");
+                Logger.Info($"正在连接MQTT服务器: {mqttHost}:{mqttPort}");
 
                 // 构建MQTT客户端选项
                 var optionsBuilder = new MqttClientOptionsBuilder()
@@ -56,26 +57,26 @@ namespace EasyIotSharp.DataProcessor.Processing.Implementation
                 // 设置断开连接时的重连逻辑
                 _mqttClient.DisconnectedAsync += async e =>
                 {
-                    LogHelper.Warn("MQTT客户端断开连接，尝试重新连接...");
+                    Logger.Warn("MQTT客户端断开连接，尝试重新连接...");
                     await Task.Delay(TimeSpan.FromSeconds(5));
                     try
                     {
                         await _mqttClient.ConnectAsync(options);
-                        LogHelper.Info("MQTT客户端重新连接成功");
+                        Logger.Info("MQTT客户端重新连接成功");
                     }
                     catch (Exception ex)
                     {
-                        LogHelper.Error($"MQTT客户端重新连接失败: {ex.Message}");
+                        Logger.Error("MQTT客户端重新连接失败", ex);
                     }
                 };
 
                 // 连接到MQTT服务器
                 await _mqttClient.ConnectAsync(options);
-                LogHelper.Info("MQTT客户端连接成功");
+                Logger.Info("MQTT客户端连接成功");
             }
             catch (Exception ex)
             {
-                LogHelper.Error($"初始化MQTT客户端失败: {ex.Message}");
+                Logger.Error("初始化MQTT客户端失败", ex);
             }
         }
 
@@ -85,7 +86,7 @@ namespace EasyIotSharp.DataProcessor.Processing.Implementation
             {
                 if (!_mqttClient.IsConnected)
                 {
-                    LogHelper.Warn("MQTT客户端未连接，尝试重新连接...");
+                    Logger.Warn("MQTT客户端未连接，尝试重新连接...");
                     await InitializeMqttClient();
                 }
 
@@ -108,11 +109,11 @@ namespace EasyIotSharp.DataProcessor.Processing.Implementation
 
                 // 发布消息
                 await _mqttClient.PublishAsync(message);
-                LogHelper.Debug($"成功发布数据到MQTT主题: {topic}");
+                Logger.Debug($"成功发布数据到MQTT主题: {topic}");
             }
             catch (Exception ex)
             {
-                LogHelper.Error($"发布数据到MQTT失败: {ex.Message}");
+                Logger.Error("发布数据到MQTT失败", ex);
             }
         }
 
@@ -122,7 +123,7 @@ namespace EasyIotSharp.DataProcessor.Processing.Implementation
             {
                 if (!_mqttClient.IsConnected)
                 {
-                    LogHelper.Warn("MQTT客户端未连接，尝试重新连接...");
+                    Logger.Warn("MQTT客户端未连接，尝试重新连接...");
                     await InitializeMqttClient();
                 }
 
@@ -139,11 +140,11 @@ namespace EasyIotSharp.DataProcessor.Processing.Implementation
 
                 // 并行执行所有发布任务
                 await Task.WhenAll(tasks);
-                LogHelper.Debug($"成功批量发布数据到MQTT");
+                Logger.Debug("成功批量发布数据到MQTT");
             }
             catch (Exception ex)
             {
-                LogHelper.Error($"批量发布数据到MQTT失败: {ex.Message}");
+                Logger.Error("批量发布数据到MQTT失败", ex);
             }
         }
     }

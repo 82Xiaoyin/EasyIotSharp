@@ -2,9 +2,9 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using EasyIotSharp.DataProcessor.Processing.Interfaces;
-using EasyIotSharp.DataProcessor.Util;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
+using log4net;
 
 namespace EasyIotSharp.DataProcessor.Processing
 {
@@ -13,6 +13,8 @@ namespace EasyIotSharp.DataProcessor.Processing
     /// </summary>
     public class DataProcessingService : BackgroundService
     {
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(DataProcessingService));
+        
         // 消息接收器
         private readonly IMessageReceiver _messageReceiver;
         // 消息处理器
@@ -41,15 +43,15 @@ namespace EasyIotSharp.DataProcessor.Processing
         /// </summary>
         private async void OnMessageReceived(object sender, MessageReceivedEventArgs e)
         {
-            LogHelper.Info($"收到项目 {e.ProjectId} 的消息，长度: {e.RawMessage?.Length ?? 0}");
+            Logger.Info($"收到项目 {e.ProjectId} 的消息，长度: {e.RawMessage?.Length ?? 0}");
             try
             {
                 await _messageProcessor.ProcessMessageAsync(e.ProjectId, e.RawMessage);
-                LogHelper.Debug($"已将项目 {e.ProjectId} 的消息传递给处理器");
+                Logger.Debug($"已将项目 {e.ProjectId} 的消息传递给处理器");
             }
             catch (Exception ex)
             {
-                LogHelper.Error($"处理项目 {e.ProjectId} 的消息时发生错误: {ex.Message}");
+                Logger.Error($"处理项目 {e.ProjectId} 的消息时发生错误", ex);
             }
         }
 
@@ -62,20 +64,15 @@ namespace EasyIotSharp.DataProcessor.Processing
             {
                 AppContext.SetSwitch("System.Diagnostics.EventLog.EnableLogToConsole", false);
 
-                // 初始化消息接收器
                 await _messageReceiver.InitializeAsync();
-
-                // 启动性能监控
                 _performanceMonitor.Start();
-
-                // 启动消息处理
                 await _messageProcessor.StartProcessingAsync(stoppingToken);
 
-                LogHelper.Info("数据处理服务已启动");
+                Logger.Info("数据处理服务已启动");
             }
             catch (Exception ex)
             {
-                LogHelper.Error($"执行服务时发生错误: {ex.Message}");
+                Logger.Error("执行服务时发生错误", ex);
                 throw;
             }
         }
@@ -87,23 +84,16 @@ namespace EasyIotSharp.DataProcessor.Processing
         {
             try
             {
-                // 停止性能监控
                 _performanceMonitor.Stop();
-
-                // 停止消息处理
                 await _messageProcessor.StopProcessingAsync();
-
-                // 关闭消息接收器
                 await _messageReceiver.Shutdown();
-
-                // 取消订阅事件
                 _messageReceiver.MessageReceived -= OnMessageReceived;
 
-                LogHelper.Info("数据处理服务已停止");
+                Logger.Info("数据处理服务已停止");
             }
             catch (Exception ex)
             {
-                LogHelper.Error($"停止服务时发生错误: {ex.Message}");
+                Logger.Error("停止服务时发生错误", ex);
             }
 
             await base.StopAsync(cancellationToken);
