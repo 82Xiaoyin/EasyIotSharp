@@ -27,10 +27,11 @@ namespace EasyIotSharp.API.Controllers
         /// <returns>分页结果</returns>
         [HttpPost("/Export/ExportRecord/Query")]
         [Authorize]
-        public async Task<PagedResultDto<ExportDataRecordDto>> QueryExportRecord([FromBody] ExportRecordInput input)
+        public async Task <UPrimeResponse<PagedResultDto<ExportDataRecordDto>>> QueryExportRecord([FromBody] ExportRecordInput input)
         {
-            return await _exportRecordService.QueryExportRecord(input);
-
+            UPrimeResponse<PagedResultDto<ExportDataRecordDto>> res = new UPrimeResponse<PagedResultDto<ExportDataRecordDto>>();
+            res.Result = await _exportRecordService.QueryExportRecord(input);
+            return res;
         }
 
         /// <summary>

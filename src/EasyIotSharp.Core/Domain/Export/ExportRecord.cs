@@ -45,6 +45,7 @@ namespace EasyIotSharp.Core.Domain.Export
         /// <summary>
         /// 资源Id
         /// </summary>
+        [SugarColumn(IsNullable = true)]
         public string ResourceId { get; set; }
     }
 }
