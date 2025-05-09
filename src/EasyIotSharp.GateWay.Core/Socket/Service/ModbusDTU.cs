@@ -92,9 +92,9 @@ namespace EasyIotSharp.GateWay.Core.Socket.Service
         /// </summary>
         private async Task ParseReceivedData(IntPtr connId, byte[] data, string configJson)
         {
-            var _sensorPointRepository = UPrimeEngine.Instance.Resolve<ISensorPointService>();
-            var _sensorRepository = UPrimeEngine.Instance.Resolve<ISensorService>();
-            var _sensorQuotaRepository = UPrimeEngine.Instance.Resolve<ISensorQuotaService>();
+            var _sensorPointService = UPrimeEngine.Instance.Resolve<ISensorPointService>();
+            var _sensorService = UPrimeEngine.Instance.Resolve<ISensorService>();
+            var _sensorQuotaService = UPrimeEngine.Instance.Resolve<ISensorQuotaService>();
             try
             {
                 if (data == null || data.Length < 7) return;
@@ -110,9 +110,9 @@ namespace EasyIotSharp.GateWay.Core.Socket.Service
                     Logger.Error("配置解析失败或为空");
                     return;
                 }
-                var sensorPointList = _sensorPointRepository.GetBySensorPointList();
-                var sensorList = _sensorRepository.GetSensorList();
-                var sensorQuotaLists = _sensorQuotaRepository.GetSensorQuotaList();
+                var sensorPointList = _sensorPointService.GetBySensorPointList();
+                var sensorList = _sensorService.GetSensorList();
+                var sensorQuotaLists = _sensorQuotaService.GetSensorQuotaList();
                 // 查找匹配的配置项
                 foreach (var config in configModels)
                 {

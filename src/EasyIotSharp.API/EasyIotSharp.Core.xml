@@ -1028,6 +1028,16 @@
             项目id
             </summary>
         </member>
+        <member name="P:EasyIotSharp.Core.Domain.Proejct.Gateway.Imei">
+             <summary>
+            IMEI号
+             </summary>
+        </member>
+        <member name="P:EasyIotSharp.Core.Domain.Proejct.Gateway.DeviceModel">
+            <summary>
+            设备型号
+            </summary>
+        </member>
         <member name="T:EasyIotSharp.Core.Domain.Proejct.GatewayProtocol">
             <summary>
             网关协议表
@@ -3161,6 +3171,16 @@
             操作人
             </summary>
         </member>
+        <member name="P:EasyIotSharp.Core.Dto.Project.GatewayDto.Imei">
+             <summary>
+            IMEI号
+             </summary>
+        </member>
+        <member name="P:EasyIotSharp.Core.Dto.Project.GatewayDto.DeviceModel">
+            <summary>
+            设备型号
+            </summary>
+        </member>
         <member name="T:EasyIotSharp.Core.Dto.Project.GatewayProtocolDto">
             <summary>
             代表一条网关协议的"DTO"
@@ -3331,6 +3351,16 @@
         <member name="P:EasyIotSharp.Core.Dto.Project.Params.InsertGatewayInput.ProjectId">
             <summary>
             项目id
+            </summary>
+        </member>
+        <member name="P:EasyIotSharp.Core.Dto.Project.Params.InsertGatewayInput.Imei">
+             <summary>
+            IMEI号
+             </summary>
+        </member>
+        <member name="P:EasyIotSharp.Core.Dto.Project.Params.InsertGatewayInput.DeviceModel">
+            <summary>
+            设备型号
             </summary>
         </member>
         <member name="T:EasyIotSharp.Core.Dto.Project.Params.InsertGatewayProtocolInput">
@@ -3595,6 +3625,16 @@
         <member name="P:EasyIotSharp.Core.Dto.Project.Params.UpdateGatewayInput.ProjectId">
             <summary>
             项目id
+            </summary>
+        </member>
+        <member name="P:EasyIotSharp.Core.Dto.Project.Params.UpdateGatewayInput.Imei">
+             <summary>
+            IMEI号
+             </summary>
+        </member>
+        <member name="P:EasyIotSharp.Core.Dto.Project.Params.UpdateGatewayInput.DeviceModel">
+            <summary>
+            设备型号
             </summary>
         </member>
         <member name="T:EasyIotSharp.Core.Dto.Project.Params.UpdateGatewayProtocolInput">
@@ -8599,6 +8639,75 @@
             </summary>
             <param name="input"></param>
             <returns></returns>
+        </member>
+        <member name="T:EasyIotSharp.Core.Services.Project.Impl.GatewayService">
+            <summary>
+            网关服务实现类
+            提供网关的增删改查等基础操作
+            </summary>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.Project.Impl.GatewayService.#ctor(EasyIotSharp.Core.Repositories.Project.IGatewayRepository,EasyIotSharp.Core.Repositories.Project.IProjectBaseRepository,EasyIotSharp.Core.Repositories.Hardware.IProtocolRepository,EasyIotSharp.Core.Caching.Project.IGatewayCacheService)">
+            <summary>
+            构造函数
+            </summary>
+            <param name="gatewayRepository">网关仓储</param>
+            <param name="projectBaseRepository">项目基础仓储</param>
+            <param name="protocolRepository">协议仓储</param>
+            <param name="gatewayCacheService">网关缓存服务</param>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.Project.Impl.GatewayService.GetGateway(System.String)">
+            <summary>
+            获取指定ID的网关信息
+            </summary>
+            <param name="id">网关ID</param>
+            <returns>网关信息DTO</returns>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.Project.Impl.GatewayService.QueryGateway(EasyIotSharp.Core.Dto.Project.Params.QueryGatewayInput)">
+            <summary>
+            查询网关列表
+            </summary>
+            <param name="input">查询条件</param>
+            <returns>分页后的网关列表</returns>
+            <remarks>
+            当满足以下条件时会使用缓存：
+            1. 关键字为空
+            2. 项目ID为空
+            3. 协议ID为空
+            4. 状态为-1
+            5. 启用分页
+            6. 页码小于等于5且每页大小为10
+            </remarks>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.Project.Impl.GatewayService.InsertGateway(EasyIotSharp.Core.Dto.Project.Params.InsertGatewayInput)">
+            <summary>
+            新增网关
+            </summary>
+            <param name="input">网关信息</param>
+            <returns>异步任务</returns>
+            <exception cref="T:EasyIotSharp.Core.BizException">当网关名称重复时抛出异常</exception>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.Project.Impl.GatewayService.UpdateGateway(EasyIotSharp.Core.Dto.Project.Params.UpdateGatewayInput)">
+            <summary>
+            更新网关信息
+            </summary>
+            <param name="input">更新的网关信息</param>
+            <returns>异步任务</returns>
+            <exception cref="T:EasyIotSharp.Core.BizException">
+            抛出异常的情况：
+            1. 网关不存在
+            2. 更新后的网关名称与其他网关重复
+            </exception>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.Project.Impl.GatewayService.DeleteGateway(EasyIotSharp.Core.Dto.Project.Params.DeleteGatewayInput)">
+            <summary>
+            删除网关（软删除）
+            </summary>
+            <param name="input">删除参数</param>
+            <returns>异步任务</returns>
+            <remarks>
+            执行软删除操作，更新网关的IsDelete状态
+            删除后会触发网关事件，清除相关缓存
+            </remarks>
         </member>
         <member name="M:EasyIotSharp.Core.Services.Project.Impl.ProjectBaseService.UploadProjectUnity(System.String,EasyIotSharp.Core.Dto.Enum.ResourceEnums,Microsoft.AspNetCore.Http.IFormFile)">
             <summary>

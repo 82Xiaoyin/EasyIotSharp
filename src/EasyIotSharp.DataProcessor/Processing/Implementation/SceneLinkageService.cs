@@ -12,6 +12,7 @@ using System.Linq;
 using EasyIotSharp.Core.Dto.Rule.Params;
 using EasyIotSharp.Core.Dto.Rule;
 using log4net;
+using EasyIotSharp.Core.Repositories.Influxdb;
 
 namespace EasyIotSharp.DataProcessor.Processing.Implementation
 {
@@ -29,6 +30,9 @@ namespace EasyIotSharp.DataProcessor.Processing.Implementation
         // 规则链服务，用于查询和执行场景联动规则
         private readonly IRuleChainService _ruleChainService;
         
+        // 数据仓库服务，用于存储告警数据
+        //private readonly IDataRepository _dataRepository;
+        
         /// <summary>
         /// 构造函数
         /// </summary>
@@ -36,6 +40,7 @@ namespace EasyIotSharp.DataProcessor.Processing.Implementation
         {
             // 通过UPrime容器解析规则链服务
             _ruleChainService = UPrimeEngine.Instance.Resolve<IRuleChainService>();
+            //_dataRepository = UPrimeEngine.Instance.Resolve<IDataRepository>();
         }
         
         /// <summary>
@@ -240,7 +245,7 @@ namespace EasyIotSharp.DataProcessor.Processing.Implementation
                 // 如果所有条件都满足，执行动作
                 if (allConditionsMet)
                 {
-                    await ExecuteRuleActions(rule, dataPoint, projectId);
+                    await ExecuteRuleActions(rule, projectId, dataPoint,conditionResults);
                 }
             }
             catch (Exception ex)
@@ -407,11 +412,14 @@ namespace EasyIotSharp.DataProcessor.Processing.Implementation
         /// <param name="dataPoint">触发规则的数据点</param>
         /// <param name="projectId">项目ID</param>
         /// <returns>执行任务</returns>
-        private async Task ExecuteRuleActions(RuleChainDto rule, Dictionary<string, object> dataPoint, string projectId)
+        private async Task ExecuteRuleActions(RuleChainDto rule, string projectId, Dictionary<string, object> dataPoint, List<string> conditionResults)
         {
             try
             {
                 Logger.Info($"触发场景联动规则: {rule.Name}, 项目ID: {projectId}");
+                
+                // 保存告警数据到InfluxDB
+                //await SaveAlarmToInfluxDBAsync(projectId, rule, dataPoint, conditionResults);
                 
                 // TODO: 实现规则动作执行逻辑
                 // 这里需要根据实际业务需求实现，可能包括：
@@ -422,9 +430,9 @@ namespace EasyIotSharp.DataProcessor.Processing.Implementation
                 // 5. 触发其他规则链
                 
                 // 解析规则动作
-                if (!string.IsNullOrEmpty(rule.RuleContentJson))
+                if (!string.IsNullOrEmpty(rule.AlarmsJSON))
                 {
-                    var ruleContent = JsonConvert.DeserializeObject<JObject>(rule.RuleContentJson);
+                    var ruleContent = JsonConvert.DeserializeObject<JObject>(rule.AlarmsJSON);
                     if (ruleContent != null && ruleContent.ContainsKey("actions"))
                     {
                         var actions = ruleContent["actions"] as JArray;
@@ -437,16 +445,17 @@ namespace EasyIotSharp.DataProcessor.Processing.Implementation
                             {
                                 string actionType = action["type"]?.ToString();
                                 Logger.Info($"执行动作: {actionType}");
-                                
+                                //通知ID
+                                string alarmSceneId= action["alarmSceneId"]?.ToString();
                                 // 根据动作类型执行不同的操作
                                 switch (actionType)
                                 {
-                                    case "notification":
+                                    case "alarm_notify":
                                         // 发送通知
                                         await SendNotification(action, rule, dataPoint, projectId);
                                         break;
                                         
-                                    case "control":
+                                    case "device_control":
                                         // 控制设备
                                         await ControlDevice(action, rule, dataPoint, projectId);
                                         break;
@@ -555,5 +564,81 @@ namespace EasyIotSharp.DataProcessor.Processing.Implementation
                 Logger.Error($"记录事件失败: {ex.Message}");
             }
         }
+        
+        /// <summary>
+        /// 保存告警数据到InfluxDB
+        /// </summary>
+        /// <param name="projectId">项目ID</param>
+        /// <param name="rule">触发告警的规则</param>
+        /// <param name="dataPoint">触发告警的数据点</param>
+        /// <param name="conditionResults">条件评估结果</param>
+        /// <returns>保存任务</returns>
+        //private async Task SaveAlarmToInfluxDBAsync(string projectId, RuleChainDto rule, Dictionary<string, object> dataPoint, List<string> conditionResults)
+        //{
+        //    try
+        //    {
+        //        // 获取租户简称，如果数据点中没有，则使用默认值
+        //        string tenantAbbreviation = "default";
+        //        if (dataPoint.ContainsKey("tenantAbbreviation") && dataPoint["tenantAbbreviation"] != null)
+        //        {
+        //            tenantAbbreviation = dataPoint["tenantAbbreviation"].ToString();
+        //        }
+                
+        //        // 构建告警数据
+        //        var alarmData = new Dictionary<string, object>
+        //        {
+        //            ["projectId"] = projectId,
+        //            ["ruleId"] = rule.Id,
+        //            ["ruleName"] = rule.Name,
+        //            ["alarmLevel"] = rule.Level ?? "warning", // 默认为warning级别
+        //            ["alarmType"] = "scene_linkage",
+        //            ["message"] = $"触发场景联动规则: {rule.Name}",
+        //            ["conditionDetails"] = string.Join("; ", conditionResults),
+        //            ["notified"] = false,
+        //            ["acknowledged"] = false,
+        //            ["time"] = DateTime.UtcNow
+        //        };
+                
+        //        // 从数据点中提取关键信息
+        //        if (dataPoint.TryGetValue("pointType", out object pointTypeObj))
+        //        {
+        //            alarmData["pointType"] = pointTypeObj;
+        //        }
+                
+        //        if (dataPoint.TryGetValue("pointId", out object pointIdObj))
+        //        {
+        //            alarmData["pointId"] = pointIdObj;
+        //        }
+                
+        //        // 如果有触发值，也添加到告警数据中
+        //        foreach (var condition in rule.Conditions ?? new List<JObject>())
+        //        {
+        //            string paramCode = condition["paramCode"]?.ToString();
+        //            if (!string.IsNullOrEmpty(paramCode) && dataPoint.TryGetValue(paramCode, out object paramValue))
+        //            {
+        //                alarmData[$"trigger_{paramCode}"] = paramValue;
+                        
+        //                // 如果有阈值，也添加到告警数据中
+        //                string conditionValue = condition["value"]?.ToString();
+        //                if (!string.IsNullOrEmpty(conditionValue))
+        //                {
+        //                    alarmData[$"threshold_{paramCode}"] = conditionValue;
+        //                }
+        //            }
+        //        }
+                
+        //        // 保存到InfluxDB
+        //        var measurementName = "alarms";
+        //        var dataPoints = new List<Dictionary<string, object>> { alarmData };
+                
+        //        await _dataRepository.SaveDataPointsAsync(measurementName, tenantAbbreviation, dataPoints);
+                
+        //        Logger.Info($"成功保存告警数据到InfluxDB，规则: {rule.Name}, 项目: {projectId}");
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Logger.Error("保存告警数据到InfluxDB失败", ex);
+        //    }
+        //}
     }
 }
