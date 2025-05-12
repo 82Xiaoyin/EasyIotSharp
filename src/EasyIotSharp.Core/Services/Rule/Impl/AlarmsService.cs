@@ -93,22 +93,24 @@ namespace EasyIotSharp.Core.Services.Rule.Impl
             var countdata = await repository.GetAsync(countsql);
 
             var dicList = new List<Dictionary<string, object>>();
-
-            foreach (var item in data.Values)
+            if (data != null)
             {
-                var dic = new Dictionary<string, object>();
-                for (int j = 0; j < item.Count; j++)
+                foreach (var item in data.Values)
                 {
-                    var rawTimestamp = item[j];
-                    // 直接使用原始时间戳进行格式化，避免转换损失精度
-                    if (rawTimestamp is DateTime dateTime)
+                    var dic = new Dictionary<string, object>();
+                    for (int j = 0; j < item.Count; j++)
                     {
-                        dic.Add(data.Columns[j], dateTime.ToString("yyyy-MM-ddTHH:mm:ss.fffZ", System.Globalization.CultureInfo.InvariantCulture));
+                        var rawTimestamp = item[j];
+                        // 直接使用原始时间戳进行格式化，避免转换损失精度
+                        if (rawTimestamp is DateTime dateTime)
+                        {
+                            dic.Add(data.Columns[j], dateTime.ToString("yyyy-MM-ddTHH:mm:ss.fffZ", System.Globalization.CultureInfo.InvariantCulture));
+                        }
+                        else
+                            dic.Add(data.Columns[j], item[j] == null ? null : item[j].ToString());
                     }
-                    else
-                        dic.Add(data.Columns[j], item[j] == null ? null : item[j].ToString());
+                    dicList.Add(dic);
                 }
-                dicList.Add(dic);
             }
             list = ConvertToDtoList(dicList);
             list.ForEach(f => f.pointName = sensorPointList.Where(w => w.Id == f.pointid).FirstOrDefault()?.Name ?? "");
@@ -173,7 +175,7 @@ namespace EasyIotSharp.Core.Services.Rule.Impl
 
             var dicList = new List<Dictionary<string, object>>();
 
-            if (data.Values != null)
+            if (data != null)
             {
                 foreach (var item in data.Values)
                 {
