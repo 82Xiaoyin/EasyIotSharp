@@ -197,7 +197,7 @@ namespace EasyIotSharp.API.Controllers
         /// <param name="input"></param>
         /// <returns></returns>
         [HttpPost("/Rule/Alarms/Query")]
-        //[Authorize]
+        [Authorize]
         public async Task<UPrimeResponse<List<AlarmsDto>>> QueryProjectBase([FromBody] AlarmsInput input)
         {
             UPrimeResponse<List<AlarmsDto>> res = new UPrimeResponse<List<AlarmsDto>>();
