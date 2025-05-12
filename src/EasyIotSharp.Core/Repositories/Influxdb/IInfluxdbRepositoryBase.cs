@@ -53,5 +53,12 @@ namespace EasyIotSharp.Core.Repositories.Influxdb
         Task BulkInsertAsync(IEnumerable<TEntity> entities);
 
         #endregion
+
+        /// <summary>
+        /// 删除
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task DeleteAsync(string query);
     }
 }

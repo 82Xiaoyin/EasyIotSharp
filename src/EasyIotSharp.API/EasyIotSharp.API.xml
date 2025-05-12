@@ -560,6 +560,20 @@
             <param name="input"></param>
             <returns></returns>
         </member>
+        <member name="M:EasyIotSharp.API.Controllers.RuleController.QueryProjectBase(EasyIotSharp.Core.Dto.Rule.Params.AlarmsInput)">
+            <summary>
+            获取报警记录
+            </summary>
+            <param name="input"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EasyIotSharp.API.Controllers.RuleController.UpdateAlarms(EasyIotSharp.Core.Dto.Rule.AlarmsDto)">
+            <summary>
+            修改报警内容状态
+            </summary>
+            <param name="input"></param>
+            <returns></returns>
+        </member>
         <member name="T:EasyIotSharp.API.Controllers.TenantAccountController">
             <summary>
             租户账号控制器

@@ -39,7 +39,7 @@ namespace EasyIotSharp.Core.Repositories.Influxdb
         /// </summary>
         public string DefaultDatabase => "default";
 
-        public InfluxdbRepositoryBase(IInfluxdbDatabaseProvider databaseProvider,string measurementName,string tenantDatabase)
+        public InfluxdbRepositoryBase(IInfluxdbDatabaseProvider databaseProvider, string measurementName, string tenantDatabase)
         {
             _databaseProvider = databaseProvider;
             _measurementName = measurementName;
@@ -378,6 +378,26 @@ namespace EasyIotSharp.Core.Repositories.Influxdb
                     prop.SetValue(entityAsObj, string.Empty);
                 }
             }
+        }
+
+        #endregion
+
+        #region 删除操作
+
+        /// <summary>
+        /// 根据条件删除数据
+        /// </summary>
+        /// <param name="whereClause">删除条件，例如：time >= '2024-01-01' AND time <= '2024-01-02' AND pointid='123'</param>
+        /// <returns>异步任务</returns>
+        /// <remarks>
+        /// 注意：
+        /// 1. InfluxDB删除操作不可逆，请谨慎使用
+        /// 2. 建议在删除前先备份重要数据
+        /// 3. whereClause必须包含时间范围条件以提高性能
+        /// </remarks>
+        public async Task DeleteAsync(string query)
+        {
+            await _databaseProvider.Client.Client.QueryAsync(query, _tenantDatabase);
         }
 
         #endregion

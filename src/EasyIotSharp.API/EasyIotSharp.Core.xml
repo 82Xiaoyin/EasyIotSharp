@@ -4155,6 +4155,41 @@
             是否启用
             </summary>
         </member>
+        <member name="P:EasyIotSharp.Core.Dto.Rule.Params.AlarmsInput.SensorId">
+            <summary>
+            设备Id
+            </summary>
+        </member>
+        <member name="P:EasyIotSharp.Core.Dto.Rule.Params.AlarmsInput.SensorPointId">
+            <summary>
+            测点Id
+            </summary>
+        </member>
+        <member name="P:EasyIotSharp.Core.Dto.Rule.Params.AlarmsInput.ProjectId">
+            <summary>
+            项目Id
+            </summary>
+        </member>
+        <member name="P:EasyIotSharp.Core.Dto.Rule.Params.AlarmsInput.StartTime">
+            <summary>
+            开始时间
+            </summary>
+        </member>
+        <member name="P:EasyIotSharp.Core.Dto.Rule.Params.AlarmsInput.EndTime">
+            <summary>
+            结束时间
+            </summary>
+        </member>
+        <member name="P:EasyIotSharp.Core.Dto.Rule.Params.AlarmsInput.IsSort">
+            <summary>
+            排序
+            </summary>
+        </member>
+        <member name="P:EasyIotSharp.Core.Dto.Rule.Params.AlarmsInput.Abbreviation">
+            <summary>
+            租户
+            </summary>
+        </member>
         <member name="P:EasyIotSharp.Core.Dto.Rule.Params.NotifyRecordInput.Type">
             <summary>
             类型
@@ -6520,6 +6555,13 @@
             批量插入
             </summary>
         </member>
+        <member name="M:EasyIotSharp.Core.Repositories.Influxdb.IInfluxdbRepositoryBase`1.DeleteAsync(System.String)">
+            <summary>
+            删除
+            </summary>
+            <param name="query"></param>
+            <returns></returns>
+        </member>
         <member name="P:EasyIotSharp.Core.Repositories.Influxdb.InfluxdbRepositoryBase`1.Client">
             <summary>
             InfluxDB 客户端
@@ -6590,6 +6632,7 @@
             获取实体时间戳
             </summary>
         </member>
+        <!-- Badly formed XML comment ignored for member "M:EasyIotSharp.Core.Repositories.Influxdb.InfluxdbRepositoryBase`1.DeleteAsync(System.String)" -->
         <member name="T:EasyIotSharp.Core.Repositories.Mysql.IMySqlRepositoryBase`2">
             <summary>
             
@@ -7505,6 +7548,12 @@
             - 使用基类的分页查询方法获取数据
             </remarks>
         </member>
+        <member name="M:EasyIotSharp.Core.Repositories.Tenant.Impl.TenantRepository.GetTenantList">
+            <summary>
+            获取所有租户
+            </summary>
+            <returns></returns>
+        </member>
         <member name="T:EasyIotSharp.Core.Repositories.Tenant.ITenantRepository">
             <summary>
             租户仓储接口类
@@ -7521,6 +7570,12 @@
             <param name="isFreeze">-1=不参与查询 1=已冻结 2=未冻结</param>
             <param name="pageIndex">起始页</param>
             <param name="pageSize">每页多少条</param>
+            <returns></returns>
+        </member>
+        <member name="M:EasyIotSharp.Core.Repositories.Tenant.ITenantRepository.GetTenantList">
+            <summary>
+            获取所有租户
+            </summary>
             <returns></returns>
         </member>
         <member name="T:EasyIotSharp.Core.Services.APIProvider.IWatchmenAPIService">
@@ -9059,6 +9114,20 @@
             <param name="input"></param>
             <returns></returns>
         </member>
+        <member name="M:EasyIotSharp.Core.Services.Rule.IAlarmsService.GetAlarmsData(EasyIotSharp.Core.Dto.Rule.Params.AlarmsInput)">
+            <summary>
+            报警列表
+            </summary>
+            <param name="input"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.Rule.IAlarmsService.UpdateAlarms(EasyIotSharp.Core.Dto.Rule.AlarmsDto)">
+            <summary>
+            报警列表修改
+            </summary>
+            <param name="input"></param>
+            <returns></returns>
+        </member>
         <member name="M:EasyIotSharp.Core.Services.Rule.Impl.AlarmsConfigService.QueryAlarmsConfig(EasyIotSharp.Core.Dto.PagingInput)">
             <summary>
             列表
@@ -9097,6 +9166,56 @@
             <param name="input"></param>
             <returns></returns>
             <exception cref="T:EasyIotSharp.Core.BizException"></exception>
+        </member>
+        <member name="T:EasyIotSharp.Core.Services.Rule.Impl.AlarmsService">
+            <summary>
+            报警服务实现类
+            用于处理系统报警相关的业务逻辑
+            </summary>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.Rule.Impl.AlarmsService.#ctor">
+            <summary>
+            构造函数
+            </summary>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.Rule.Impl.AlarmsService.GetAlarmsData(EasyIotSharp.Core.Dto.Rule.Params.AlarmsInput)">
+            <summary>
+            获取报警数据
+            </summary>
+            <param name="input">查询参数，包含传感器ID、项目ID、时间范围等条件</param>
+            <returns>报警数据列表</returns>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.Rule.Impl.AlarmsService.UpdateAlarms(EasyIotSharp.Core.Dto.Rule.AlarmsDto)">
+            <summary>
+            更新报警数据
+            </summary>
+            <param name="input">报警数据传输对象，包含需要更新的报警信息</param>
+            <returns>异步任务</returns>
+            <remarks>
+            该方法用于更新报警记录，包括以下字段：
+            - 时间戳
+            - 确认状态（默认为true）
+            - 报警等级
+            - 报警类型
+            - 条件详情
+            - 报警消息
+            - 通知状态
+            - 传感器信息
+            - 项目信息
+            - 规则信息
+            - 阈值信息
+            </remarks>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.Rule.Impl.AlarmsService.ConvertToDtoList(System.Collections.Generic.List{System.Collections.Generic.Dictionary{System.String,System.Object}})">
+            <summary>
+            将字典列表转换为报警DTO列表
+            </summary>
+            <param name="list">包含报警数据的字典列表</param>
+            <returns>转换后的报警DTO列表</returns>
+            <remarks>
+            该方法通过反射将字典中的数据映射到AlarmsDto对象的属性中
+            支持自动类型转换，将字符串值转换为属性对应的类型
+            </remarks>
         </member>
         <member name="M:EasyIotSharp.Core.Services.Rule.Impl.NotifyService.QueryNotifyConfig(EasyIotSharp.Core.Dto.PagingInput)">
             <summary>
@@ -9775,6 +9894,12 @@
             <param name="soldierService">用户服务</param>
             <param name="tenantCacheService">租户缓存服务</param>
         </member>
+        <member name="M:EasyIotSharp.Core.Services.Tenant.Impl.TenantService.GetTenantList">
+            <summary>
+            获取所有租户
+            </summary>
+            <returns></returns>
+        </member>
         <member name="M:EasyIotSharp.Core.Services.Tenant.Impl.TenantService.GetTenant(System.String)">
             <summary>
             获取单个租户信息
@@ -9859,6 +9984,12 @@
             2. 记录操作者信息
             3. 清除相关缓存
             </remarks>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.Tenant.ITenantService.GetTenantList">
+            <summary>
+            获取所有租户
+            </summary>
+            <returns></returns>
         </member>
         <member name="M:EasyIotSharp.Core.Services.Tenant.ITenantService.GetTenant(System.String)">
             <summary>

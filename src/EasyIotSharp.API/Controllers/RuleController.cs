@@ -14,16 +14,19 @@ using EasyIotSharp.Core.Dto.Rule;
 using EasyIotSharp.Core.Dto.Rule.Params;
 using EasyIotSharp.Core.Dto.Queue.Params;
 using EasyIotSharp.Core.Services.Rule.Impl;
+using System.Collections.Generic;
 
 namespace EasyIotSharp.API.Controllers
 {
     public class RuleController : ApiControllerBase
     {
         private readonly IAlarmsConfigService _alarmsConfigService;
+        private readonly IAlarmsService _alarmsService;
         private readonly INotifyService _notifyService;
         public RuleController()
         {
             _alarmsConfigService = UPrime.UPrimeEngine.Instance.Resolve<IAlarmsConfigService>();
+            _alarmsService = UPrime.UPrimeEngine.Instance.Resolve<IAlarmsService>();
             _notifyService = UPrime.UPrimeEngine.Instance.Resolve<INotifyService>();
         }
 
@@ -181,6 +184,38 @@ namespace EasyIotSharp.API.Controllers
             UPrimeResponse<PagedResultDto<NotifyRecordDto>> res = new UPrimeResponse<PagedResultDto<NotifyRecordDto>>();
             res.Result = await _notifyService.QueryNotifyRecord(input);
             return res;
+        }
+
+        #endregion
+
+
+        #region 报警记录
+        
+        /// <summary>
+        /// 获取报警记录
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
+        [HttpPost("/Rule/Alarms/Query")]
+        //[Authorize]
+        public async Task<UPrimeResponse<List<AlarmsDto>>> QueryProjectBase([FromBody] AlarmsInput input)
+        {
+            UPrimeResponse<List<AlarmsDto>> res = new UPrimeResponse<List<AlarmsDto>>();
+            res.Result = await _alarmsService.GetAlarmsData(input);
+            return res;
+        }
+
+        /// <summary>
+        /// 修改报警内容状态
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
+        [HttpPost("/Rule/Alarms/UpdateState")]
+        [Authorize]
+        public async Task<UPrimeResponse> UpdateAlarms([FromBody] AlarmsDto input)
+        {
+            await _alarmsService.UpdateAlarms(input);
+            return new UPrimeResponse();
         }
 
         #endregion
