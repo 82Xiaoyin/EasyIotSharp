@@ -246,7 +246,7 @@ namespace EasyIotSharp.DataProcessor.Processing.Implementation
                         {
                             _dataRepository.SaveDataPointsAsync(measurementName, data.TenantAbbreviation, dataPoints),
                             _mqttService.PublishBatchDataAsync(projectId, dataPoints),
-                            _sceneLinkageService.ProcessSceneLinkageAsync(projectId, dataPoints)
+                            _sceneLinkageService.ProcessSceneLinkageAsync(projectId, dataPoints,data.TenantAbbreviation)
                         };
                         
                         await Task.WhenAll(tasks);

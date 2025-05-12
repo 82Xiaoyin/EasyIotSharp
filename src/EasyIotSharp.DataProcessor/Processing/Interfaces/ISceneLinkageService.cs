@@ -10,8 +10,9 @@ namespace EasyIotSharp.DataProcessor.Processing.Interfaces
         /// </summary>
         /// <param name="projectId">项目ID</param>
         /// <param name="dataPoints">数据点列表</param>
+        /// <param name="TenantAbbreviation">数据库简称</param>
         /// <returns>处理任务</returns>
-        Task ProcessSceneLinkageAsync(string projectId, IEnumerable<Dictionary<string, object>> dataPoints);
+        Task ProcessSceneLinkageAsync(string projectId, IEnumerable<Dictionary<string, object>> dataPoints,string TenantAbbreviation);
         
         /// <summary>
         /// 检查是否有场景联动需要执行

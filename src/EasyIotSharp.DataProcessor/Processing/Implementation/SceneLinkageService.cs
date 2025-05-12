@@ -31,16 +31,16 @@ namespace EasyIotSharp.DataProcessor.Processing.Implementation
         private readonly IRuleChainService _ruleChainService;
         
         // 数据仓库服务，用于存储告警数据
-        //private readonly IDataRepository _dataRepository;
+         private readonly IDataRepository _dataRepository;
         
         /// <summary>
         /// 构造函数
         /// </summary>
-        public SceneLinkageService()
+        public SceneLinkageService(IDataRepository dataRepository)
         {
             // 通过UPrime容器解析规则链服务
             _ruleChainService = UPrimeEngine.Instance.Resolve<IRuleChainService>();
-            //_dataRepository = UPrimeEngine.Instance.Resolve<IDataRepository>();
+            _dataRepository = dataRepository;
         }
         
         /// <summary>
@@ -85,7 +85,7 @@ namespace EasyIotSharp.DataProcessor.Processing.Implementation
         /// <param name="projectId">项目ID</param>
         /// <param name="dataPoints">数据点列表</param>
         /// <returns>处理任务</returns>
-        public async Task ProcessSceneLinkageAsync(string projectId, IEnumerable<Dictionary<string, object>> dataPoints)
+        public async Task ProcessSceneLinkageAsync(string projectId, IEnumerable<Dictionary<string, object>> dataPoints, string TenantAbbreviation)
         {
             try
             {
@@ -117,7 +117,7 @@ namespace EasyIotSharp.DataProcessor.Processing.Implementation
                     // 对每条规则进行评估
                     foreach (var rule in ruleChains.Items)
                     {
-                        await EvaluateRuleForDataPoint(rule, dataPoint, projectId);
+                        await EvaluateRuleForDataPoint(rule, dataPoint, projectId, TenantAbbreviation);
                     }
                 }
                 
@@ -136,7 +136,7 @@ namespace EasyIotSharp.DataProcessor.Processing.Implementation
         /// <param name="dataPoint">数据点</param>
         /// <param name="projectId">项目ID</param>
         /// <returns>评估任务</returns>
-        private async Task EvaluateRuleForDataPoint(RuleChainDto rule, Dictionary<string, object> dataPoint, string projectId)
+        private async Task EvaluateRuleForDataPoint(RuleChainDto rule, Dictionary<string, object> dataPoint, string projectId,string TenantAbbreviation)
         {
             try
             {
@@ -245,7 +245,7 @@ namespace EasyIotSharp.DataProcessor.Processing.Implementation
                 // 如果所有条件都满足，执行动作
                 if (allConditionsMet)
                 {
-                    await ExecuteRuleActions(rule, projectId, dataPoint,conditionResults);
+                    await ExecuteRuleActions(rule, projectId, dataPoint,conditionResults, TenantAbbreviation);
                 }
             }
             catch (Exception ex)
@@ -412,14 +412,14 @@ namespace EasyIotSharp.DataProcessor.Processing.Implementation
         /// <param name="dataPoint">触发规则的数据点</param>
         /// <param name="projectId">项目ID</param>
         /// <returns>执行任务</returns>
-        private async Task ExecuteRuleActions(RuleChainDto rule, string projectId, Dictionary<string, object> dataPoint, List<string> conditionResults)
+        private async Task ExecuteRuleActions(RuleChainDto rule, string projectId, Dictionary<string, object> dataPoint, List<string> conditionResults,string TenantAbbreviation)
         {
             try
             {
                 Logger.Info($"触发场景联动规则: {rule.Name}, 项目ID: {projectId}");
                 
                 // 保存告警数据到InfluxDB
-                //await SaveAlarmToInfluxDBAsync(projectId, rule, dataPoint, conditionResults);
+                await SaveAlarmToInfluxDBAsync(projectId, rule, dataPoint, conditionResults, TenantAbbreviation);
                 
                 // TODO: 实现规则动作执行逻辑
                 // 这里需要根据实际业务需求实现，可能包括：
@@ -451,8 +451,8 @@ namespace EasyIotSharp.DataProcessor.Processing.Implementation
                                 switch (actionType)
                                 {
                                     case "alarm_notify":
-                                        // 发送通知
-                                        await SendNotification(action, rule, dataPoint, projectId);
+                                        // 处理告警通知动作
+                                        await ProcessAlarmNotifyAction(action, rule, dataPoint, projectId);
                                         break;
                                         
                                     case "device_control":
@@ -480,36 +480,6 @@ namespace EasyIotSharp.DataProcessor.Processing.Implementation
             catch (Exception ex)
             {
                 Logger.Error($"执行规则动作失败: {ex.Message}, 规则ID: {rule.Id}");
-            }
-        }
-        
-        /// <summary>
-        /// 发送通知
-        /// </summary>
-        private async Task SendNotification(JToken action, RuleChainDto rule, Dictionary<string, object> dataPoint, string projectId)
-        {
-            try
-            {
-                string notificationType = action["notificationType"]?.ToString();
-                string content = action["content"]?.ToString();
-                
-                // 替换内容中的变量
-                if (!string.IsNullOrEmpty(content))
-                {
-                    foreach (var key in dataPoint.Keys)
-                    {
-                        content = content.Replace($"{{{key}}}", dataPoint[key]?.ToString());
-                    }
-                }
-                
-                Logger.Info($"发送{notificationType}通知: {content}");
-                
-                // TODO: 实现具体的通知发送逻辑
-                await Task.CompletedTask;
-            }
-            catch (Exception ex)
-            {
-                Logger.Error($"发送通知失败: {ex.Message}");
             }
         }
         
@@ -573,72 +543,130 @@ namespace EasyIotSharp.DataProcessor.Processing.Implementation
         /// <param name="dataPoint">触发告警的数据点</param>
         /// <param name="conditionResults">条件评估结果</param>
         /// <returns>保存任务</returns>
-        //private async Task SaveAlarmToInfluxDBAsync(string projectId, RuleChainDto rule, Dictionary<string, object> dataPoint, List<string> conditionResults)
-        //{
-        //    try
-        //    {
-        //        // 获取租户简称，如果数据点中没有，则使用默认值
-        //        string tenantAbbreviation = "default";
-        //        if (dataPoint.ContainsKey("tenantAbbreviation") && dataPoint["tenantAbbreviation"] != null)
-        //        {
-        //            tenantAbbreviation = dataPoint["tenantAbbreviation"].ToString();
-        //        }
+        private async Task SaveAlarmToInfluxDBAsync(string projectId, RuleChainDto rule, Dictionary<string, object> dataPoint, List<string> conditionResults,string TenantAbbreviation)
+        {
+            try
+            {
                 
-        //        // 构建告警数据
-        //        var alarmData = new Dictionary<string, object>
-        //        {
-        //            ["projectId"] = projectId,
-        //            ["ruleId"] = rule.Id,
-        //            ["ruleName"] = rule.Name,
-        //            ["alarmLevel"] = rule.Level ?? "warning", // 默认为warning级别
-        //            ["alarmType"] = "scene_linkage",
-        //            ["message"] = $"触发场景联动规则: {rule.Name}",
-        //            ["conditionDetails"] = string.Join("; ", conditionResults),
-        //            ["notified"] = false,
-        //            ["acknowledged"] = false,
-        //            ["time"] = DateTime.UtcNow
-        //        };
+                // 获取租户简称，如果数据点中没有，则使用默认值
+                string tenantAbbreviation = TenantAbbreviation;
                 
-        //        // 从数据点中提取关键信息
-        //        if (dataPoint.TryGetValue("pointType", out object pointTypeObj))
-        //        {
-        //            alarmData["pointType"] = pointTypeObj;
-        //        }
+                // 构建告警数据
+                var alarmData = new Dictionary<string, object>
+                {
+                    ["projectId"] = projectId,
+                    ["ruleId"] = rule.Id,
+                    ["ruleName"] = rule.Name,
+                    ["alarmLevel"] ="warning", // 默认为warning级别
+                    ["alarmType"] = "scene_linkage",
+                    ["message"] = $"触发场景联动规则: {rule.Name}",
+                    ["conditionDetails"] = string.Join("; ", conditionResults),
+                    ["notified"] = false,
+                    ["acknowledged"] = false,
+                    ["remark"] = "",
+                    ["time"] = DateTime.Now
+                };
                 
-        //        if (dataPoint.TryGetValue("pointId", out object pointIdObj))
-        //        {
-        //            alarmData["pointId"] = pointIdObj;
-        //        }
+                // 从数据点中提取关键信息
+                if (dataPoint.TryGetValue("pointType", out object pointTypeObj))
+                {
+                    alarmData["pointType"] = pointTypeObj;
+                }
                 
-        //        // 如果有触发值，也添加到告警数据中
-        //        foreach (var condition in rule.Conditions ?? new List<JObject>())
-        //        {
-        //            string paramCode = condition["paramCode"]?.ToString();
-        //            if (!string.IsNullOrEmpty(paramCode) && dataPoint.TryGetValue(paramCode, out object paramValue))
-        //            {
-        //                alarmData[$"trigger_{paramCode}"] = paramValue;
-                        
-        //                // 如果有阈值，也添加到告警数据中
-        //                string conditionValue = condition["value"]?.ToString();
-        //                if (!string.IsNullOrEmpty(conditionValue))
-        //                {
-        //                    alarmData[$"threshold_{paramCode}"] = conditionValue;
-        //                }
-        //            }
-        //        }
+                if (dataPoint.TryGetValue("pointId", out object pointIdObj))
+                {
+                    alarmData["pointId"] = pointIdObj;
+                }
                 
-        //        // 保存到InfluxDB
-        //        var measurementName = "alarms";
-        //        var dataPoints = new List<Dictionary<string, object>> { alarmData };
+                // 解析规则条件
+                if (!string.IsNullOrEmpty(rule.RuleContentJson))
+                {
+                    var ruleContent = JsonConvert.DeserializeObject<JObject>(rule.RuleContentJson);
+                    if (ruleContent != null && ruleContent.ContainsKey("conditions"))
+                    {
+                        var conditions = ruleContent["conditions"] as JArray;
+                        if (conditions != null && conditions.Any())
+                        {
+                            // 遍历所有条件
+                            foreach (var condition in conditions)
+                            {
+                                string targetId = condition["targetId"]?.ToString();
+                                string paramCode = condition["paramCode"]?.ToString();
+                                string operatorType = condition["operator"]?.ToString();
+                                string conditionValue = condition["value"]?.ToString();
+                                
+                                // 如果数据点ID与条件中的目标ID匹配
+                                if (!string.IsNullOrEmpty(targetId) && 
+                                    dataPoint.TryGetValue("pointId", out object pointId) && 
+                                    pointId?.ToString() == targetId)
+                                {
+                                    // 添加目标ID到告警数据
+                                    alarmData["targetId"] = targetId;
+                                    
+                                    // 如果参数编码存在且数据点中有对应的值
+                                    if (!string.IsNullOrEmpty(paramCode) && 
+                                        dataPoint.TryGetValue(paramCode, out object paramValue))
+                                    {
+                                        // 添加触发参数和值到告警数据
+                                        alarmData[$"trigger_param"] = paramCode;
+                                        alarmData[$"trigger_value"] = paramValue;
+                                        alarmData[$"threshold_operator"] = operatorType;
+                                        alarmData[$"threshold_value"] = conditionValue;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
                 
-        //        await _dataRepository.SaveDataPointsAsync(measurementName, tenantAbbreviation, dataPoints);
+                // 保存到InfluxDB
+                var measurementName = "alarms";
+                var dataPoints = new List<Dictionary<string, object>> { alarmData };
                 
-        //        Logger.Info($"成功保存告警数据到InfluxDB，规则: {rule.Name}, 项目: {projectId}");
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        Logger.Error("保存告警数据到InfluxDB失败", ex);
-        //    }
-        //}
+                await _dataRepository.SaveDataPointsAsync(measurementName, tenantAbbreviation, dataPoints);
+                
+                Logger.Info($"成功保存告警数据到InfluxDB，规则: {rule.Name}, 项目: {projectId}");
+            }
+            catch (Exception ex)
+            {
+                Logger.Error("保存告警数据到InfluxDB失败", ex);
+            }
+        }
+        /// <summary>
+        /// 处理告警通知动作
+        /// </summary>
+        /// <param name="action">动作配置</param>
+        /// <param name="rule">规则链</param>
+        /// <param name="dataPoint">触发规则的数据点</param>
+        /// <param name="projectId">项目ID</param>
+        /// <returns>处理任务</returns>
+        private async Task ProcessAlarmNotifyAction(JToken action, RuleChainDto rule, Dictionary<string, object> dataPoint, string projectId)
+        {
+            try
+            {
+                // 获取告警场景ID
+                string alarmSceneId = action["alarmSceneId"]?.ToString();
+
+                if (string.IsNullOrEmpty(alarmSceneId))
+                {
+                    Logger.Warn("告警场景ID为空，无法处理告警通知");
+                    return;
+                }
+
+                Logger.Info($"处理告警通知动作，告警场景ID: {alarmSceneId}");
+
+                // TODO: 根据告警场景ID查询告警配置信息
+                // 例如：告警级别、通知方式、接收人等
+
+                // TODO: 发送告警通知
+                // 例如：短信、邮件、推送等
+            }
+            catch (Exception ex)
+            {
+                Logger.Error($"处理告警通知动作失败: {ex.Message}");
+            }
+        }
     }
 }
+
+
