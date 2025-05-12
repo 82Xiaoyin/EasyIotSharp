@@ -301,6 +301,7 @@ namespace EasyIotSharp.Core.Services.TenantAccount.Impl
             info.Icon = input.Icon;
             info.Url = input.Url;
             info.Sort = input.Sort;
+            info.Type = input.Type;
             info.IsEnable = input.IsEnable;
             info.IsSuperAdmin = input.IsSuperAdmin;
             info.OperatorId = ContextUser.UserId;
