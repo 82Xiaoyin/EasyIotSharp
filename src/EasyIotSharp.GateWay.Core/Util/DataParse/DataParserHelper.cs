@@ -4,6 +4,7 @@ using EasyIotSharp.GateWay.Core.Model.AnalysisDTO;
 using EasyIotSharp.GateWay.Core.Services;
 using EasyIotSharp.GateWay.Core.Socket;
 using log4net;
+using MongoDB.Bson.IO;
 using System;
 using System.Linq;
 using System.Text.Json;
