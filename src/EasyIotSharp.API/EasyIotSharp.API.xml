@@ -99,6 +99,13 @@
             </summary>
             <param name="id">记录ID</param>
         </member>
+        <member name="M:EasyIotSharp.API.Controllers.ExportController.QueryExportReport(EasyIotSharp.Core.Dto.Export.Params.ExportReportInput)">
+            <summary>
+            导出列表
+            </summary>
+            <param name="input">查询参数</param>
+            <returns>分页结果</returns>
+        </member>
         <member name="M:EasyIotSharp.API.Controllers.FileController.QueryResources(EasyIotSharp.Core.Dto.File.Params.ResourceInput)">
             <summary>
             资源列表

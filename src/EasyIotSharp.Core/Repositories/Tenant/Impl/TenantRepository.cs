@@ -113,5 +113,16 @@ namespace EasyIotSharp.Core.Repositories.Tenant.Impl
 
             return (totalCount, items);
         }
+
+        /// <summary>
+        /// 获取所有租户
+        /// </summary>
+        /// <returns></returns>
+        public async Task<List<EasyIotSharp.Core.Domain.Tenant.Tenant>> GetTenantList()
+        {
+            // 初始化条件
+            var predicate = PredicateBuilder.New<EasyIotSharp.Core.Domain.Tenant.Tenant>(t => t.IsDelete == false);
+            return await GetListAsync(predicate);
+        }
     }
 }

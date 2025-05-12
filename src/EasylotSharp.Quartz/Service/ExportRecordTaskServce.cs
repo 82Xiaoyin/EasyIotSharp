@@ -29,6 +29,9 @@ using log4net;
 
 namespace EasylotSharp.Quartz.Service
 {
+    /// <summary>
+    /// 租户手动导出数据
+    /// </summary>
     [DisallowConcurrentExecution]
     public class ExportRecordTaskServce : IJob
     {

@@ -39,6 +39,15 @@ namespace EasyIotSharp.Core.Services.Tenant.Impl
         }
 
         /// <summary>
+        /// 获取所有租户
+        /// </summary>
+        /// <returns></returns>
+        public async Task<List<EasyIotSharp.Core.Domain.Tenant.Tenant>> GetTenantList()
+        {
+            return await _tenantRepository.GetTenantList();
+        }
+
+        /// <summary>
         /// 获取单个租户信息
         /// </summary>
         /// <param name="id">租户ID</param>
@@ -64,10 +73,10 @@ namespace EasyIotSharp.Core.Services.Tenant.Impl
         /// </remarks>
         public async Task<PagedResultDto<TenantDto>> QueryTenant(QueryTenantInput input)
         {
-            if (string.IsNullOrEmpty(input.Keyword) && input.ExpiredType.Equals(-1) 
-                && input.ContractEndTime.IsNull() && 
-                input.ContractStartTime.IsNull() 
-                && input.IsPage.Equals(true) 
+            if (string.IsNullOrEmpty(input.Keyword) && input.ExpiredType.Equals(-1)
+                && input.ContractEndTime.IsNull() &&
+                input.ContractStartTime.IsNull()
+                && input.IsPage.Equals(true)
                 && input.PageIndex <= 5 && input.PageSize == 10)
             {
                 return await _tenantCacheService.QueryTenant(input, async () =>
@@ -78,7 +87,8 @@ namespace EasyIotSharp.Core.Services.Tenant.Impl
                     return new PagedResultDto<TenantDto>() { TotalCount = totalCount, Items = list };
                 });
             }
-            else {
+            else
+            {
                 var query = await _tenantRepository.Query(input.Keyword, input.ExpiredType, input.ContractStartTime, input.ContractEndTime, input.IsFreeze, input.PageIndex, input.PageSize);
                 int totalCount = query.totalCount;
                 var list = query.items.MapTo<List<TenantDto>>();
@@ -108,7 +118,7 @@ namespace EasyIotSharp.Core.Services.Tenant.Impl
             {
                 throw new BizException(BizError.BIND_EXCEPTION_ERROR, "租户名称重复");
             }
-            int numId= (await _tenantRepository.CountAsync()) + 1;
+            int numId = (await _tenantRepository.CountAsync()) + 1;
             //创建租户管理员账号
             string managerId = await _soldierService.InsertAdminSoldier(new InsertAdminSoldierInput()
             {
@@ -147,7 +157,7 @@ namespace EasyIotSharp.Core.Services.Tenant.Impl
             model.OperatorName = ContextUser.UserName;
             await _tenantRepository.InsertAsync(model);
             //清除缓存
-            await EventBus.TriggerAsync(new TenantEventData(){});
+            await EventBus.TriggerAsync(new TenantEventData() { });
         }
 
         /// <summary>
@@ -220,8 +230,8 @@ namespace EasyIotSharp.Core.Services.Tenant.Impl
             {
                 throw new BizException(BizError.BIND_EXCEPTION_ERROR, "未找到指定数据");
             }
-            if (info.IsFreeze!= input.IsFreeze)
-            {       
+            if (info.IsFreeze != input.IsFreeze)
+            {
                 info.IsFreeze = input.IsFreeze;
                 info.FreezeDes = input.FreezeDes;
                 info.UpdatedAt = DateTime.Now;

@@ -38,6 +38,7 @@ using EasyIotSharp.Core.Repositories.Export;
 using EasyIotSharp.Core.Repositories.Files;
 using EasyIotSharp.Core.Repositories.Files.Impl;
 using EasyIotSharp.Core.Repositories.Export.Impl;
+using EasyIotSharp.Core.Services.Export;
 
 namespace EasyIotSharp.Core
 {
@@ -108,6 +109,7 @@ namespace EasyIotSharp.Core
 
             IocManager.Register<IExportRecordRepository, ExportRecordRepository>();
             IocManager.Register<IResourceRepository, ResourceRepository>();
+            IocManager.Register<IExportReportRepository, ExportReportRepository>();
         }
 
         /// <summary>

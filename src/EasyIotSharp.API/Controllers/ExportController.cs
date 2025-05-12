@@ -14,10 +14,12 @@ namespace EasyIotSharp.API.Controllers
     public class ExportController : ApiControllerBase
     {
         private readonly IExportRecordService _exportRecordService;
+        private readonly IExportReportService _exportReportService;
 
         public ExportController()
         {
             _exportRecordService = UPrime.UPrimeEngine.Instance.Resolve<IExportRecordService>();
+            _exportReportService = UPrime.UPrimeEngine.Instance.Resolve<IExportReportService>();
         }
 
         /// <summary>
@@ -73,5 +75,18 @@ namespace EasyIotSharp.API.Controllers
             return new UPrimeResponse();
         }
 
+        /// <summary>
+        /// 导出列表
+        /// </summary>
+        /// <param name="input">查询参数</param>
+        /// <returns>分页结果</returns>
+        [HttpPost("/Export/ExportReport/Query")]
+        [Authorize]
+        public async Task<UPrimeResponse<PagedResultDto<ExportReportDto>>> QueryExportReport([FromBody] ExportReportInput input)
+        {
+            UPrimeResponse<PagedResultDto<ExportReportDto>> res = new UPrimeResponse<PagedResultDto<ExportReportDto>>();
+            res.Result = await _exportReportService.QueryExportReportPage(input);
+            return res;
+        }
     }
 }

@@ -29,5 +29,11 @@ namespace EasyIotSharp.Core.Repositories.Tenant
             int isFreeze,
             int pageIndex,
             int pageSize);
+
+        /// <summary>
+        /// 获取所有租户
+        /// </summary>
+        /// <returns></returns>
+        Task<List<EasyIotSharp.Core.Domain.Tenant.Tenant>> GetTenantList();
     }
 }

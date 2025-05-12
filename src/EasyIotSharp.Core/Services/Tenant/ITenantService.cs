@@ -10,6 +10,12 @@ namespace EasyIotSharp.Core.Services.Tenant
 {
     public interface ITenantService
     {
+
+        /// <summary>
+        /// 获取所有租户
+        /// </summary>
+        /// <returns></returns>
+        Task<List<EasyIotSharp.Core.Domain.Tenant.Tenant>> GetTenantList();
         /// <summary>
         /// 通过租户id获取一条租户信息
         /// </summary>
