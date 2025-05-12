@@ -11,6 +11,7 @@ using MongoDB.Bson.IO;
 using EasyIotSharp.Core.Dto.Export.Params;
 using OfficeOpenXml.FormulaParsing.Excel.Functions.DateTime;
 using Minio.DataModel;
+using UPrime.Services.Dto;
 
 namespace EasyIotSharp.Core.Services.Rule.Impl
 {
@@ -26,6 +27,87 @@ namespace EasyIotSharp.Core.Services.Rule.Impl
         /// </summary>
         public AlarmsService()
         {
+        }
+
+        /// <summary>
+        /// 获取报警数据
+        /// </summary>
+        /// <param name="input">查询参数，包含传感器ID、项目ID、时间范围等条件</param>
+        /// <returns>报警数据列表</returns>
+        public async Task<PagedResultDto<AlarmsDto>> GetAlarmsList(AlarmsInput input)
+        {
+            var list = new List<AlarmsDto>();
+            var measurementName = $"alarms";
+
+            var sqlBuilder = new StringBuilder("select *");
+            // 添加表名和条件
+            sqlBuilder.Append(" from ").Append(measurementName).Append(" where 1=1");
+
+            if (!string.IsNullOrEmpty(input.SensorPointId))
+            {
+                sqlBuilder.Append($" and pointid = '{input.SensorPointId}'");
+            }
+
+            if (!string.IsNullOrEmpty(input.ProjectId))
+            {
+                sqlBuilder.Append($" and projectid = '{input.ProjectId}'");
+            }
+
+            // 添加时间范围条件（如果有）
+            if (input.StartTime.HasValue && input.EndTime.HasValue)
+            {
+                sqlBuilder.Append($" and time >= '{input.StartTime.Value:yyyy-MM-ddTHH:mm:ss.fffZ}' and time <= '{input.EndTime.Value:yyyy-MM-ddTHH:mm:ss.fffZ}'");
+            }
+
+            if (input.IsSort)
+            {
+                // 添加排序
+                sqlBuilder.Append(" ORDER BY time DESC ");
+            }
+
+            var countsql = sqlBuilder.ToString();
+
+            if (input.IsPage == true && input.PageIndex > 0 && input.PageSize > 0)
+            {
+                sqlBuilder.Append($" Limit {input.PageSize}  Offset {input.PageIndex - 1}");
+            }
+
+            //暂时遗弃不需要加
+            //sqlBuilder.Append(" tz('Asia/Shanghai');");
+
+            // 创建仓储实例
+            var repository = InfluxdbRepositoryFactory.Create<Dictionary<string, object>>(
+                measurementName: measurementName,
+                tenantDatabase: input.Abbreviation == null ? ContextUser.TenantAbbreviation : input.Abbreviation
+            );
+
+            // 查询数据
+            var data = await repository.GetAsync(sqlBuilder.ToString());
+            var countdata = await repository.GetAsync(countsql);
+
+            var dicList = new List<Dictionary<string, object>>();
+
+            foreach (var item in data.Values)
+            {
+                var dic = new Dictionary<string, object>();
+                for (int j = 0; j < item.Count; j++)
+                {
+                    var rawTimestamp = item[j];
+                    // 直接使用原始时间戳进行格式化，避免转换损失精度
+                    if (rawTimestamp is DateTime dateTime)
+                    {
+                        dic.Add(data.Columns[j], dateTime.ToString("yyyy-MM-ddTHH:mm:ss.fffZ", System.Globalization.CultureInfo.InvariantCulture));
+                    }
+                    else
+                        dic.Add(data.Columns[j], item[j] == null ? null : item[j].ToString());
+                }
+                dicList.Add(dic);
+            }
+            list = ConvertToDtoList(dicList);
+            var result = new PagedResultDto<AlarmsDto>();
+            result.Items = list;
+            result.TotalCount = countdata.Values.Count;
+            return result;
         }
 
         /// <summary>

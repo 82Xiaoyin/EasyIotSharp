@@ -21,6 +21,7 @@ using System.IO.Compression;
 using EasyIotSharp.Core.Services.IO;
 using System.Threading;
 using EasyIotSharp.Core.Dto.Enum;
+using Nest;
 
 namespace EasyIotSharp.Core.Services.Project.Impl
 {
@@ -42,6 +43,11 @@ namespace EasyIotSharp.Core.Services.Project.Impl
 
             _projectBaseRepository = projectBaseRepository;
             _projectBaseCacheService = projectBaseCacheService;
+        }
+
+        public async Task<List<ProjectBaseDto>> GetProjectBaseDtos(int tenantNumId)
+        {
+            return await _projectBaseRepository.GetProjectBaseDtos(tenantNumId);
         }
 
         public async Task<ProjectBaseDto> GetProjectBase(string id)

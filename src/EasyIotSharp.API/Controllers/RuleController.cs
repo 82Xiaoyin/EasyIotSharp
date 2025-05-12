@@ -190,7 +190,7 @@ namespace EasyIotSharp.API.Controllers
 
 
         #region 报警记录
-        
+
         /// <summary>
         /// 获取报警记录
         /// </summary>
@@ -198,10 +198,10 @@ namespace EasyIotSharp.API.Controllers
         /// <returns></returns>
         [HttpPost("/Rule/Alarms/Query")]
         [Authorize]
-        public async Task<UPrimeResponse<List<AlarmsDto>>> QueryProjectBase([FromBody] AlarmsInput input)
+        public async Task<UPrimeResponse<PagedResultDto<AlarmsDto>>> QueryProjectBase([FromBody] AlarmsInput input)
         {
-            UPrimeResponse<List<AlarmsDto>> res = new UPrimeResponse<List<AlarmsDto>>();
-            res.Result = await _alarmsService.GetAlarmsData(input);
+            UPrimeResponse<PagedResultDto<AlarmsDto>> res = new UPrimeResponse<PagedResultDto<AlarmsDto>>();
+            res.Result = await _alarmsService.GetAlarmsList(input);
             return res;
         }
 

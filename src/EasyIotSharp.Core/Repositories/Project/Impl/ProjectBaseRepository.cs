@@ -10,6 +10,7 @@ using EasyIotSharp.Core.Domain.Queue;
 using OfficeOpenXml.FormulaParsing.Excel.Functions.Text;
 using EasyIotSharp.Core.Dto.Project;
 using EasyIotSharp.Core.Domain.Files;
+using System.Drawing.Printing;
 
 namespace EasyIotSharp.Core.Repositories.Project.Impl
 {
@@ -24,6 +25,44 @@ namespace EasyIotSharp.Core.Repositories.Project.Impl
         /// <param name="databaseProvider">数据库提供者</param>
         public ProjectBaseRepository(ISqlSugarDatabaseProvider databaseProvider) : base(databaseProvider)
         {
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="tenantNumId"></param>
+        /// <returns></returns>
+        public async Task<List<ProjectBaseDto>> GetProjectBaseDtos(int tenantNumId)
+        {
+            var sql = Client.Queryable<ProjectBase>()
+                 .LeftJoin<RabbitProject>((p, rp) => p.Id == rp.ProjectId && rp.IsDelete == false)
+                 .LeftJoin<RabbitServerInfo>((p, rp, rs) => rp.RabbitServerInfoId == rs.Id && rs.IsDelete == false)
+                 .LeftJoin<Resource>((p, rp, rs, r) => r.Id == p.ResourceId)
+                 .Where((p, rp, rs, r) => p.IsDelete == false);
+
+            if (tenantNumId > 0)
+            {
+                sql = sql.Where((p, rp, rs, r) => p.TenantNumId.Equals(tenantNumId));
+            }
+
+            return await sql.Select((p, rp, rs, r) => new ProjectBaseDto
+            {
+                Id = p.Id,
+                TenantNumId = p.TenantNumId,
+                Name = p.Name,
+                Address = p.Address,
+                CreationTime = p.CreationTime,
+                latitude = p.latitude,
+                Longitude = p.Longitude,
+                OperatorId = p.OperatorId,
+                OperatorName = p.OperatorName,
+                Remark = p.Remark,
+                State = p.State == 1 ? true : false,
+                Host = rs.Host,
+                RabbitServerInfoId = rs.Id,
+                ResourceId = r.Id,
+                ResourceUrl = r.Url,
+            }).ToListAsync();
         }
 
         /// <summary>

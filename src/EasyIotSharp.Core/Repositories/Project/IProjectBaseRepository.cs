@@ -12,6 +12,13 @@ namespace EasyIotSharp.Core.Repositories.Project
     public interface IProjectBaseRepository : IMySqlRepositoryBase<ProjectBase, string>
     {
         /// <summary>
+        /// 通过租户ID获取项目
+        /// </summary>
+        /// <param name="tenantNumId"></param>
+        /// <returns></returns>
+        Task<List<ProjectBaseDto>> GetProjectBaseDtos(int tenantNumId);
+
+        /// <summary>
         /// 通过条件分页查询项目列表
         /// </summary>
         /// <param name="tenantNumId">租户NumId</param>

@@ -13,6 +13,13 @@ namespace EasyIotSharp.Core.Services.Project
     public interface IProjectBaseService
     {
         /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="tenantNumId"></param>
+        /// <returns></returns>
+        Task<List<ProjectBaseDto>> GetProjectBaseDtos(int tenantNumId);
+
+        /// <summary>
         /// 通过id获取一条项目信息
         /// </summary>
         /// <param name="id"></param>
