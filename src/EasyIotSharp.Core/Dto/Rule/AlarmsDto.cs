@@ -14,6 +14,7 @@ namespace EasyIotSharp.Core.Dto.Rule
         public string message { get; set; }
         public bool notified { get; set; }
         public string pointid { get; set; }
+        public string pointName { get; set; }
         public string sensorid { get; set; }
         public string sensorname { get; set; }
         public string pointtype { get; set; }

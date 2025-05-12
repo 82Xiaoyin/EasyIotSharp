@@ -6957,6 +6957,13 @@
             </summary>
             <param name="databaseProvider">数据库提供者</param>
         </member>
+        <member name="M:EasyIotSharp.Core.Repositories.Project.Impl.ProjectBaseRepository.GetProjectBaseDtos(System.Int32)">
+            <summary>
+            
+            </summary>
+            <param name="tenantNumId"></param>
+            <returns></returns>
+        </member>
         <member name="M:EasyIotSharp.Core.Repositories.Project.Impl.ProjectBaseRepository.Query(System.Int32,System.String,System.Int32,System.Nullable{System.DateTime},System.Nullable{System.DateTime},System.Int32,System.Int32)">
             <summary>
             查询项目列表
@@ -7043,6 +7050,13 @@
             获取列表
             </summary>
             <param name="sensorPointId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EasyIotSharp.Core.Repositories.Project.IProjectBaseRepository.GetProjectBaseDtos(System.Int32)">
+            <summary>
+            通过租户ID获取项目
+            </summary>
+            <param name="tenantNumId"></param>
             <returns></returns>
         </member>
         <member name="M:EasyIotSharp.Core.Repositories.Project.IProjectBaseRepository.Query(System.Int32,System.String,System.Int32,System.Nullable{System.DateTime},System.Nullable{System.DateTime},System.Int32,System.Int32)">
@@ -8901,6 +8915,13 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="M:EasyIotSharp.Core.Services.Project.IProjectBaseService.GetProjectBaseDtos(System.Int32)">
+            <summary>
+            
+            </summary>
+            <param name="tenantNumId"></param>
+            <returns></returns>
+        </member>
         <member name="M:EasyIotSharp.Core.Services.Project.IProjectBaseService.GetProjectBase(System.String)">
             <summary>
             通过id获取一条项目信息
@@ -9114,6 +9135,13 @@
             <param name="input"></param>
             <returns></returns>
         </member>
+        <member name="M:EasyIotSharp.Core.Services.Rule.IAlarmsService.GetAlarmsList(EasyIotSharp.Core.Dto.Rule.Params.AlarmsInput)">
+            <summary>
+            
+            </summary>
+            <param name="input"></param>
+            <returns></returns>
+        </member>
         <member name="M:EasyIotSharp.Core.Services.Rule.IAlarmsService.GetAlarmsData(EasyIotSharp.Core.Dto.Rule.Params.AlarmsInput)">
             <summary>
             报警列表
@@ -9173,10 +9201,17 @@
             用于处理系统报警相关的业务逻辑
             </summary>
         </member>
-        <member name="M:EasyIotSharp.Core.Services.Rule.Impl.AlarmsService.#ctor">
+        <member name="M:EasyIotSharp.Core.Services.Rule.Impl.AlarmsService.#ctor(EasyIotSharp.Core.Repositories.Project.ISensorPointRepository)">
             <summary>
             构造函数
             </summary>
+        </member>
+        <member name="M:EasyIotSharp.Core.Services.Rule.Impl.AlarmsService.GetAlarmsList(EasyIotSharp.Core.Dto.Rule.Params.AlarmsInput)">
+            <summary>
+            获取报警数据
+            </summary>
+            <param name="input">查询参数，包含传感器ID、项目ID、时间范围等条件</param>
+            <returns>报警数据列表</returns>
         </member>
         <member name="M:EasyIotSharp.Core.Services.Rule.Impl.AlarmsService.GetAlarmsData(EasyIotSharp.Core.Dto.Rule.Params.AlarmsInput)">
             <summary>

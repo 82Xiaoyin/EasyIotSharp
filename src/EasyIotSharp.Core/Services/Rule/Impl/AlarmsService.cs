@@ -12,6 +12,10 @@ using EasyIotSharp.Core.Dto.Export.Params;
 using OfficeOpenXml.FormulaParsing.Excel.Functions.DateTime;
 using Minio.DataModel;
 using UPrime.Services.Dto;
+using EasyIotSharp.Core.Repositories.Rule;
+using EasyIotSharp.Core.Repositories.Project;
+using EasyIotSharp.Core.Repositories.Project.Impl;
+using System.Linq;
 
 namespace EasyIotSharp.Core.Services.Rule.Impl
 {
@@ -21,12 +25,13 @@ namespace EasyIotSharp.Core.Services.Rule.Impl
     /// </summary>
     public class AlarmsService : ServiceBase, IAlarmsService
     {
-        // 数据仓库服务，用于存储告警数据
+        private readonly ISensorPointRepository _sensorPointRepository;
         /// <summary>
         /// 构造函数
         /// </summary>
-        public AlarmsService()
+        public AlarmsService(ISensorPointRepository sensorPointRepository)
         {
+            _sensorPointRepository = sensorPointRepository;
         }
 
         /// <summary>
@@ -39,6 +44,8 @@ namespace EasyIotSharp.Core.Services.Rule.Impl
             var list = new List<AlarmsDto>();
             var measurementName = $"alarms";
 
+
+            var sensorPointList = _sensorPointRepository.GetSensorPointList();
             var sqlBuilder = new StringBuilder("select *");
             // 添加表名和条件
             sqlBuilder.Append(" from ").Append(measurementName).Append(" where 1=1");
@@ -104,6 +111,7 @@ namespace EasyIotSharp.Core.Services.Rule.Impl
                 dicList.Add(dic);
             }
             list = ConvertToDtoList(dicList);
+            list.ForEach(f => f.pointName = sensorPointList.Where(w => w.Id == f.pointid).FirstOrDefault()?.Name ?? "");
             var result = new PagedResultDto<AlarmsDto>();
             result.Items = list;
             result.TotalCount = countdata.Values.Count;
@@ -165,23 +173,26 @@ namespace EasyIotSharp.Core.Services.Rule.Impl
 
             var dicList = new List<Dictionary<string, object>>();
 
-            foreach (var item in data.Values)
+            if (data.Values != null)
             {
-                var dic = new Dictionary<string, object>();
-                for (int j = 0; j < item.Count; j++)
+                foreach (var item in data.Values)
                 {
-                    var rawTimestamp = item[j];
-                    // 直接使用原始时间戳进行格式化，避免转换损失精度
-                    if (rawTimestamp is DateTime dateTime)
+                    var dic = new Dictionary<string, object>();
+                    for (int j = 0; j < item.Count; j++)
                     {
-                        dic.Add(data.Columns[j], dateTime.ToString("yyyy-MM-ddTHH:mm:ss.fffZ", System.Globalization.CultureInfo.InvariantCulture));
+                        var rawTimestamp = item[j];
+                        // 直接使用原始时间戳进行格式化，避免转换损失精度
+                        if (rawTimestamp is DateTime dateTime)
+                        {
+                            dic.Add(data.Columns[j], dateTime.ToString("yyyy-MM-ddTHH:mm:ss.fffZ", System.Globalization.CultureInfo.InvariantCulture));
+                        }
+                        else
+                            dic.Add(data.Columns[j], item[j] == null ? null : item[j].ToString());
                     }
-                    else
-                        dic.Add(data.Columns[j], item[j] == null ? null : item[j].ToString());
+                    dicList.Add(dic);
                 }
-                dicList.Add(dic);
+                list = ConvertToDtoList(dicList);
             }
-            list = ConvertToDtoList(dicList);
 
             return list;
         }

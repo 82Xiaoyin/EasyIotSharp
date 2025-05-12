@@ -75,7 +75,9 @@ namespace EasylotSharp.Quartz
             IScheduler scheduler = await schedulerFactory.GetScheduler();
 
             // 创建作业
-            IJobDetail job = JobBuilder.Create<ExportRecordTaskServce>()
+            IJobDetail exportRecordTask = JobBuilder.Create<ExportRecordTaskServce>()
+                .Build();
+            IJobDetail exportRecordDayTask = JobBuilder.Create<ExportRecordDayTaskService>()
                 .Build();
 
             // 使用 Cron 表达式定义触发器（每分钟执行一次）
@@ -84,7 +86,8 @@ namespace EasylotSharp.Quartz
                 .Build();
 
             // 调度任务
-            await scheduler.ScheduleJob(job, trigger);
+            await scheduler.ScheduleJob(exportRecordDayTask, trigger);
+            //await scheduler.ScheduleJob(exportRecordTask, trigger);
 
             // 启动调度器
             await scheduler.Start();

@@ -23,7 +23,7 @@ namespace EasylotSharp.Quartz.Util.Export
         /// <param name="font">字体设置</param>
         /// <param name="brush">画笔颜色</param>
         /// <param name="position">起始位置坐标</param>
-        private void DrawMultilineText(XGraphics gfx, string text, XFont font, XBrush brush, XPoint position)
+        private static void DrawMultilineText(XGraphics gfx, string text, XFont font, XBrush brush, XPoint position)
         {
             string[] lines = text.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.None);
             double lineHeight = font.Height * 1.5; // 1.5倍行距
@@ -57,7 +57,7 @@ namespace EasylotSharp.Quartz.Util.Export
         /// 3. 支持中文字体显示
         /// 4. 同时保存到文件系统和返回内存流
         /// </remarks>
-        public MemoryStream GenerateSimplePdf(string text, string fileName)
+        public static MemoryStream GenerateSimplePdf(string text, string fileName)
         {
             try
             {
@@ -72,12 +72,6 @@ namespace EasylotSharp.Quartz.Util.Export
 
                 // 创建内存流，用于存储PDF内容
                 var memoryStream = new MemoryStream();
-
-                // 设置文件保存路径
-                string currentDirectory = AppDomain.CurrentDomain.BaseDirectory;
-                string filesDirectory = Path.Combine(currentDirectory, "Files");
-                Directory.CreateDirectory(filesDirectory);
-                string outputPath = Path.Combine(filesDirectory, fileName);
 
                 // 创建PDF文档并设置内容
                 using (var document = new PdfDocument())
@@ -107,18 +101,6 @@ namespace EasylotSharp.Quartz.Util.Export
                     memoryStream.Position = 0; // 重置流位置到开始
                 }
 
-                // 如果提供了文件名，则同时保存到文件系统
-                if (!string.IsNullOrEmpty(fileName))
-                {
-                    using (var fileStream = File.Create(outputPath))
-                    {
-                        memoryStream.Position = 0;
-                        memoryStream.CopyTo(fileStream);
-                    }
-                    Console.WriteLine($"PDF文件已保存到: {outputPath}");
-                }
-
-                Console.WriteLine($"PDF文件已保存到内存流中");
                 return memoryStream;
             }
             catch (Exception ex)
