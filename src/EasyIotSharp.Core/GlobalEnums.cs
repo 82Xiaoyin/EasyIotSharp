@@ -77,5 +77,9 @@ namespace EasyIotSharp.Core
         Number = 3,
         [EnumAlias("select")]
         Select = 4,
+        [EnumAlias("inputnumber")]
+        InputNumber = 5,
+        [EnumAlias("switch")]
+        Switch = 6,
     }
 }
