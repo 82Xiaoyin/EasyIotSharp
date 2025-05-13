@@ -52,8 +52,9 @@ namespace EasyIotSharp.Core.Services.Export.Impl
                 Id = Guid.NewGuid().ToString().Replace("-", ""),
                 Name = input.Name,
                 ProjectId = input.ProjectId,
+                ResourceId = input.ResourceId,
                 Type = input.Type,
-                State = 0, // 初始状态：未执行
+                State = 1, // 初始状态：未执行
                 UpdatedAt = DateTime.Now,
                 CreationTime = DateTime.Now,
                 OperatorId = "System",

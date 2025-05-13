@@ -12,10 +12,13 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="itext7" Version="7.2.5" />
     <PackageReference Include="log4net" Version="3.0.4" />
     <PackageReference Include="Microsoft.Graph" Version="5.77.0" />
     <PackageReference Include="PDFsharp" Version="6.1.1" />
     <PackageReference Include="Quartz" Version="3.6.0" />
+    <PackageReference Include="ScottPlot" Version="4.1.68" />
+    <PackageReference Include="System.Drawing.Common" Version="6.0.0" />
   </ItemGroup>
 
   <ItemGroup>

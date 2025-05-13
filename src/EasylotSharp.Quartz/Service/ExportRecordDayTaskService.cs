@@ -53,10 +53,10 @@ namespace EasylotSharp.Quartz.Service
                 Logger.Info($"当前时间：{DateTime.Now}，开始执行日报");
                 var _tenantService = UPrimeEngine.Instance.Resolve<ITenantService>();
                 Logger.Info("成功获取租户服务实例");
-                
+
                 var list = await _tenantService.GetTenantList();
                 Logger.Info($"成功获取租户列表，共 {list?.Count ?? 0} 个租户");
-                
+
                 await HandleTenant(list);
                 Logger.Info("日报导出任务执行完成");
             }
@@ -90,7 +90,7 @@ namespace EasylotSharp.Quartz.Service
             // 获取传感器和测点列表
             var sensorList = sensorQService.GetSensorList();
             Logger.Info($"获取传感器列表成功，共 {sensorList?.Count ?? 0} 个传感器");
-            
+
             var sensorPointList = sensorPointService.GetBySensorPointList();
             Logger.Info($"获取测点列表成功，共 {sensorPointList?.Count ?? 0} 个测点");
 
@@ -144,48 +144,101 @@ namespace EasylotSharp.Quartz.Service
                                 sb.AppendLine();
                             }
 
-                            // 生成PDF并保存到临时文件
-                            using var memoryStream = PDFHelper.GenerateSimplePdf(sb.ToString(), name);
-                            Logger.Info($"PDF生成成功：{name}");
+                            // 按小时统计告警数量并转换为所需格式
+                            var chartData = alarmData
+                                .GroupBy(a => a.time.ToDateTime().Hour)
+                                .OrderBy(g => g.Key)
+                                .Select(g => (Hour: g.Key, Count: g.Count()))
+                                .ToList();
+                            if (chartData.Any())
+                            {
+                                continue;
+                            }
+                            byte[] chartImage = null;
+                            // 在生成图表之前添加日志
+                            if (!chartData.Any())
+                            {
+                                Logger.Info($"项目 {project.Name} 在指定时间段内没有告警数据");
+                            }
+                            else
+                            {
+                                // 生成折线图
+                                chartImage = PDFHelper.GenerateHourlyAlarmChart(
+                                   chartData,
+                                   $"{project.Name} - 24小时告警趋势",
+                                   800,
+                                   400
+                               );
+                            }
+
+
+                            // 在 HandleTenant 方法中，修改 PDF 生成和保存部分的代码
+                            var content = sb.ToString();
+                            if (string.IsNullOrEmpty(content))
+                            {
+                                Logger.Warn($"生成的报告内容为空：{name}");
+                                content = "无告警数据";  // 设置默认内容
+                            }
+
+                            byte[] pdfBytes = null;
+                            using (var memoryStream = new MemoryStream())
+                            {
+                                pdfBytes = PDFHelper.GenerateSimplePdf(content, name, chartImage);
+                                memoryStream.Close();
+                            }
+
+                            if (pdfBytes == null || pdfBytes.Length == 0)
+                            {
+                                Logger.Error($"生成的PDF内容为空：{name}");
+                                continue;
+                            }
+
+                            Logger.Info($"PDF内容生成成功：{name}，内容大小：{pdfBytes.Length} 字节");
+
                             pdfPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "ExportFiles", $"{name}.pdf");
                             var directory = Path.GetDirectoryName(pdfPath);
-                            
+
                             // 确保导出目录存在
                             if (!Directory.Exists(directory))
                             {
                                 Directory.CreateDirectory(directory);
                             }
 
-                            // 将PDF内容写入文件
-                            using (var fileStream = new FileStream(pdfPath, FileMode.Create, FileAccess.Write))
+                            try
                             {
-                                memoryStream.Position = 0;
-                                memoryStream.CopyTo(fileStream);
+                                // 直接写入文件
+                                File.WriteAllBytes(pdfPath, pdfBytes);
+                                Logger.Info($"PDF文件保存成功：{pdfPath}");
+
+                                // 准备上传资源模型
+                                var resourceModel = new ResourceInsert
+                                {
+                                    Abbreviation = tenantItem.Abbreviation,
+                                    Name = name,
+                                    Remark = "日报生成"
+                                };
+
+                                // 上传PDF文件到资源服务
+                                var resourceId = await UploadZipFile(pdfPath, resourceModel, resourceService);
+                                Logger.Info($"PDF文件上传成功，资源ID：{resourceId}");
+
+                                // 创建导出报告记录
+                                var insertexportReport = new ExportReportInsert
+                                {
+                                    ExecuteTime = DateTime.Now,
+                                    Type = 0,
+                                    Name = name + ".pdf",
+                                    ProjectId = project.Id,
+                                    State = 1,
+                                    ResourceId = resourceId
+                                };
+                                await exportReportService.CreateExportReport(insertexportReport);
                             }
-
-                            // 准备上传资源模型
-                            var resourceModel = new ResourceInsert
+                            catch (Exception ex)
                             {
-                                Abbreviation = tenantItem.Abbreviation,
-                                Name = name,
-                                Remark = "日报生成"
-                            };
-
-                            // 上传PDF文件并获取资源ID
-                            var resourceId = await UploadZipFile(pdfPath, resourceModel, resourceService);
-                            Logger.Info($"PDF文件上传成功，资源ID：{resourceId}");
-
-                            // 创建导出报告记录
-                            var insertexportReport = new ExportReportInsert
-                            {
-                                ExecuteTime = DateTime.Now,
-                                Type = 0,
-                                Name = name + ".pdf",
-                                ProjectId = project.Id,
-                                State = 1,
-                                ResourceId = resourceId
-                            };
-                            await exportReportService.CreateExportReport(insertexportReport);
+                                Logger.Error($"处理PDF文件时发生错误: {ex.Message}", ex);
+                                throw;
+                            }
                         }
                         catch (Exception ex)
                         {

@@ -24,7 +24,7 @@ namespace EasylotSharp.Quartz
             // 添加 log4net 配置初始化
             var logRepository = LogManager.GetRepository(Assembly.GetEntryAssembly());
             XmlConfigurator.Configure(logRepository, new FileInfo("log4net.config"));
-            
+
             //var builder = WebApplication.CreateBuilder(args);
 
             //// 注册 Quartz 服务
@@ -79,15 +79,27 @@ namespace EasylotSharp.Quartz
                 .Build();
             IJobDetail exportRecordDayTask = JobBuilder.Create<ExportRecordDayTaskService>()
                 .Build();
+            //IJobDetail exportRecordMonthTask = JobBuilder.Create<ExportRecordMonthTaskService>()
+            //    .Build();
 
-            // 使用 Cron 表达式定义触发器（每分钟执行一次）
+            // 使用 Cron 表达式定义触发器（每秒钟执行一次）
             ITrigger trigger = TriggerBuilder.Create()
-                .WithCronSchedule("* * * * * ?") // 每分钟执行一次
+                .WithCronSchedule("* * * * * ?") // 每秒钟执行一次
+                .Build();
+
+            ITrigger exportRecordDayTrigger = TriggerBuilder.Create()
+                .WithCronSchedule("0 10 0 * * ?") // 每天凌晨 00:10 执行
+                .Build();
+
+            ITrigger exportRecordMonthTrigger = TriggerBuilder.Create()
+                .WithCronSchedule("0 30 0 1 * ?") // 每月1号凌晨 00:30 执行
                 .Build();
 
             // 调度任务
             await scheduler.ScheduleJob(exportRecordDayTask, trigger);
             //await scheduler.ScheduleJob(exportRecordTask, trigger);
+            //await scheduler.ScheduleJob(exportRecordDayTask, exportRecordDayTrigger);
+            //await scheduler.ScheduleJob(exportRecordMonthTask, exportRecordMonthTrigger);
 
             // 启动调度器
             await scheduler.Start();
