@@ -105,6 +105,7 @@ namespace EasylotSharp.Quartz.Service
 
                     foreach (var project in projectList)
                     {
+                        PDFHelper pDFHelper = new PDFHelper();
                         Logger.Info($"开始处理项目：{project.Name}");
                         string pdfPath = null;
                         try
@@ -163,7 +164,7 @@ namespace EasylotSharp.Quartz.Service
                             else
                             {
                                 // 生成折线图
-                                chartImage = PDFHelper.GenerateHourlyAlarmChart(
+                                chartImage = pDFHelper.GenerateHourlyAlarmChart(
                                    chartData,
                                    $"{project.Name} - 24小时告警趋势",
                                    800,
@@ -183,7 +184,7 @@ namespace EasylotSharp.Quartz.Service
                             byte[] pdfBytes = null;
                             using (var memoryStream = new MemoryStream())
                             {
-                                pdfBytes = PDFHelper.GenerateSimplePdf(content, name, chartImage);
+                                pdfBytes = pDFHelper.GenerateSimplePdf(content, name, chartImage);
                                 memoryStream.Close();
                             }
 

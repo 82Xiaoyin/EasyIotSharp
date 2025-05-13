@@ -13,17 +13,16 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using iText.Kernel.Colors;
-using static iText.Kernel.Font.PdfFontFactory;
 
 namespace EasylotSharp.Quartz.Util.Export
 {
-    public static class PDFHelper
+    public  class PDFHelper
     {
         // 添加字体缓存
-        private static PdfFont _simsunFont;
+        private  PdfFont _simsunFont;
 
         // 获取中文字体
-        private static PdfFont GetChineseFont()
+        private  PdfFont GetChineseFont()
         {
             if (_simsunFont == null)
             {
@@ -61,7 +60,7 @@ namespace EasylotSharp.Quartz.Util.Export
             return _simsunFont;
         }
 
-        public static byte[] GenerateHourlyAlarmChart(
+        public  byte[] GenerateHourlyAlarmChart(
             IEnumerable<(int Hour, int Count)> hourlyData,
             string title,
             int width = 800,
@@ -137,7 +136,7 @@ namespace EasylotSharp.Quartz.Util.Export
         /// <summary>
         /// 处理文本换行的辅助方法
         /// </summary>
-        private static string ProcessMultilineText(string text)
+        private  string ProcessMultilineText(string text)
         {
             if (string.IsNullOrEmpty(text)) return string.Empty;
 
@@ -165,7 +164,7 @@ namespace EasylotSharp.Quartz.Util.Export
             return sb.ToString().TrimEnd();
         }
 
-        public static byte[] GenerateSimplePdf(string content, string title, byte[] chartImage = null)
+        public  byte[] GenerateSimplePdf(string content, string title, byte[] chartImage = null)
         {
             if (string.IsNullOrEmpty(content)) throw new ArgumentNullException(nameof(content));
             if (string.IsNullOrEmpty(title)) throw new ArgumentNullException(nameof(title));
