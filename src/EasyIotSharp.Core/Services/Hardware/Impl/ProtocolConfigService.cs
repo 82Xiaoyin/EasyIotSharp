@@ -155,7 +155,11 @@ namespace EasyIotSharp.Core.Services.Hardware.Impl
         /// </remarks>
         public async Task InsertProtocolConfig(InsertProtocolConfigInput input)
         {
-            var isExistName = await _protocolConfigRepository.FirstOrDefaultAsync(x => x.Identifier == input.Identifier && x.IsDelete == false);
+            if (input.ProtocolId.IsNull())
+            {
+                throw new BizException(BizError.BIND_EXCEPTION_ERROR, "协议id不能为空");
+            }
+            var isExistName = await _protocolConfigRepository.FirstOrDefaultAsync(x => x.Identifier == input.Identifier && x.ProtocolId == input.ProtocolId && x.IsDelete == false);
             if (isExistName.IsNotNull())
             {
                 throw new BizException(BizError.BIND_EXCEPTION_ERROR, "标识符重复");
@@ -226,7 +230,11 @@ namespace EasyIotSharp.Core.Services.Hardware.Impl
             {
                 throw new BizException(BizError.BIND_EXCEPTION_ERROR, "协议配置不存在");
             }
-            var isExistName = await _protocolConfigRepository.FirstOrDefaultAsync(x => x.Identifier == input.Identifier && x.IsDelete == false);
+            if (input.ProtocolId.IsNull())
+            {
+                throw new BizException(BizError.BIND_EXCEPTION_ERROR, "协议id不能为空");
+            }
+            var isExistName = await _protocolConfigRepository.FirstOrDefaultAsync(x => x.Identifier == input.Identifier && x.ProtocolId==input.ProtocolId && x.IsDelete == false);
             if (isExistName.IsNotNull() && isExistName.Id != input.Id)
             {
                 throw new BizException(BizError.BIND_EXCEPTION_ERROR, "标识符重复");

@@ -387,10 +387,13 @@ namespace EasyIotSharp.Core.Services.IO.Impl
         /// <param name="bucketName">桶名</param>
         /// <param name="fileName">文件名</param>
         /// <returns>文件流</returns>
+        /// <summary> 
         public async Task<Stream> DownloadAsync(string bucketName, string fileName)
         {
             try
             {
+                _logger?.LogInformation($"开始下载文件 {fileName} 从 {bucketName}");
+
                 var stream = new MemoryStream();
                 var args = new GetObjectArgs()
                     .WithBucket(bucketName)
@@ -401,6 +404,35 @@ namespace EasyIotSharp.Core.Services.IO.Impl
                 stream.Position = 0;
                 _logger?.LogInformation($"文件 {fileName} 从 {bucketName} 下载成功");
                 return stream;
+            }
+            catch (Minio.Exceptions.ObjectNotFoundException ex)
+            {
+                _logger?.LogWarning($"文件 {fileName} 在存储桶 {bucketName} 中不存在");
+
+                // 尝试URL编码文件名再次尝试
+                try
+                {
+                    string encodedFileName = string.Join("/",
+                        fileName.Split('/').Select(segment => Uri.EscapeDataString(segment)));
+
+                    _logger?.LogInformation($"尝试使用编码后的文件名下载: {encodedFileName}");
+
+                    var stream = new MemoryStream();
+                    var args = new GetObjectArgs()
+                        .WithBucket(bucketName)
+                        .WithObject(encodedFileName)
+                        .WithCallbackStream(s => s.CopyTo(stream));
+
+                    await _minioClient.GetObjectAsync(args);
+                    stream.Position = 0;
+                    _logger?.LogInformation($"使用编码后的文件名下载成功");
+                    return stream;
+                }
+                catch (Exception innerEx)
+                {
+                    _logger?.LogError(innerEx, $"使用编码后的文件名下载失败");
+                    throw ex; // 抛出原始异常
+                }
             }
             catch (Exception ex)
             {
