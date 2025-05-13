@@ -151,10 +151,7 @@ namespace EasylotSharp.Quartz.Service
                                 .OrderBy(g => g.Key)
                                 .Select(g => (Hour: g.Key, Count: g.Count()))
                                 .ToList();
-                            if (chartData.Any())
-                            {
-                                continue;
-                            }
+                            
                             byte[] chartImage = null;
                             // 在生成图表之前添加日志
                             if (!chartData.Any())
