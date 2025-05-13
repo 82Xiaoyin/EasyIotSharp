@@ -13,16 +13,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using iText.Kernel.Colors;
+using iText.StyledXmlParser.Jsoup.Nodes;
 
 namespace EasylotSharp.Quartz.Util.Export
 {
-    public  class PDFHelper
+    public class PDFHelper
     {
         // 添加字体缓存
-        private  PdfFont _simsunFont;
+        private PdfFont _simsunFont;
 
         // 获取中文字体
-        private  PdfFont GetChineseFont()
+        private PdfFont GetChineseFont()
         {
             if (_simsunFont == null)
             {
@@ -60,7 +61,92 @@ namespace EasylotSharp.Quartz.Util.Export
             return _simsunFont;
         }
 
-        public  byte[] GenerateHourlyAlarmDayChart(
+        public byte[] GenerateAlarmTrendChart(
+    Dictionary<string, List<int>> alarmTrends,
+    List<string> dateLabels,
+    string title)
+        {
+            // 检查数据是否为空
+            if (alarmTrends == null || !alarmTrends.Any() || dateLabels == null || !dateLabels.Any())
+            {
+                return null;
+            }
+
+            // 创建新的图表
+            var plt = new Plot(800, 400);
+
+            // 定义颜色数组
+            var colors = new[] {
+        System.Drawing.Color.Blue,
+        System.Drawing.Color.Red,
+        System.Drawing.Color.Green,
+        System.Drawing.Color.Orange,
+        System.Drawing.Color.Purple
+    };
+            int colorIndex = 0;
+
+            // 为每个传感器绘制折线图
+            foreach (var trend in alarmTrends)
+            {
+                var yData = trend.Value.Select(v => (double)v).ToArray();
+                var xData = Enumerable.Range(0, yData.Length).Select(i => (double)i).ToArray();
+
+                // 使用更简单的 API 绘制折线图
+                plt.PlotScatter(xData, yData,
+                    label: trend.Key,
+                    lineWidth: 2,
+                    markerSize: 5,
+                    color: colors[colorIndex % colors.Length]);
+
+                colorIndex++;
+            }
+
+            // 设置标题和标签
+            plt.Title(title);
+            plt.XLabel("日期");
+            plt.YLabel("告警数量");
+
+            // 设置 X 轴范围和刻度
+            plt.SetAxisLimits(xMin: -0.5, xMax: dateLabels.Count - 0.5);
+            plt.XAxis.ManualTickPositions(
+                Enumerable.Range(0, dateLabels.Count).Select(i => (double)i).ToArray(),
+                dateLabels.ToArray());
+
+            // 添加网格线
+            plt.Grid(true);
+
+            // 添加图例
+            plt.Legend();
+
+            // 导出为图片
+            string chartDirectory = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "ExportFiles");
+            // 确保目录存在
+            if (!Directory.Exists(chartDirectory))
+            {
+                Directory.CreateDirectory(chartDirectory);
+            }
+            string tempFilePath = Path.Combine(chartDirectory, $"chart_{Guid.NewGuid()}.png");
+            try
+            {
+                // 先保存到文件
+                plt.SaveFig(tempFilePath);
+
+                // 读取文件内容
+                byte[] imageBytes = File.ReadAllBytes(tempFilePath);
+
+                return imageBytes;
+            }
+            finally
+            {
+                // 确保临时文件被删除
+                if (File.Exists(tempFilePath))
+                {
+                    File.Delete(tempFilePath);
+                }
+            }
+        }
+
+        public byte[] GenerateHourlyAlarmDayChart(
             IEnumerable<(int Hour, int Count)> hourlyData,
             string title,
             int width = 800,
@@ -136,7 +222,7 @@ namespace EasylotSharp.Quartz.Util.Export
         /// <summary>
         /// 处理文本换行的辅助方法
         /// </summary>
-        private  string ProcessMultilineText(string text)
+        private string ProcessMultilineText(string text)
         {
             if (string.IsNullOrEmpty(text)) return string.Empty;
 
@@ -164,7 +250,7 @@ namespace EasylotSharp.Quartz.Util.Export
             return sb.ToString().TrimEnd();
         }
 
-        public  byte[] GenerateSimplePdf(string content, string title, byte[] chartImage = null)
+        public byte[] GenerateSimplePdf(string content, string title, byte[] chartImage = null)
         {
             if (string.IsNullOrEmpty(content)) throw new ArgumentNullException(nameof(content));
             if (string.IsNullOrEmpty(title)) throw new ArgumentNullException(nameof(title));
@@ -178,7 +264,7 @@ namespace EasylotSharp.Quartz.Util.Export
                 // 创建PDF文档
                 var writer = new PdfWriter(memoryStream);
                 var pdf = new PdfDocument(writer);
-                var document = new Document(pdf);
+                var document = new iText.Layout.Document(pdf);
 
                 try
                 {
