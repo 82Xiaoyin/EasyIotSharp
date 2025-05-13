@@ -253,9 +253,9 @@ namespace EasyIotSharp.Core.Services.Files.Impl
                     throw new BizException(BizError.BIND_EXCEPTION_ERROR, "资源URL不存在");
                 }
 
-                // 从URL中提取对象名称
+                // 从URL中提取对象名称 
                 var uri = new Uri(resource.Url);
-                var pathSegments = uri.AbsolutePath.Split('/').Skip(2).ToArray(); // 跳过前两个段
+                var pathSegments = uri.AbsolutePath.Split('/').Skip(2).ToArray(); // 跳过前两个段 
 
                 if (pathSegments.Length < 1)
                 {
@@ -263,7 +263,13 @@ namespace EasyIotSharp.Core.Services.Files.Impl
                 }
 
                 string bucketName = ContextUser?.TenantAbbreviation.ToLower();
-                string objectName = string.Join("/", pathSegments);
+
+                // 修改这里：进行两次URL解码
+                string objectName = string.Join("/", pathSegments.Select(segment =>
+                    Uri.UnescapeDataString(Uri.UnescapeDataString(segment)) // 解码两次
+                ));
+
+                Logger.Info($"尝试下载文件，存储桶: {bucketName}, 对象名称: {objectName}");
 
                 // 获取文件流
                 var fileStream = await _minIOFileService.DownloadAsync(bucketName, objectName);
@@ -288,7 +294,7 @@ namespace EasyIotSharp.Core.Services.Files.Impl
             }
             catch (Exception ex)
             {
-                Logger.Error($"下载资源失败: {ex.Message}", ex);
+                Logger.Error($"下载资源失败: {ex.ToString()}", ex);
                 throw new BizException(BizError.BIND_EXCEPTION_ERROR, $"下载资源失败: {ex.Message}");
             }
         }

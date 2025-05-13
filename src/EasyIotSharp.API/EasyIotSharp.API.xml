@@ -135,11 +135,11 @@
             <returns></returns>
         </member>
         <member name="M:EasyIotSharp.API.Controllers.FileController.DownloadFile(EasyIotSharp.Core.Dto.File.Params.DownloadResourceInput)">
-            <summary>
-            资源下载
-            </summary>
-            <param name="input"></param>
-            <returns></returns>
+            <summary> 
+            资源下载 
+            </summary> 
+            <param name="input"></param> 
+            <returns></returns> 
         </member>
         <member name="M:EasyIotSharp.API.Controllers.HardwareController.GetProtocol(System.String)">
             <summary>

@@ -90,6 +90,11 @@ namespace EasyIotSharp.Core.Services.Rule.Impl
 
             // 查询数据
             var data = await repository.GetAsync(sqlBuilder.ToString());
+            // 检查返回数据是否为空
+            if (data == null || data.Values == null || data.Values.Count == 0 || data.Columns == null)
+            {
+                return new PagedResultDto<AlarmsDto>();
+            }
             var countdata = await repository.GetAsync(countsql);
 
             var dicList = new List<Dictionary<string, object>>();

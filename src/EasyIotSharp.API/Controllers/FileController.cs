@@ -13,6 +13,7 @@ using UPrime.Services.Dto;
 using EasyIotSharp.Core.Services.Hardware;
 using EasyIotSharp.Core.Dto.Enum;
 using EasyIotSharp.Core.Dto;
+using System;
 
 namespace EasyIotSharp.API.Controllers
 {
@@ -80,17 +81,43 @@ namespace EasyIotSharp.API.Controllers
             return res;
         }
 
-        /// <summary>
-        /// 资源下载
-        /// </summary>
-        /// <param name="input"></param>
-        /// <returns></returns>
+        /// <summary> 
+        /// 资源下载 
+        /// </summary> 
+        /// <param name="input"></param> 
+        /// <returns></returns> 
         [HttpPost("/File/Resource/Download")]
         [Authorize]
         public async Task<IActionResult> DownloadFile([FromBody] DownloadResourceInput input)
         {
-            var result = await _resourceService.DownloadResource(input);
-            return File(result.FileStream, result.ContentType, result.FileName);
+            try
+            {
+                // 验证输入
+                if (input == null || string.IsNullOrEmpty(input.Id))
+                {
+                    return BadRequest("资源ID不能为空");
+                }
+
+                var result = await _resourceService.DownloadResource(input);
+
+                // 验证结果
+                if (result == null || result.FileStream == null)
+                {
+                    return NotFound("找不到指定的资源文件");
+                }
+
+                // 验证文件流
+                if (result.FileStream.Length == 0)
+                {
+                    return NotFound("资源文件为空");
+                }
+
+                return File(result.FileStream, result.ContentType, result.FileName);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "下载资源文件时发生错误");
+            }
         }
     }
 }

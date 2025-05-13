@@ -2554,6 +2554,11 @@
             根据id修改一条协议配置的入参类
             </summary>
         </member>
+        <member name="P:EasyIotSharp.Core.Dto.Hardware.Params.UpdateProtocolConfigInput.ProtocolId">
+            <summary>
+            协议id
+            </summary>
+        </member>
         <member name="P:EasyIotSharp.Core.Dto.Hardware.Params.UpdateProtocolConfigInput.Id">
             <summary>
             协议配置id
@@ -8540,14 +8545,7 @@
             </summary>
             <param name="fileName">文件名</param>
         </member>
-        <member name="M:EasyIotSharp.Core.Services.IO.Impl.MinIOFileService.DownloadAsync(System.String,System.String)">
-            <summary>
-            下载文件
-            </summary>
-            <param name="bucketName">桶名</param>
-            <param name="fileName">文件名</param>
-            <returns>文件流</returns>
-        </member>
+        <!-- Badly formed XML comment ignored for member "M:EasyIotSharp.Core.Services.IO.Impl.MinIOFileService.DownloadAsync(System.String,System.String)" -->
         <member name="M:EasyIotSharp.Core.Services.IO.Impl.MinIOFileService.DownloadAsync(System.String)">
             <summary>
             下载文件

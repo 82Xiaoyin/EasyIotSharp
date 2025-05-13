@@ -10,6 +10,10 @@ namespace EasyIotSharp.Core.Dto.Hardware.Params
     public class UpdateProtocolConfigInput
     {
         /// <summary>
+        /// 协议id
+        /// </summary>
+        public string ProtocolId { get; set; }
+        /// <summary>
         /// 协议配置id
         /// </summary>
         public string Id { get; set; }
