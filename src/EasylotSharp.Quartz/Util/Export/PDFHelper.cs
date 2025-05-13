@@ -60,7 +60,7 @@ namespace EasylotSharp.Quartz.Util.Export
             return _simsunFont;
         }
 
-        public  byte[] GenerateHourlyAlarmChart(
+        public  byte[] GenerateHourlyAlarmDayChart(
             IEnumerable<(int Hour, int Count)> hourlyData,
             string title,
             int width = 800,

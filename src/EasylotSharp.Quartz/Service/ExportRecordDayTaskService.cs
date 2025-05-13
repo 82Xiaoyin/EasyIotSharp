@@ -164,7 +164,7 @@ namespace EasylotSharp.Quartz.Service
                             else
                             {
                                 // 生成折线图
-                                chartImage = pDFHelper.GenerateHourlyAlarmChart(
+                                chartImage = pDFHelper.GenerateHourlyAlarmDayChart(
                                    chartData,
                                    $"{project.Name} - 24小时告警趋势",
                                    800,
