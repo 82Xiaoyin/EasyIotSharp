@@ -1,10 +1,10 @@
 ﻿using EasyIotSharp.API.Filters;
+using EasyIotSharp.Core.Caching.Gateways;
 using EasyIotSharp.Core.Dto.Gateways;
 using EasyIotSharp.Core.Dto.Project;
 using EasyIotSharp.Core.Dto.Project.Params;
 using EasyIotSharp.Core.Services.Project;
 using EasyIotSharp.Core.Services.Tenant;
-using EasyIotSharp.GateWay.Core.Socket;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -23,9 +23,10 @@ namespace EasyIotSharp.API.Controllers
         private readonly IGatewayService _gatewayService;
         private readonly IGatewayProtocolService _gatewayProtocolService;
         private readonly ISensorPointService _sensorPointService;
-
+        private readonly IRegisteredGatewayCacheService _registeredGatewayCacheService;
         public ProjectController()
         {
+            _registeredGatewayCacheService = UPrime.UPrimeEngine.Instance.Resolve<IRegisteredGatewayCacheService>();
             _projectBaseService = UPrime.UPrimeEngine.Instance.Resolve<IProjectBaseService>();
             _classificationService = UPrime.UPrimeEngine.Instance.Resolve<IClassificationService>();
             _gatewayService = UPrime.UPrimeEngine.Instance.Resolve<IGatewayService>();
@@ -337,8 +338,8 @@ namespace EasyIotSharp.API.Controllers
         public async Task<UPrimeResponse<PagedResultDto<GatewayConnectionInfo>>> GatewayProtocolLogs([FromBody] QueryGatewayProtocolInput input)
         {
             UPrimeResponse<PagedResultDto<GatewayConnectionInfo>> res = new UPrimeResponse<PagedResultDto<GatewayConnectionInfo>>();
-            var ls = GatewayConnectionManager.Instance.GetAllRegisteredGateways();
-            var connections = GatewayConnectionManager.Instance.GetAllRegisteredGateways().Where(x => x.GatewayId == input.GatewayId).ToList();
+            var connections = _registeredGatewayCacheService.GetAllRegisteredGateways(() => { return new List<GatewayConnectionInfo>(); });
+
             res.Result = new PagedResultDto<GatewayConnectionInfo>() { TotalCount = connections.Count, Items = connections };
             return res;
         }

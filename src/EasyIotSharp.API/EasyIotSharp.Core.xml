@@ -1997,6 +1997,11 @@
             文件流
             </summary>
         </member>
+        <member name="P:EasyIotSharp.Core.Dto.File.Params.UpdateResourceInput.Abbreviation">
+            <summary>
+            租互别名
+            </summary>
+        </member>
         <member name="T:EasyIotSharp.Core.Dto.Gateways.GatewayConnectionInfo">
             <summary>
             网关连接信息
@@ -7837,7 +7842,7 @@
             <summary>
             删除资源
             </summary>
-            <param name="id">资源ID</param>
+            <param name="input">资源input</param>
             <returns>是否成功</returns>
         </member>
         <member name="M:EasyIotSharp.Core.Services.Files.Impl.ResourceService.DownloadResource(EasyIotSharp.Core.Dto.File.Params.DownloadResourceInput)">

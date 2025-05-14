@@ -184,7 +184,7 @@ namespace EasyIotSharp.Core.Services.Files.Impl
         /// <summary>
         /// 删除资源
         /// </summary>
-        /// <param name="id">资源ID</param>
+        /// <param name="input">资源input</param>
         /// <returns>是否成功</returns>
         public async Task<string> DeleteResource(DeleteInput input)
         {

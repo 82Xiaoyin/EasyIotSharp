@@ -47,5 +47,11 @@ namespace EasyIotSharp.Core.Dto.File.Params
         /// 文件流
         /// </summary>
         public IFormFile FormFile { get; set; }
+
+
+        /// <summary>
+        /// 租互别名
+        /// </summary>
+        public string Abbreviation { get; set; }
     }
 }

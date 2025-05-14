@@ -13,7 +13,7 @@
     "restart_delay": "60",
     "args": [
       "EasyIotSharp.API.dll",
-      "--urls=http://*:5546",
+      "--urls=http://*:5005",
       "--env=qa"
     ]
   }
