@@ -5,6 +5,7 @@ using EasyIotSharp.GateWay.Core.Util;
 using System;
 using log4net;
 using UPrime;
+using System.Threading.Tasks;
 
 namespace EasyIotSharp.GateWay.Core.Services
 {
@@ -21,12 +22,12 @@ namespace EasyIotSharp.GateWay.Core.Services
         public void InitializeServices()
         {
             ConsoleUI.ShowSeparator();
-            
+
             // 初始化TCP服务器
             ConsoleUI.ShowProgress("正在初始化TCP服务器 (端口:5020)...", () =>
             {
-                _socketBase.InitTCPServer(new Model.SocketDTO.InitParamsInfo 
-                { 
+                _socketBase.InitTCPServer(new Model.SocketDTO.InitParamsInfo
+                {
                     LocalPort = 5020,
                     Description = "modbusRTU",
                     StartState = true,
@@ -37,9 +38,9 @@ namespace EasyIotSharp.GateWay.Core.Services
             });
 
             // 初始化RabbitMQ
-            ConsoleUI.ShowProgress("正在初始化RabbitMQ服务...", () =>
+            ConsoleUI.ShowProgress("正在初始化RabbitMQ服务...", async () =>
             {
-                EasyIotSharp.GateWay.Core.LoadingConfig.RabbitMQ.RabbitMQConfig.InitMQ();
+                await EasyIotSharp.GateWay.Core.LoadingConfig.RabbitMQ.RabbitMQConfig.InitMQ();
                 Logger.Info("RabbitMQ初始化成功");
             });
             // 初始化MQTT服务
@@ -50,11 +51,11 @@ namespace EasyIotSharp.GateWay.Core.Services
             Logger.Info("项目启动完成");
         }
 
-        public void CleanupServices()
+        public async Task CleanupServices()
         {
             try
             {
-                EasyIotSharp.GateWay.Core.LoadingConfig.RabbitMQ.RabbitMQConfig.CloseAllConnections();
+                await EasyIotSharp.GateWay.Core.LoadingConfig.RabbitMQ.RabbitMQConfig.CloseAllConnections();
                 Logger.Info("RabbitMQ连接已关闭");
                 Logger.Info("所有资源已清理完毕");
             }
