@@ -1,5 +1,6 @@
 /src/EasyIotSharp.API/obj
 /src/EasyIotSharp.API/bin
+/src/EasyIotSharp.API/App_Data
 /src/EasyIotSharp.Core/obj
 /src/EasyIotSharp.Core/bin
 /src/EasyIotSharp.Core.Tests/obj
