@@ -28,7 +28,6 @@
 # 主题格式                           #用途说明
 | -------------------------- | --------------------- |
 | `{项目id}/{设备id}/rawdata`    | 设备原始数据上报（传感器数据、采集数据等） |
-| `{项目id}/{设备id}/rawdata`    | 设备原始数据上报（传感器数据、采集数据等） |
 # 低频数据示例
 {
   "TenantAbbreviation": "ABC", // 租户简称，用于标识数据所属的租户
@@ -78,7 +77,7 @@
     } 
   ]
 }
-|`devices/telemetry/{网关id}`     | 设备数据定期上报     |
+| `{项目id}/{设备id}/status`     | 设备状态上报（在线/离线、电量等）     |
 {
   "timestamp": 1714348795,
   "deviceId": "CX-E-1",
@@ -191,11 +190,48 @@
 # 主题格式                           #用途说明     |
 | ----------------------------------------------------- | ------- |
 | `iot/project/{projectId}/scene/points/showAll`        | 显示所有点位  |
+{
+	"MethodName": "ShowAllDeviceItemUI",
+	"Data": null
+}
 | `iot/project/{projectId}/scene/points/hideAll`        | 隐藏所有点位  |
+{
+	"MethodName": "HideAllDeviceItemUI",
+	"Data": null
+}
 | `iot/project/{projectId}/scene/points/lightUp`        | 点亮UI点位  |
+{
+	"MethodName": "CreateUIPoint",
+	"Data": null
+}
 | `iot/project/{projectId}/scene/points/showAndLightUp` | 显示并点亮点位 |
+{
+	"MethodName": "GetAllDeviceInfo",
+	"Data": [{
+			"deviceId": "QX-01",
+			"deviceColorState": "#112B7E"
+		},
+		{
+			"deviceId": "QX-02",
+			"deviceColorState": "#4EE8D0"
+		}
+	]
+}
 | `iot/project/{projectId}/scene/camera/reset`          | 相机复位    |
+{
+	"MethodName": "ResetCameraView",
+	"Data": null
+}
+
 | `iot/project/{projectId}/scene/camera/focus`          | 相机聚焦到设备 |
+{
+	"MethodName": "SetCameraTarget",
+	"Data": [{
+			"deviceId": "QX-01",
+			"deviceColorState": "#112B7E"
+		}
+	]
+}
 
 
 ####  系统状态同步  ####
