@@ -1,8 +1,6 @@
 ﻿using EasyIotSharp.Core;
 using EasyIotSharp.GateWay.Core.Interfaces;
 using EasyIotSharp.GateWay.Core.Socket.Service;
-using EasyIotSharp.DataProcessor.Processing.Interfaces;
-using EasyIotSharp.DataProcessor.Processing.Implementation;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
@@ -12,6 +10,8 @@ using UPrime.Dependency.Impl;
 using UPrime.Modules;
 using MqttService = EasyIotSharp.GateWay.Core.Socket.Service.MqttService;
 using IMqttService = EasyIotSharp.GateWay.Core.Interfaces.IMqttService;
+using EasyIotSharp.GateWay.Core.Socket.Interfaces;
+using EasyIotSharp.GateWay.Core.Services;
 
 namespace EasyIotSharp.GateWay.Core
 {

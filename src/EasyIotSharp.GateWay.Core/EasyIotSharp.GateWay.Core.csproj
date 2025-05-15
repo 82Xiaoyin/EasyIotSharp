@@ -28,7 +28,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\EasyIotSharp.Core\EasyIotSharp.Core.csproj" />
-    <ProjectReference Include="..\EasyIotSharp.DataProcessor\EasyIotSharp.DataProcessor.csproj" />
   </ItemGroup>
 
   <ItemGroup>
