@@ -417,10 +417,7 @@ namespace EasyIotSharp.DataProcessor.Processing.Implementation
             try
             {
                 Logger.Info($"触发场景联动规则: {rule.Name}, 项目ID: {projectId}");
-                
-                // 保存告警数据到InfluxDB
-                await SaveAlarmToInfluxDBAsync(projectId, rule, dataPoint, conditionResults, TenantAbbreviation);
-                
+               
                 // TODO: 实现规则动作执行逻辑
                 // 这里需要根据实际业务需求实现，可能包括：
                 // 1. 发送通知（短信、邮件、推送）
@@ -446,7 +443,11 @@ namespace EasyIotSharp.DataProcessor.Processing.Implementation
                                 string actionType = action["type"]?.ToString();
                                 Logger.Info($"执行动作: {actionType}");
                                 //通知ID
-                                string alarmSceneId= action["alarmSceneId"]?.ToString();
+                                string alarmConfigId= action["alarmSceneId"]?.ToString();
+
+                                // 保存告警数据到InfluxDB
+                                await SaveAlarmToInfluxDBAsync(projectId, alarmConfigId, rule, dataPoint, conditionResults, TenantAbbreviation);
+
                                 // 根据动作类型执行不同的操作
                                 switch (actionType)
                                 {
@@ -543,7 +544,7 @@ namespace EasyIotSharp.DataProcessor.Processing.Implementation
         /// <param name="dataPoint">触发告警的数据点</param>
         /// <param name="conditionResults">条件评估结果</param>
         /// <returns>保存任务</returns>
-        private async Task SaveAlarmToInfluxDBAsync(string projectId, RuleChainDto rule, Dictionary<string, object> dataPoint, List<string> conditionResults,string TenantAbbreviation)
+        private async Task SaveAlarmToInfluxDBAsync(string projectId,string alarmConfigId, RuleChainDto rule, Dictionary<string, object> dataPoint, List<string> conditionResults,string TenantAbbreviation)
         {
             try
             {
@@ -559,6 +560,7 @@ namespace EasyIotSharp.DataProcessor.Processing.Implementation
                     ["ruleName"] = rule.Name,
                     ["alarmLevel"] ="warning", // 默认为warning级别
                     ["alarmType"] = "scene_linkage",
+                    ["alarmConfigId"] = alarmConfigId,
                     ["message"] = $"触发场景联动规则: {rule.Name}",
                     ["conditionDetails"] = string.Join("; ", conditionResults),
                     ["notified"] = false,

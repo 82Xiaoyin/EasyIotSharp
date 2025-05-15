@@ -16,9 +16,9 @@ namespace EasyIotSharp.Core.Domain.TenantAccount
         /// <summary>
         /// 是否管理员（一个租户只有一个用户拥有一个管理员角色）
         /// 1=管理员
-        /// 2=普通用户
+        /// 0=普通用户
         /// </summary>
-        public int IsManager { get; set; }
+        public bool IsManager { get; set; }
 
         /// <summary>
         /// 用户id

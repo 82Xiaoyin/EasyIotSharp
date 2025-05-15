@@ -239,7 +239,7 @@ namespace EasyIotSharp.Core.Services.TenantAccount.Impl
             {
                 throw new BizException(BizError.BIND_EXCEPTION_ERROR, "用户名重复");
             }
-            var isExistManager = await _soldierRoleRepository.FirstOrDefaultAsync(x => x.IsManager == 2 && x.RoleId == input.RoleId && x.TenantNumId == ContextUser.TenantNumId && x.IsDelete == false);
+            var isExistManager = await _soldierRoleRepository.FirstOrDefaultAsync(x => x.IsManager == false && x.RoleId == input.RoleId && x.TenantNumId == ContextUser.TenantNumId && x.IsDelete == false);
             if (isExistManager.IsNotNull())
             {
                 throw new BizException(BizError.BIND_EXCEPTION_ERROR, "只能有一个用户分配管理员角色");
@@ -248,7 +248,7 @@ namespace EasyIotSharp.Core.Services.TenantAccount.Impl
             model.Id = Guid.NewGuid().ToString().Replace("-", "");
             model.TenantNumId = ContextUser.TenantNumId;
             model.IsSuperAdmin = false;
-            model.IsManager = 2;
+            model.IsManager = false;
             model.Mobile = input.Mobile;
             model.Username = input.Username;
             model.Password = "123456".Md5();
@@ -286,7 +286,7 @@ namespace EasyIotSharp.Core.Services.TenantAccount.Impl
         /// <exception cref="BizException">当手机号已存在时抛出异常</exception>
         /// <remarks>
         /// 创建内容包括：
-        /// 1. 管理员用户信息（IsManager=1）
+        /// 1. 管理员用户信息（IsManager=true）
         /// 2. 创建管理员角色
         /// 3. 用户角色关联
         /// 4. 清除相关缓存
@@ -302,7 +302,7 @@ namespace EasyIotSharp.Core.Services.TenantAccount.Impl
             model.Id = Guid.NewGuid().ToString().Replace("-", "");
             model.TenantNumId = ContextUser.TenantNumId;
             model.IsSuperAdmin = false;
-            model.IsManager = 1;
+            model.IsManager = true;
             model.Mobile = input.Mobile;
             model.Username = input.Username;
             model.Password = "123456".Md5();
@@ -377,7 +377,7 @@ namespace EasyIotSharp.Core.Services.TenantAccount.Impl
 
             if (input.IsUpdateRole == true)
             {
-                var isExistManager = await _soldierRoleRepository.FirstOrDefaultAsync(x => x.IsManager == 2 && x.RoleId == input.RoleId && x.TenantNumId == ContextUser.TenantNumId && x.IsDelete == false);
+                var isExistManager = await _soldierRoleRepository.FirstOrDefaultAsync(x => x.IsManager == false && x.RoleId == input.RoleId && x.TenantNumId == ContextUser.TenantNumId && x.IsDelete == false);
                 if (isExistManager.IsNotNull() && input.Id != isExistManager.Id)
                 {
                     throw new BizException(BizError.BIND_EXCEPTION_ERROR, "只能有一个用户分配管理员角色");

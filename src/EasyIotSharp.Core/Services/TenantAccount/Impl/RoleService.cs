@@ -85,7 +85,7 @@ namespace EasyIotSharp.Core.Services.TenantAccount.Impl
             var roleMedel = new Role();
             roleMedel.Id = Guid.NewGuid().ToString().Replace("-", "");
             roleMedel.TenantNumId = ContextUser.TenantNumId;
-            roleMedel.IsManager = 2;
+            roleMedel.IsManager = false;
             roleMedel.Name = input.Name;
             roleMedel.Remark = input.Remark;
             roleMedel.IsEnable = input.IsEnable;
@@ -124,7 +124,7 @@ namespace EasyIotSharp.Core.Services.TenantAccount.Impl
             var roleMedel = new Role();
             roleMedel.Id = Guid.NewGuid().ToString().Replace("-", "");
             roleMedel.TenantNumId = ContextUser.TenantNumId;
-            roleMedel.IsManager = 1;
+            roleMedel.IsManager = true;
             roleMedel.Name = input.Name;
             roleMedel.Remark = input.Remark;
             roleMedel.IsEnable = true;
@@ -214,7 +214,7 @@ namespace EasyIotSharp.Core.Services.TenantAccount.Impl
             {
                 throw new BizException(BizError.BIND_EXCEPTION_ERROR, "未找到指定数据");
             }
-            if (info.IsManager == 1)
+            if (info.IsManager == true)
             {
                 throw new BizException(BizError.BIND_EXCEPTION_ERROR, "管理员角色不可禁用");
             }
@@ -235,7 +235,7 @@ namespace EasyIotSharp.Core.Services.TenantAccount.Impl
             {
                 throw new BizException(BizError.BIND_EXCEPTION_ERROR, "未找到指定数据");
             }
-            if (info.IsManager == 1)
+            if (info.IsManager == true)
             {
                 throw new BizException(BizError.BIND_EXCEPTION_ERROR, "管理员角色不可删除");
             }

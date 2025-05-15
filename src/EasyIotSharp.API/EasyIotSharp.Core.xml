@@ -1503,7 +1503,7 @@
             <summary>
             是否管理员（一个租户只有一个用户拥有一个管理员角色）
             1=管理员
-            2=普通用户
+            0=普通用户
             </summary>
         </member>
         <member name="P:EasyIotSharp.Core.Domain.TenantAccount.Role.Name">
@@ -1560,7 +1560,7 @@
             <summary>
             是否管理员
             1=管理员
-            2=普通用户
+            0=普通用户
             </summary>
         </member>
         <member name="P:EasyIotSharp.Core.Domain.TenantAccount.Soldier.Mobile">
@@ -1617,7 +1617,7 @@
             <summary>
             是否管理员（一个租户只有一个用户拥有一个管理员角色）
             1=管理员
-            2=普通用户
+            0=普通用户
             </summary>
         </member>
         <member name="P:EasyIotSharp.Core.Domain.TenantAccount.SoldierRole.SoldierId">
@@ -5117,7 +5117,7 @@
             <summary>
             是否管理员
             1=管理员
-            2=普通用户
+            0=普通用户
             </summary>
         </member>
         <member name="P:EasyIotSharp.Core.Dto.TenantAccount.SoldierDto.Mobile">
@@ -9754,7 +9754,7 @@
             <exception cref="T:EasyIotSharp.Core.BizException">当手机号已存在时抛出异常</exception>
             <remarks>
             创建内容包括：
-            1. 管理员用户信息（IsManager=1）
+            1. 管理员用户信息（IsManager=true）
             2. 创建管理员角色
             3. 用户角色关联
             4. 清除相关缓存

@@ -53,9 +53,9 @@ namespace EasyIotSharp.Core.Dto.TenantAccount
         /// <summary>
         /// 是否管理员
         /// 1=管理员
-        /// 2=普通用户
+        /// 0=普通用户
         /// </summary>
-        public int IsManager { get; set; }
+        public bool IsManager { get; set; }
 
         /// <summary>
         /// 手机号
